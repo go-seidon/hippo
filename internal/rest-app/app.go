@@ -76,6 +76,14 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 			opts = append(opts, debugOpt)
 		}
 
+		if option.Config.AppEnv == app.ENV_LOCAL || option.Config.AppEnv == app.ENV_TEST {
+			prettyOpt := logging.EnablePrettyPrint()
+			opts = append(opts, prettyOpt)
+		}
+
+		stackSkipOpt := logging.AddStackSkip("github.com/go-seidon/local/internal/logging")
+		opts = append(opts, stackSkipOpt)
+
 		logger = logging.NewLogrusLog(opts...)
 	}
 
