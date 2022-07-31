@@ -68,7 +68,7 @@ func (l *logrusLog) WithFields(fs map[string]interface{}) Logger {
 }
 
 func (l *logrusLog) WithError(err error) Logger {
-	entry := l.client.WithError(err)
+	entry := l.client.WithField(FIELD_ERROR, err)
 	nl := &logrusLog{
 		client: entry,
 	}
@@ -84,22 +84,29 @@ func (l *logrusLog) WithContext(ctx context.Context) Logger {
 }
 
 func NewLogrusLog(opts ...Option) *logrusLog {
-	option := LogOption{}
+	option := LogOption{
+		StackSkip: []string{
+			"github.com/sirupsen/logrus",
+		},
+	}
 	for _, opt := range opts {
 		opt(&option)
 	}
 
 	client := logrus.New()
 	client.SetOutput(os.Stdout)
-	client.SetFormatter(&logrus.JSONFormatter{})
+	client.SetFormatter(&GoFormatter{
+		PrettyPrint: option.PrettyPrintEnabled,
+		StackSkip:   option.StackSkip,
+	})
 	if option.DebuggingEnabled {
 		client.SetLevel(logrus.DebugLevel)
 	}
 
 	appCtx := logrus.Fields{}
-	if option.AppName != "" && option.AppVersion != "" {
+	if option.AppCtxEnabled {
 		appCtx = logrus.Fields{
-			"service": map[string]interface{}{
+			FIELD_SERVICE: map[string]interface{}{
 				"name":    option.AppName,
 				"version": option.AppVersion,
 			},
