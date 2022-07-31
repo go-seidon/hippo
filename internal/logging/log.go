@@ -2,6 +2,11 @@ package logging
 
 import "context"
 
+const (
+	FIELD_SERVICE = "service"
+	FIELD_ERROR   = "error"
+)
+
 type Logger interface {
 	SimpleLog
 	FormatedLog
@@ -36,17 +41,35 @@ type CustomLog interface {
 	WithContext(ctx context.Context) Logger
 }
 
-type LogOption struct {
-	AppName    string
-	AppVersion string
+type LogMessage struct {
+	Timestamp      string `json:"timestamp"`
+	Message        string `json:"message"`
+	Severity       string `json:"severity"`
+	ReportLocation struct {
+		FilePath     string `json:"filePath,omitempty"`
+		LineNumber   int    `json:"lineNumber,omitempty"`
+		FunctionName string `json:"functionName,omitempty"`
+	} `json:"reportLocation,omitempty"`
+	Service  interface{}            `json:"service,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
 
-	DebuggingEnabled bool
+type LogOption struct {
+	AppCtxEnabled bool
+	AppName       string
+	AppVersion    string
+
+	DebuggingEnabled   bool
+	PrettyPrintEnabled bool
+
+	StackSkip []string
 }
 
 type Option func(*LogOption)
 
 func WithAppContext(name, version string) Option {
 	return func(lo *LogOption) {
+		lo.AppCtxEnabled = true
 		lo.AppName = name
 		lo.AppVersion = version
 	}
@@ -55,5 +78,17 @@ func WithAppContext(name, version string) Option {
 func EnableDebugging() Option {
 	return func(lo *LogOption) {
 		lo.DebuggingEnabled = true
+	}
+}
+
+func EnablePrettyPrint() Option {
+	return func(lo *LogOption) {
+		lo.PrettyPrintEnabled = true
+	}
+}
+
+func AddStackSkip(pkg string) Option {
+	return func(lo *LogOption) {
+		lo.StackSkip = append(lo.StackSkip, pkg)
 	}
 }
