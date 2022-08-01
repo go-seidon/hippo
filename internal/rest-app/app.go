@@ -181,6 +181,21 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 	generalRouter := router.NewRoute().Subrouter()
 	fileRouter := router.NewRoute().Subrouter()
 
+	requestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
+		Logger: logger,
+		IngoreURI: map[string]bool{
+			"/health": true,
+		},
+		Header: map[string]string{
+			"X-Request-Id":     "requestId",
+			"X-Correlation-Id": "correlationId",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	router.Use(requestLogMiddleware)
 	router.Use(DefaultHeaderMiddleware)
 	router.HandleFunc(
 		"/",
