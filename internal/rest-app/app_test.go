@@ -77,6 +77,7 @@ var _ = Describe("Response Package", func() {
 					rest_app.WithLogger(log),
 					rest_app.WithConfig(app.Config{
 						DBProvider: app.DB_PROVIDER_MYSQL,
+						AppEnv:     "local",
 					}),
 				)
 

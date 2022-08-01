@@ -351,11 +351,6 @@ var _ = Describe("Middleware Package", func() {
 
 				rw.
 					EXPECT().
-					WriteHeader(gomock.Eq(200)).
-					Times(1)
-
-				rw.
-					EXPECT().
 					Write(gomock.Eq([]byte{})).
 					Return(1, nil).
 					Times(1)
@@ -364,7 +359,6 @@ var _ = Describe("Middleware Package", func() {
 					EXPECT().
 					ServeHTTP(gomock.Any(), gomock.Eq(req)).
 					Do(func(w http.ResponseWriter, r *http.Request) {
-						w.WriteHeader(200)
 						w.Write([]byte{})
 					}).
 					Times(1)
