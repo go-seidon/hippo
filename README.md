@@ -7,19 +7,11 @@
 No doc right now
 
 ## Todo
-1. Add verbose logging:
-```json
-{
-  "correlation_id": "",
-  "ip_address": "",
-  "received_at": "",
-  "execution_time": "",
-  "call_stack": "",
-}
-```
-2. Inject logger to mysql instance (logging to stdout with plaintext)
-3. Separate db write and read
-4. Add `repository-postgre` implementation
+1. Inject logger to mysql instance & http server instance
+2. Separate db write and read
+3. Add docker image
+4. Deploy dev
+5. Add `repository-mongo` implementation
 
 ## Nice to have
 1. Separate findFile query in DeleteFile and RetrieveFile
@@ -29,6 +21,9 @@ No doc right now
 5. Access file using custom link with certain limitation such as access duration, attribute user_id, etc
 6. Change NewDailyRotate using optional param
 7. Resize image capability (?width=720&height=480)
+8. Add `repository-postgre` implementation
+9. Add grpc app
+10. Add hybrid app
 
 ## Technical Stack
 1. Transport layer

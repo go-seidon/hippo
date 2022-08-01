@@ -1,14 +1,14 @@
 package logging
 
 import (
+	"context"
 	"os"
 
-	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	"github.com/sirupsen/logrus"
 )
 
 type logrusLog struct {
-	client *logrus.Logger
+	client *logrus.Entry
 }
 
 func (l *logrusLog) Info(args ...interface{}) {
@@ -60,29 +60,62 @@ func (l *logrusLog) Warnln(args ...interface{}) {
 }
 
 func (l *logrusLog) WithFields(fs map[string]interface{}) Logger {
-	l.client = l.client.WithFields(fs).Logger
-	return l
+	entry := l.client.WithFields(fs)
+	nl := &logrusLog{
+		client: entry,
+	}
+	return nl
+}
+
+func (l *logrusLog) WithError(err error) Logger {
+	entry := l.client.WithField(FIELD_ERROR, err)
+	nl := &logrusLog{
+		client: entry,
+	}
+	return nl
+}
+
+func (l *logrusLog) WithContext(ctx context.Context) Logger {
+	entry := l.client.WithContext(ctx)
+	nl := &logrusLog{
+		client: entry,
+	}
+	return nl
 }
 
 func NewLogrusLog(opts ...Option) *logrusLog {
-	option := LogOption{}
+	option := LogOption{
+		StackSkip: []string{
+			"github.com/sirupsen/logrus",
+		},
+	}
 	for _, opt := range opts {
 		opt(&option)
 	}
 
-	c := logrus.New()
-	c.SetFormatter(stackdriver.NewFormatter(
-		stackdriver.WithService(option.AppName),
-		stackdriver.WithVersion(option.AppVersion),
-	))
-	c.SetOutput(os.Stdout)
-
+	client := logrus.New()
+	client.SetOutput(os.Stdout)
+	client.SetFormatter(&GoFormatter{
+		PrettyPrint: option.PrettyPrintEnabled,
+		StackSkip:   option.StackSkip,
+	})
 	if option.DebuggingEnabled {
-		c.SetLevel(logrus.DebugLevel)
+		client.SetLevel(logrus.DebugLevel)
 	}
 
+	appCtx := logrus.Fields{}
+	if option.AppCtxEnabled {
+		appCtx = logrus.Fields{
+			FIELD_SERVICE: map[string]interface{}{
+				"name":    option.AppName,
+				"version": option.AppVersion,
+			},
+		}
+	}
+	entry := client.WithFields(appCtx)
+
 	l := &logrusLog{
-		client: c,
+		client: entry,
 	}
 	return l
 }

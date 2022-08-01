@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	logging "github.com/go-seidon/local/internal/logging"
@@ -228,6 +229,34 @@ func (m *MockLogger) Warnln(msg ...interface{}) {
 func (mr *MockLoggerMockRecorder) Warnln(msg ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warnln", reflect.TypeOf((*MockLogger)(nil).Warnln), msg...)
+}
+
+// WithContext mocks base method.
+func (m *MockLogger) WithContext(ctx context.Context) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithContext", ctx)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// WithContext indicates an expected call of WithContext.
+func (mr *MockLoggerMockRecorder) WithContext(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithContext", reflect.TypeOf((*MockLogger)(nil).WithContext), ctx)
+}
+
+// WithError mocks base method.
+func (m *MockLogger) WithError(err error) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithError", err)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// WithError indicates an expected call of WithError.
+func (mr *MockLoggerMockRecorder) WithError(err interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithError", reflect.TypeOf((*MockLogger)(nil).WithError), err)
 }
 
 // WithFields mocks base method.

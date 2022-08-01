@@ -3,12 +3,15 @@ package rest_app_test
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/go-seidon/local/internal/auth"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Middleware Package", func() {
@@ -186,6 +189,280 @@ var _ = Describe("Middleware Package", func() {
 				handler.
 					EXPECT().
 					ServeHTTP(gomock.Eq(rw), gomock.Eq(req)).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+	})
+
+	Context("NewRequestLogMiddleware", Label("unit"), func() {
+		var (
+			logger  *mock.MockLogger
+			clock   *mock.MockClock
+			handler *mock.MockHandler
+			m       http.Handler
+
+			rw               *mock.MockResponseWriter
+			req              *http.Request
+			currentTimestamp time.Time
+		)
+
+		BeforeEach(func() {
+			t := GinkgoT()
+			ctrl := gomock.NewController(t)
+			logger = mock.NewMockLogger(ctrl)
+			clock = mock.NewMockClock(ctrl)
+			handler = mock.NewMockHandler(ctrl)
+			fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				Logger: logger,
+				Clock:  clock,
+			})
+			m = fn(handler)
+
+			rw = mock.NewMockResponseWriter(ctrl)
+			req = &http.Request{
+				Header:     http.Header{},
+				Method:     http.MethodPost,
+				RequestURI: "/custom-endpoint",
+				URL: &url.URL{
+					Host: "localhost",
+				},
+			}
+			currentTimestamp = time.Now()
+		})
+
+		When("logger is not specified", func() {
+			It("should return error", func() {
+				fn, err := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: nil,
+					Clock:  clock,
+				})
+
+				Expect(fn).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("logger is not specified")))
+			})
+		})
+
+		When("ignore uri is specified", func() {
+			It("should return result", func() {
+				req.RequestURI = "uri"
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  clock,
+					IngoreURI: map[string]bool{
+						"uri": true,
+					},
+				})
+				m = fn(handler)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Eq(rw), gomock.Eq(req)).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+
+		When("ignore uri is not specified", func() {
+			It("should return result", func() {
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  clock,
+				})
+				m = fn(handler)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTimestamp).
+					Times(1)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Any(), gomock.Eq(req)).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Error(gomock.Eq("request: POST /custom-endpoint")).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+
+		When("header is specified", func() {
+			It("should return result", func() {
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  clock,
+					Header: map[string]string{
+						"Authorization": "auth",
+					},
+				})
+				m = fn(handler)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTimestamp).
+					Times(1)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Any(), gomock.Eq(req)).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Error(gomock.Eq("request: POST /custom-endpoint")).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+
+		When("clock is not specified", func() {
+			It("should return result", func() {
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  nil,
+				})
+				m = fn(handler)
+
+				clock.
+					EXPECT().
+					Now().
+					Times(0)
+
+				rw.
+					EXPECT().
+					Write(gomock.Eq([]byte{})).
+					Return(1, nil).
+					Times(1)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Any(), gomock.Eq(req)).
+					Do(func(w http.ResponseWriter, r *http.Request) {
+						w.Write([]byte{})
+					}).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Info(gomock.Eq("request: POST /custom-endpoint")).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+
+		When("request is success", func() {
+			It("should return result", func() {
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  clock,
+				})
+				m = fn(handler)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTimestamp).
+					Times(1)
+
+				rw.
+					EXPECT().
+					WriteHeader(gomock.Eq(200)).
+					Times(1)
+
+				rw.
+					EXPECT().
+					Write(gomock.Eq([]byte{})).
+					Return(1, nil).
+					Times(1)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Any(), gomock.Eq(req)).
+					Do(func(w http.ResponseWriter, r *http.Request) {
+						w.WriteHeader(200)
+						w.Write([]byte{})
+					}).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Info(gomock.Eq("request: POST /custom-endpoint")).
+					Times(1)
+
+				m.ServeHTTP(rw, req)
+			})
+		})
+
+		When("client request error", func() {
+			It("should return result", func() {
+				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+					Logger: logger,
+					Clock:  clock,
+				})
+				m = fn(handler)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTimestamp).
+					Times(1)
+
+				rw.
+					EXPECT().
+					WriteHeader(gomock.Eq(400)).
+					Times(1)
+
+				handler.
+					EXPECT().
+					ServeHTTP(gomock.Any(), gomock.Eq(req)).
+					Do(func(w http.ResponseWriter, r *http.Request) {
+						w.WriteHeader(400)
+					}).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Warn(gomock.Eq("request: POST /custom-endpoint")).
 					Times(1)
 
 				m.ServeHTTP(rw, req)

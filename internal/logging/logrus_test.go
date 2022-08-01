@@ -1,6 +1,9 @@
 package logging_test
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/go-seidon/local/internal/logging"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -253,6 +256,42 @@ var _ = Describe("Logrus Package", func() {
 		When("success send log", func() {
 			It("should return nil", func() {
 				res := logger.WithFields(map[string]interface{}{})
+
+				Expect(res).ToNot(BeNil())
+			})
+		})
+	})
+
+	Context("WithError function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("success send log", func() {
+			It("should return nil", func() {
+				res := logger.WithError(fmt.Errorf("some error"))
+
+				Expect(res).ToNot(BeNil())
+			})
+		})
+	})
+
+	Context("WithContext function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("success send log", func() {
+			It("should return nil", func() {
+				res := logger.WithContext(context.Background())
 
 				Expect(res).ToNot(BeNil())
 			})
