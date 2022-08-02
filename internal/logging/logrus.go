@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -81,6 +82,14 @@ func (l *logrusLog) WithContext(ctx context.Context) Logger {
 		client: entry,
 	}
 	return nl
+}
+
+func (l *logrusLog) WriterLevel(level string) io.Writer {
+	lvl, err := logrus.ParseLevel(level)
+	if err != nil {
+		lvl = logrus.ErrorLevel
+	}
+	return l.client.WriterLevel(lvl)
 }
 
 func NewLogrusLog(opts ...Option) *logrusLog {
