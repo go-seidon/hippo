@@ -73,6 +73,11 @@ var _ = Describe("Response Package", func() {
 
 		When("parameter is specified", func() {
 			It("should return result", func() {
+				log.
+					EXPECT().
+					WriterLevel(gomock.Eq("error")).
+					Times(1)
+
 				res, err := rest_app.NewRestApp(
 					rest_app.WithLogger(log),
 					rest_app.WithConfig(app.Config{

@@ -3,6 +3,7 @@ package rest_app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -236,8 +237,9 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 	server := option.Server
 	if option.Server == nil {
 		server = &http.Server{
-			Addr:    raCfg.GetAddress(),
-			Handler: router,
+			Addr:     raCfg.GetAddress(),
+			Handler:  router,
+			ErrorLog: log.New(logger.WriterLevel("error"), "", 0),
 		}
 	}
 
