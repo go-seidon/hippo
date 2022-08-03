@@ -52,15 +52,6 @@ var _ = Describe("Handler Package", func() {
 					Message: "resource not found",
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: NotFoundHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: NotFoundHandler").
-					Times(1)
-
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -114,15 +105,6 @@ var _ = Describe("Handler Package", func() {
 					Code:    "ERROR",
 					Message: "method is not allowed",
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: MethodNotAllowedHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: MethodNotAllowedHandler").
-					Times(1)
 
 				serializer.
 					EXPECT().
@@ -189,15 +171,6 @@ var _ = Describe("Handler Package", func() {
 					},
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: RootHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RootHandler").
-					Times(1)
-
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -248,15 +221,6 @@ var _ = Describe("Handler Package", func() {
 					Code:    "ERROR",
 					Message: err.Error(),
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: HealthCheckHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: HealthCheckHandler").
-					Times(1)
 
 				healthService.
 					EXPECT().
@@ -348,15 +312,6 @@ var _ = Describe("Handler Package", func() {
 					Message: "success check service health",
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: HealthCheckHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: HealthCheckHandler").
-					Times(1)
-
 				healthService.
 					EXPECT().
 					Check().
@@ -420,15 +375,6 @@ var _ = Describe("Handler Package", func() {
 					Message: err.Error(),
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: DeleteFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: DeleteFileHandler").
-					Times(1)
-
 				deleteService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
@@ -464,15 +410,6 @@ var _ = Describe("Handler Package", func() {
 					Code:    "NOT_FOUND",
 					Message: err.Error(),
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: DeleteFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: DeleteFileHandler").
-					Times(1)
 
 				deleteService.
 					EXPECT().
@@ -514,15 +451,6 @@ var _ = Describe("Handler Package", func() {
 						DeletedAt: res.DeletedAt.UnixMilli(),
 					},
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: DeleteFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: DeleteFileHandler").
-					Times(1)
 
 				deleteService.
 					EXPECT().
@@ -592,15 +520,6 @@ var _ = Describe("Handler Package", func() {
 					Message: err.Error(),
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: RetrieveFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RetrieveFileHandler").
-					Times(1)
-
 				retrieveService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
@@ -636,15 +555,6 @@ var _ = Describe("Handler Package", func() {
 					Code:    "NOT_FOUND",
 					Message: err.Error(),
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: RetrieveFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RetrieveFileHandler").
-					Times(1)
 
 				retrieveService.
 					EXPECT().
@@ -694,15 +604,6 @@ var _ = Describe("Handler Package", func() {
 					Code:    "ERROR",
 					Message: "read error",
 				}
-
-				log.
-					EXPECT().
-					Debug("In function: RetrieveFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RetrieveFileHandler").
-					Times(1)
 
 				retrieveService.
 					EXPECT().
@@ -754,15 +655,6 @@ var _ = Describe("Handler Package", func() {
 					DeletedAt: nil,
 				}
 
-				log.
-					EXPECT().
-					Debug("In function: RetrieveFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RetrieveFileHandler").
-					Times(1)
-
 				retrieveService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
@@ -785,15 +677,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("mimetype is not empty", func() {
 			It("should write response", func() {
-
-				log.
-					EXPECT().
-					Debug("In function: RetrieveFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: RetrieveFileHandler").
-					Times(1)
 
 				fileData.
 					EXPECT().
@@ -882,14 +765,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed parse form file", func() {
 			It("should return error", func() {
-				log.
-					EXPECT().
-					Debug("In function: UploadFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: UploadFileHandler").
-					Times(1)
 
 				r, _ := http.NewRequest(http.MethodPost, "/v1/file", nil)
 				w := httptest.NewRecorder()
@@ -908,14 +783,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed upload file", func() {
 			It("should return error", func() {
-				log.
-					EXPECT().
-					Debug("In function: UploadFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: UploadFileHandler").
-					Times(1)
 
 				locator.
 					EXPECT().
@@ -945,14 +812,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
-				log.
-					EXPECT().
-					Debug("In function: UploadFileHandler").
-					Times(1)
-				log.
-					EXPECT().
-					Debug("Returning function: UploadFileHandler").
-					Times(1)
 
 				locator.
 					EXPECT().

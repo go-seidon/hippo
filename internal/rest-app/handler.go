@@ -19,8 +19,6 @@ import (
 
 func NewNotFoundHandler(log logging.Logger, s serialization.Serializer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: NotFoundHandler")
-		defer log.Debug("Returning function: NotFoundHandler")
 
 		w.Header().Set("Content-Type", "application/json")
 		Response(
@@ -34,8 +32,6 @@ func NewNotFoundHandler(log logging.Logger, s serialization.Serializer) http.Han
 
 func NewMethodNotAllowedHandler(log logging.Logger, s serialization.Serializer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: MethodNotAllowedHandler")
-		defer log.Debug("Returning function: MethodNotAllowedHandler")
 
 		w.Header().Set("Content-Type", "application/json")
 		Response(
@@ -49,8 +45,6 @@ func NewMethodNotAllowedHandler(log logging.Logger, s serialization.Serializer) 
 
 func NewRootHandler(log logging.Logger, s serialization.Serializer, config *RestAppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: RootHandler")
-		defer log.Debug("Returning function: RootHandler")
 
 		d := struct {
 			AppName    string `json:"app_name"`
@@ -65,8 +59,6 @@ func NewRootHandler(log logging.Logger, s serialization.Serializer, config *Rest
 
 func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healthService healthcheck.HealthCheck) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: HealthCheckHandler")
-		defer log.Debug("Returning function: HealthCheckHandler")
 
 		r, err := healthService.Check()
 		if err != nil {
@@ -127,8 +119,6 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 
 func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, deleter deleting.Deleter) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: DeleteFileHandler")
-		defer log.Debug("Returning function: DeleteFileHandler")
 
 		vars := mux.Vars(req)
 
@@ -173,8 +163,6 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 
 func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retriever retrieving.Retriever) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: RetrieveFileHandler")
-		defer log.Debug("Returning function: RetrieveFileHandler")
 
 		vars := mux.Vars(req)
 
@@ -227,8 +215,6 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 
 func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, uploader uploading.Uploader, locator uploading.UploadLocation, config *RestAppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("In function: UploadFileHandler")
-		defer log.Debug("Returning function: UploadFileHandler")
 
 		// set form max size + add 1KB (non file size estimation if any)
 		req.Body = http.MaxBytesReader(w, req.Body, config.UploadFormSize+1024)
