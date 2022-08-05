@@ -31,13 +31,18 @@ var _ = Describe("Middleware Package", func() {
 			r = &http.Request{}
 			w = mock.NewMockResponseWriter(ctrl)
 			httpHandler = mock.NewMockHandler(ctrl)
-			middleware = rest_app.DefaultHeaderMiddleware(httpHandler)
+			fn := rest_app.NewDefaultMiddleware(rest_app.DefaultMiddlewareParam{
+				CorrelationIdHeaderKey: "X-Correlation-Id",
+				CorrelationIdCtxKey:    rest_app.CorrelationIdCtxKey,
+			})
+			middleware = fn(httpHandler)
 		})
 
 		When("middleware is called", func() {
 			It("should call serve http", func() {
-				httpHandler.EXPECT().
-					ServeHTTP(gomock.Eq(w), gomock.Eq(r)).
+				httpHandler.
+					EXPECT().
+					ServeHTTP(gomock.Eq(w), gomock.Any()).
 					Times(1)
 
 				w.EXPECT().

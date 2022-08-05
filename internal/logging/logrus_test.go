@@ -254,7 +254,7 @@ var _ = Describe("Logrus Package", func() {
 		})
 
 		When("success send log", func() {
-			It("should return nil", func() {
+			It("should return result", func() {
 				res := logger.WithFields(map[string]interface{}{})
 
 				Expect(res).ToNot(BeNil())
@@ -272,7 +272,7 @@ var _ = Describe("Logrus Package", func() {
 		})
 
 		When("success send log", func() {
-			It("should return nil", func() {
+			It("should return result", func() {
 				res := logger.WithError(fmt.Errorf("some error"))
 
 				Expect(res).ToNot(BeNil())
@@ -290,8 +290,34 @@ var _ = Describe("Logrus Package", func() {
 		})
 
 		When("success send log", func() {
-			It("should return nil", func() {
+			It("should return result", func() {
 				res := logger.WithContext(context.Background())
+
+				Expect(res).ToNot(BeNil())
+			})
+		})
+	})
+
+	Context("WriterLevel function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("level is valid", func() {
+			It("should return result", func() {
+				res := logger.WriterLevel("warn")
+
+				Expect(res).ToNot(BeNil())
+			})
+		})
+
+		When("level is invalid", func() {
+			It("should return result", func() {
+				res := logger.WriterLevel("invalid-level")
 
 				Expect(res).ToNot(BeNil())
 			})

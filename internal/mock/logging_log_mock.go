@@ -6,6 +6,7 @@ package mock
 
 import (
 	context "context"
+	io "io"
 	reflect "reflect"
 
 	logging "github.com/go-seidon/local/internal/logging"
@@ -273,6 +274,20 @@ func (mr *MockLoggerMockRecorder) WithFields(fs interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithFields", reflect.TypeOf((*MockLogger)(nil).WithFields), fs)
 }
 
+// WriterLevel mocks base method.
+func (m *MockLogger) WriterLevel(level string) io.Writer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriterLevel", level)
+	ret0, _ := ret[0].(io.Writer)
+	return ret0
+}
+
+// WriterLevel indicates an expected call of WriterLevel.
+func (mr *MockLoggerMockRecorder) WriterLevel(level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriterLevel", reflect.TypeOf((*MockLogger)(nil).WriterLevel), level)
+}
+
 // MockSimpleLog is a mock of SimpleLog interface.
 type MockSimpleLog struct {
 	ctrl     *gomock.Controller
@@ -536,4 +551,83 @@ func (m *MockLineLog) Warnln(msg ...interface{}) {
 func (mr *MockLineLogMockRecorder) Warnln(msg ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warnln", reflect.TypeOf((*MockLineLog)(nil).Warnln), msg...)
+}
+
+// MockCustomLog is a mock of CustomLog interface.
+type MockCustomLog struct {
+	ctrl     *gomock.Controller
+	recorder *MockCustomLogMockRecorder
+}
+
+// MockCustomLogMockRecorder is the mock recorder for MockCustomLog.
+type MockCustomLogMockRecorder struct {
+	mock *MockCustomLog
+}
+
+// NewMockCustomLog creates a new mock instance.
+func NewMockCustomLog(ctrl *gomock.Controller) *MockCustomLog {
+	mock := &MockCustomLog{ctrl: ctrl}
+	mock.recorder = &MockCustomLogMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCustomLog) EXPECT() *MockCustomLogMockRecorder {
+	return m.recorder
+}
+
+// WithContext mocks base method.
+func (m *MockCustomLog) WithContext(ctx context.Context) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithContext", ctx)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// WithContext indicates an expected call of WithContext.
+func (mr *MockCustomLogMockRecorder) WithContext(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithContext", reflect.TypeOf((*MockCustomLog)(nil).WithContext), ctx)
+}
+
+// WithError mocks base method.
+func (m *MockCustomLog) WithError(err error) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithError", err)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// WithError indicates an expected call of WithError.
+func (mr *MockCustomLogMockRecorder) WithError(err interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithError", reflect.TypeOf((*MockCustomLog)(nil).WithError), err)
+}
+
+// WithFields mocks base method.
+func (m *MockCustomLog) WithFields(fs map[string]interface{}) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithFields", fs)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// WithFields indicates an expected call of WithFields.
+func (mr *MockCustomLogMockRecorder) WithFields(fs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithFields", reflect.TypeOf((*MockCustomLog)(nil).WithFields), fs)
+}
+
+// WriterLevel mocks base method.
+func (m *MockCustomLog) WriterLevel(level string) io.Writer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriterLevel", level)
+	ret0, _ := ret[0].(io.Writer)
+	return ret0
+}
+
+// WriterLevel indicates an expected call of WriterLevel.
+func (mr *MockCustomLogMockRecorder) WriterLevel(level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriterLevel", reflect.TypeOf((*MockCustomLog)(nil).WriterLevel), level)
 }

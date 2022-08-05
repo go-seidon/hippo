@@ -3,6 +3,7 @@ package rest_app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -21,6 +22,11 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+type ContextKey string
+
+const CorrelationIdKey = "correlationId"
+const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
 type RestApp struct {
 	config *RestAppConfig
@@ -181,22 +187,24 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 	generalRouter := router.NewRoute().Subrouter()
 	fileRouter := router.NewRoute().Subrouter()
 
-	requestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
+	RequestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
 		Logger: logger,
 		IngoreURI: map[string]bool{
 			"/health": true,
 		},
 		Header: map[string]string{
-			"X-Request-Id":     "requestId",
-			"X-Correlation-Id": "correlationId",
+			"X-Correlation-Id": CorrelationIdKey,
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	router.Use(requestLogMiddleware)
-	router.Use(DefaultHeaderMiddleware)
+	router.Use(RequestLogMiddleware)
+	router.Use(NewDefaultMiddleware(DefaultMiddlewareParam{
+		CorrelationIdHeaderKey: "X-Correlation-Id",
+		CorrelationIdCtxKey:    CorrelationIdCtxKey,
+	}))
 	router.HandleFunc(
 		"/",
 		NewRootHandler(logger, serializer, raCfg),
@@ -229,15 +237,16 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	basicAuthMiddleware := NewBasicAuthMiddleware(basicAuth, serializer)
-	generalRouter.Use(basicAuthMiddleware)
-	fileRouter.Use(basicAuthMiddleware)
+	BasicAuthMiddleware := NewBasicAuthMiddleware(basicAuth, serializer)
+	generalRouter.Use(BasicAuthMiddleware)
+	fileRouter.Use(BasicAuthMiddleware)
 
 	server := option.Server
 	if option.Server == nil {
 		server = &http.Server{
-			Addr:    raCfg.GetAddress(),
-			Handler: router,
+			Addr:     raCfg.GetAddress(),
+			Handler:  router,
+			ErrorLog: log.New(logger.WriterLevel("error"), "", 0),
 		}
 	}
 

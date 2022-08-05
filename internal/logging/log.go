@@ -1,6 +1,9 @@
 package logging
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 const (
 	FIELD_SERVICE = "service"
@@ -39,6 +42,7 @@ type CustomLog interface {
 	WithFields(fs map[string]interface{}) Logger
 	WithError(err error) Logger
 	WithContext(ctx context.Context) Logger
+	WriterLevel(level string) io.Writer
 }
 
 type LogMessage struct {

@@ -13,12 +13,25 @@ import (
 	"github.com/go-seidon/local/internal/serialization"
 )
 
-func DefaultHeaderMiddleware(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+type DefaultMiddlewareParam struct {
+	CorrelationIdHeaderKey string
+	CorrelationIdCtxKey    ContextKey
+}
 
-		h.ServeHTTP(w, r)
-	})
+func NewDefaultMiddleware(p DefaultMiddlewareParam) func(h http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			correlationId := r.Header.Get(p.CorrelationIdHeaderKey)
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, p.CorrelationIdCtxKey, correlationId)
+
+			r = r.WithContext(ctx)
+
+			h.ServeHTTP(w, r)
+		})
+	}
 }
 
 func NewBasicAuthMiddleware(a auth.BasicAuth, s serialization.Serializer) func(h http.Handler) http.Handler {
