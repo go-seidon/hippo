@@ -7,11 +7,10 @@
 No doc right now
 
 ## Todo
-1. Inject logger to mysql instance & http server instance
-2. Separate db write and read
-3. Add docker image
-4. Deploy dev
-5. Add `repository-mongo` implementation
+1. Separate db write and read
+2. Add docker image
+3. Deploy dev
+4. Add `repository-mongo` implementation
 
 ## Nice to have
 1. Separate findFile query in DeleteFile and RetrieveFile
@@ -24,6 +23,8 @@ No doc right now
 8. Add `repository-postgre` implementation
 9. Add grpc app
 10. Add hybrid app
+11. Inject logger to mysql instance
+12. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
 
 ## Technical Stack
 1. Transport layer
