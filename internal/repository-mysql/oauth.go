@@ -11,10 +11,13 @@ import (
 )
 
 type oAuthRepository struct {
-	dbClient *sql.DB
-	clock    datetime.Clock
+	mClient *sql.DB
+	rClient *sql.DB
+	clock   datetime.Clock
 }
 
+// @note: use master client to avoid
+// unable to modify state when replica database is down
 func (r *oAuthRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
 	sqlQuery := `
 		SELECT 
@@ -24,7 +27,7 @@ func (r *oAuthRepository) FindClient(ctx context.Context, p repository.FindClien
 	`
 
 	var res repository.FindClientResult
-	row := r.dbClient.QueryRow(sqlQuery, p.ClientId)
+	row := r.mClient.QueryRow(sqlQuery, p.ClientId)
 	err := row.Scan(
 		&res.ClientId,
 		&res.ClientSecret,
@@ -45,7 +48,10 @@ func NewOAuthRepository(opts ...RepoOption) (*oAuthRepository, error) {
 		opt(&option)
 	}
 
-	if option.dbClient == nil {
+	if option.mClient == nil {
+		return nil, fmt.Errorf("invalid db client specified")
+	}
+	if option.rClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
 
@@ -57,8 +63,9 @@ func NewOAuthRepository(opts ...RepoOption) (*oAuthRepository, error) {
 	}
 
 	r := &oAuthRepository{
-		dbClient: option.dbClient,
-		clock:    clock,
+		mClient: option.mClient,
+		rClient: option.rClient,
+		clock:   clock,
 	}
 	return r, nil
 }
