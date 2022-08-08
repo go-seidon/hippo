@@ -10,7 +10,7 @@ services:
       - MYSQL_ROOT_PASSWORD=toor
     volumes:
       - mysql-db-data:/var/lib/mysql
-      - ./m1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - ./mysql/m1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3308:3306
   mysql-db-r1:
@@ -25,7 +25,7 @@ services:
       - mysql-db
     volumes:
       - mysql-db-r1-data:/var/lib/mysql
-      - ./r1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - ./mysql/r1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3311:3306
   mysql-db-r2:
@@ -40,7 +40,7 @@ services:
       - mysql-db-r1
     volumes:
       - mysql-db-r2-data:/var/lib/mysql
-      - ./r2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - ./mysql/r2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3312:3306
   mysql-db-test:

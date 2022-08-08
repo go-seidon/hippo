@@ -7,7 +7,7 @@ skip-host-cache
 skip-name-resolve 
 
 # It must be different from every other ID in use by any other source or replica.
-server-id = 11
+server-id = 12
 
 # Enables bin log and sets the base name and path for the binary log files
 log_bin = /var/log/mysql/mysql-bin.log
@@ -20,3 +20,6 @@ relay-log = /var/log/mysql/mysql-relay-bin.log
 # binlog_do_db = db1
 # binlog_do_db = db2
 binlog_do_db = goseidon_local
+
+# update bin log when performing sync with other replica
+log-slave-updates
