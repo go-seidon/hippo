@@ -13,6 +13,9 @@ services:
       - ./mysql/m1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3308:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.11
   mysql-db-r1:
     image: "mariadb:10.4"
     container_name: mysql-db-r1
@@ -28,6 +31,9 @@ services:
       - ./mysql/r1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3311:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.21
   mysql-db-r2:
     image: "mariadb:10.4"
     container_name: mysql-db-r2
@@ -43,6 +49,9 @@ services:
       - ./mysql/r2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3312:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.22
   mysql-db-test:
     image: "mariadb:10.4"
     container_name: mysql-db-test
@@ -53,6 +62,9 @@ services:
       - MYSQL_ROOT_PASSWORD=toor
     ports:
       - 3307:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.99
   phpmyadmin:
     image: "phpmyadmin:5.2"
     container_name: phpmyadmin
@@ -66,7 +78,29 @@ services:
       - mysql-db-r1
       - mysql-db-r2
       - mysql-db-test
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.101
+  proxy:
+    image: "haproxy:2.6"
+    container_name: "haproxy"
+    restart: always
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - 8020:80 # stats
+      - 3300:3300 # mysql master
+      - 3301:3301 # mysql replica
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.102
 volumes:
   mysql-db-data:
   mysql-db-r1-data:
   mysql-db-r2-data:
+networks:
+  mysql-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
