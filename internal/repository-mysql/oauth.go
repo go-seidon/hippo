@@ -27,7 +27,7 @@ func (r *oAuthRepository) FindClient(ctx context.Context, p repository.FindClien
 	`
 
 	var res repository.FindClientResult
-	row := r.mClient.QueryRow(sqlQuery, p.ClientId)
+	row := r.rClient.QueryRow(sqlQuery, p.ClientId)
 	err := row.Scan(
 		&res.ClientId,
 		&res.ClientSecret,
