@@ -126,11 +126,19 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 
 	var repoOpt app.RepositoryOption
 	if option.Config.DBProvider == app.DB_PROVIDER_MYSQL {
-		repoOpt = app.WithMySQLRepository(
-			option.Config.MySQLUser, option.Config.MySQLPassword,
-			option.Config.MySQLDBName, option.Config.MySQLHost,
-			option.Config.MySQLPort,
-		)
+		repoOpt = app.WithMySQL(app.MySQLConn{
+			Host:     option.Config.MySQLMasterHost,
+			Port:     option.Config.MySQLMasterPort,
+			User:     option.Config.MySQLMasterUser,
+			Password: option.Config.MySQLMasterPassword,
+			DbName:   option.Config.MySQLMasterDBName,
+		}, app.MySQLConn{
+			Host:     option.Config.MySQLReplicaHost,
+			Port:     option.Config.MySQLReplicaPort,
+			User:     option.Config.MySQLReplicaUser,
+			Password: option.Config.MySQLReplicaPassword,
+			DbName:   option.Config.MySQLReplicaDBName,
+		})
 	}
 	repo, err := app.NewRepository(repoOpt)
 	if err != nil {

@@ -18,7 +18,7 @@ import (
 var _ = Describe("OAuth Repository", func() {
 
 	Context("NewOAuthRepository function", Label("unit"), func() {
-		When("db client is not specified", func() {
+		When("master db client is not specified", func() {
 			It("should return error", func() {
 				res, err := repository_mysql.NewOAuthRepository()
 
@@ -27,10 +27,21 @@ var _ = Describe("OAuth Repository", func() {
 			})
 		})
 
+		When("replica db client is not specified", func() {
+			It("should return error", func() {
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				res, err := repository_mysql.NewOAuthRepository(mOpt)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid db client specified")))
+			})
+		})
+
 		When("required parameter is specified", func() {
 			It("should return result", func() {
-				opt := repository_mysql.WithDbClient(&sql.DB{})
-				res, err := repository_mysql.NewOAuthRepository(opt)
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
+				res, err := repository_mysql.NewOAuthRepository(mOpt, rOpt)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
@@ -40,8 +51,9 @@ var _ = Describe("OAuth Repository", func() {
 		When("clock is specified", func() {
 			It("should return result", func() {
 				clockOpt := repository_mysql.WithClock(&mock.MockClock{})
-				dbOpt := repository_mysql.WithDbClient(&sql.DB{})
-				res, err := repository_mysql.NewOAuthRepository(clockOpt, dbOpt)
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
+				res, err := repository_mysql.NewOAuthRepository(clockOpt, mOpt, rOpt)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
@@ -67,8 +79,9 @@ var _ = Describe("OAuth Repository", func() {
 			}
 			dbClient = mock
 
-			dbOpt := repository_mysql.WithDbClient(db)
-			repo, _ = repository_mysql.NewOAuthRepository(dbOpt)
+			dbMOpt := repository_mysql.WithDbMaster(db)
+			dbROpt := repository_mysql.WithDbReplica(db)
+			repo, _ = repository_mysql.NewOAuthRepository(dbMOpt, dbROpt)
 			p = repository.FindClientParam{
 				ClientId: "client_id",
 			}

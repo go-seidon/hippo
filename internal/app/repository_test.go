@@ -26,7 +26,7 @@ var _ = Describe("Repository Package", func() {
 
 		When("option is not specified", func() {
 			It("should return error", func() {
-				res, err := app.NewRepository(nil)
+				res, err := app.NewRepository()
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("invalid repository option")))
@@ -45,8 +45,20 @@ var _ = Describe("Repository Package", func() {
 
 		When("success create mysql repository", func() {
 			It("should return result", func() {
-				opt := app.WithMySQLRepository("mock-username", "mock-password", "mock-db", "mock-host", 3306)
-				res, err := app.NewRepository(opt)
+				masterOpt := app.WithMySQL(app.MySQLConn{
+					Host:     "mock-host",
+					Port:     3306,
+					User:     "mock-username",
+					Password: "mock-password",
+					DbName:   "mock-db",
+				}, app.MySQLConn{
+					Host:     "mock-host",
+					Port:     3306,
+					User:     "mock-username",
+					Password: "mock-password",
+					DbName:   "mock-db",
+				})
+				res, err := app.NewRepository(masterOpt)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())

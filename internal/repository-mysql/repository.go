@@ -7,15 +7,22 @@ import (
 )
 
 type RepositoryOption struct {
-	dbClient *sql.DB
-	clock    datetime.Clock
+	mClient *sql.DB
+	rClient *sql.DB
+	clock   datetime.Clock
 }
 
 type RepoOption = func(*RepositoryOption)
 
-func WithDbClient(dbClient *sql.DB) RepoOption {
+func WithDbMaster(dbClient *sql.DB) RepoOption {
 	return func(ro *RepositoryOption) {
-		ro.dbClient = dbClient
+		ro.mClient = dbClient
+	}
+}
+
+func WithDbReplica(dbClient *sql.DB) RepoOption {
+	return func(ro *RepositoryOption) {
+		ro.rClient = dbClient
 	}
 }
 

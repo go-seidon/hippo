@@ -14,13 +14,15 @@ const (
 	DB_PROVIDER_MONGO = "mongo"
 )
 
-func NewRepository(o RepositoryOption) (*NewRepositoryResult, error) {
-	if o == nil {
+func NewRepository(o ...RepositoryOption) (*NewRepositoryResult, error) {
+	if len(o) == 0 {
 		return nil, fmt.Errorf("invalid repository option")
 	}
 
 	var p NewRepositoryOption
-	o.Apply(&p)
+	for _, opt := range o {
+		opt.Apply(&p)
+	}
 
 	if p.Provider == DB_PROVIDER_MYSQL {
 		return newMySQLRepository(p)
@@ -30,25 +32,37 @@ func NewRepository(o RepositoryOption) (*NewRepositoryResult, error) {
 }
 
 func newMySQLRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
-	dsn := fmt.Sprintf(
+	masterDsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?parseTime=true",
-		p.MySQLUser, p.MySQLPassword,
-		p.MySQLHost, p.MySQLPort, p.MySQLDBName,
+		p.MySQLMasterUser, p.MySQLMasterPassword,
+		p.MySQLMasterHost, p.MySQLMasterPort, p.MySQLMasterDBName,
 	)
-	client, err := sql.Open("mysql", dsn)
+	masterClient, err := sql.Open("mysql", masterDsn)
+	if err != nil {
+		return nil, err
+	}
+
+	replicaDsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true",
+		p.MySQLReplicaUser, p.MySQLReplicaPassword,
+		p.MySQLReplicaHost, p.MySQLReplicaPort, p.MySQLReplicaDBName,
+	)
+	replicaClient, err := sql.Open("mysql", replicaDsn)
 	if err != nil {
 		return nil, err
 	}
 
 	fileRepo, err := repository_mysql.NewFileRepository(
-		repository_mysql.WithDbClient(client),
+		repository_mysql.WithDbMaster(masterClient),
+		repository_mysql.WithDbReplica(replicaClient),
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	oauthRepo, err := repository_mysql.NewOAuthRepository(
-		repository_mysql.WithDbClient(client),
+		repository_mysql.WithDbMaster(masterClient),
+		repository_mysql.WithDbReplica(replicaClient),
 	)
 	if err != nil {
 		return nil, err
@@ -68,11 +82,17 @@ type RepositoryOption interface {
 type NewRepositoryOption struct {
 	Provider string
 
-	MySQLHost     string
-	MySQLPort     int
-	MySQLUser     string
-	MySQLPassword string
-	MySQLDBName   string
+	MySQLMasterHost     string
+	MySQLMasterPort     int
+	MySQLMasterUser     string
+	MySQLMasterPassword string
+	MySQLMasterDBName   string
+
+	MySQLReplicaHost     string
+	MySQLReplicaPort     int
+	MySQLReplicaUser     string
+	MySQLReplicaPassword string
+	MySQLReplicaDBName   string
 }
 
 type NewRepositoryResult struct {
@@ -80,29 +100,54 @@ type NewRepositoryResult struct {
 	OAuthRepo repository.OAuthRepository
 }
 
-type mysqlRepositoryOption struct {
-	host     string
-	port     int
-	username string
-	password string
-	dbName   string
+type MySQLConn struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DbName   string
 }
 
-func (o *mysqlRepositoryOption) Apply(p *NewRepositoryOption) {
-	p.MySQLHost = o.host
-	p.MySQLPort = o.port
-	p.MySQLDBName = o.dbName
-	p.MySQLUser = o.username
-	p.MySQLPassword = o.password
+type mysqlOption struct {
+	masterHost     string
+	masterPort     int
+	masterUser     string
+	masterPassword string
+	masterDbName   string
+
+	replicaHost     string
+	replicaPort     int
+	replicaUser     string
+	replicaPassword string
+	replicaDbName   string
+}
+
+func (o *mysqlOption) Apply(p *NewRepositoryOption) {
+	p.MySQLMasterHost = o.masterHost
+	p.MySQLMasterPort = o.masterPort
+	p.MySQLMasterDBName = o.masterDbName
+	p.MySQLMasterUser = o.masterUser
+	p.MySQLMasterPassword = o.masterPassword
+	p.MySQLReplicaHost = o.replicaHost
+	p.MySQLReplicaPort = o.replicaPort
+	p.MySQLReplicaDBName = o.replicaDbName
+	p.MySQLReplicaUser = o.replicaUser
+	p.MySQLReplicaPassword = o.replicaPassword
 	p.Provider = DB_PROVIDER_MYSQL
 }
 
-func WithMySQLRepository(username string, password string, dbName string, host string, port int) *mysqlRepositoryOption {
-	return &mysqlRepositoryOption{
-		username: username,
-		password: password,
-		dbName:   dbName,
-		host:     host,
-		port:     port,
+func WithMySQL(mConn MySQLConn, rConn MySQLConn) *mysqlOption {
+	return &mysqlOption{
+		masterUser:     mConn.User,
+		masterPassword: mConn.Password,
+		masterDbName:   mConn.DbName,
+		masterHost:     mConn.Host,
+		masterPort:     mConn.Port,
+
+		replicaUser:     rConn.User,
+		replicaPassword: rConn.Password,
+		replicaDbName:   rConn.DbName,
+		replicaHost:     rConn.Host,
+		replicaPort:     rConn.Port,
 	}
 }

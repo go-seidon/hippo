@@ -14,11 +14,17 @@ type Config struct {
 
 	DBProvider string `env:"DB_PROVIDER"`
 
-	MySQLHost     string `env:"MYSQL_HOST"`
-	MySQLPort     int    `env:"MYSQL_PORT"`
-	MySQLUser     string `env:"MYSQL_USER"`
-	MySQLPassword string `env:"MYSQL_PASSWORD"`
-	MySQLDBName   string `env:"MYSQL_DB_NAME"`
+	MySQLMasterHost     string `env:"MYSQL_MASTER_HOST"`
+	MySQLMasterPort     int    `env:"MYSQL_MASTER_PORT"`
+	MySQLMasterUser     string `env:"MYSQL_MASTER_USER"`
+	MySQLMasterPassword string `env:"MYSQL_MASTER_PASSWORD"`
+	MySQLMasterDBName   string `env:"MYSQL_MASTER_DB_NAME"`
+
+	MySQLReplicaHost     string `env:"MYSQL_REPLICA_HOST"`
+	MySQLReplicaPort     int    `env:"MYSQL_REPLICA_PORT"`
+	MySQLReplicaUser     string `env:"MYSQL_REPLICA_USER"`
+	MySQLReplicaPassword string `env:"MYSQL_REPLICA_PASSWORD"`
+	MySQLReplicaDBName   string `env:"MYSQL_REPLICA_DB_NAME"`
 
 	UploadFormSize  int64  `env:"UPLOAD_FORM_SIZE"`
 	UploadDirectory string `env:"UPLOAD_DIRECTORY"`

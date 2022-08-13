@@ -11,14 +11,15 @@ import (
 )
 
 type FileRepository struct {
-	dbClient *sql.DB
-	clock    datetime.Clock
+	mClient *sql.DB
+	rClient *sql.DB
+	clock   datetime.Clock
 }
 
 func (r *FileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
 	currentTimestamp := r.clock.Now()
 
-	tx, err := r.dbClient.BeginTx(ctx, &sql.TxOptions{
+	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelRepeatableRead,
 	})
 	if err != nil {
@@ -122,7 +123,7 @@ func (r *FileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 func (r *FileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
 	currentTimestamp := r.clock.Now()
 
-	tx, err := r.dbClient.BeginTx(ctx, &sql.TxOptions{})
+	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -181,9 +182,11 @@ func (r *FileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 	return res, nil
 }
 
+// @note: using replica client by default
+// when transaction occured switch to master client (through `DbTransaction`)
 func (r *FileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
 	var q Query
-	q = r.dbClient
+	q = r.rClient
 
 	if p.DbTransaction != nil {
 		q = p.DbTransaction
@@ -248,7 +251,10 @@ func NewFileRepository(opts ...RepoOption) (*FileRepository, error) {
 		opt(&option)
 	}
 
-	if option.dbClient == nil {
+	if option.mClient == nil {
+		return nil, fmt.Errorf("invalid db client specified")
+	}
+	if option.rClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
 
@@ -260,8 +266,9 @@ func NewFileRepository(opts ...RepoOption) (*FileRepository, error) {
 	}
 
 	r := &FileRepository{
-		dbClient: option.dbClient,
-		clock:    clock,
+		mClient: option.mClient,
+		rClient: option.rClient,
+		clock:   clock,
 	}
 	return r, nil
 }

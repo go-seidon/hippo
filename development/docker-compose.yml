@@ -1,0 +1,126 @@
+version: '3'
+services:
+  mysql-db:
+    image: "mariadb:10.4"
+    container_name: mysql-db
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_ROOT_PASSWORD=toor
+    volumes:
+      - mysql-db-data:/var/lib/mysql
+      - ./mysql/m1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3308:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.11
+  mysql-db-r1:
+    image: "mariadb:10.4"
+    container_name: mysql-db-r1
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_ROOT_PASSWORD=toor
+    depends_on:
+      - mysql-db
+    volumes:
+      - mysql-db-r1-data:/var/lib/mysql
+      - ./mysql/r1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3311:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.21
+  mysql-db-r2:
+    image: "mariadb:10.4"
+    container_name: mysql-db-r2
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_ROOT_PASSWORD=toor
+    depends_on:
+      - mysql-db-r1
+    volumes:
+      - mysql-db-r2-data:/var/lib/mysql
+      - ./mysql/r2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3312:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.22
+  mysql-db-r3:
+    image: "mariadb:10.4"
+    container_name: mysql-db-r3
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_ROOT_PASSWORD=toor
+    depends_on:
+      - mysql-db-r1
+    volumes:
+      - mysql-db-r3-data:/var/lib/mysql
+      - ./mysql/r3.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3313:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.23
+  mysql-db-test:
+    image: "mariadb:10.4"
+    container_name: mysql-db-test
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local_test
+      - MYSQL_ROOT_PASSWORD=toor
+    ports:
+      - 3307:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.99
+  phpmyadmin:
+    image: "phpmyadmin:5.2"
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 8010:80
+    environment:
+      - PMA_HOSTS=mysql-db,mysql-db-r1,mysql-db-r2,mysql-db-r3,mysql-db-test
+    depends_on:
+      - mysql-db
+      - mysql-db-r1
+      - mysql-db-r2
+      - mysql-db-r3
+      - mysql-db-test
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.101
+  proxy:
+    image: "haproxy:2.6"
+    container_name: "haproxy"
+    restart: always
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - 8020:80 # stats
+      - 3300:3300 # mysql master
+      - 3301:3301 # mysql replica
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.102
+volumes:
+  mysql-db-data:
+  mysql-db-r1-data:
+  mysql-db-r2-data:
+  mysql-db-r3-data:
+networks:
+  mysql-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

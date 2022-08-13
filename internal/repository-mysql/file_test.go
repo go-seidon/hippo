@@ -20,7 +20,7 @@ import (
 
 var _ = Describe("File Repository", func() {
 	Context("NewFileRepository function", Label("unit"), func() {
-		When("db client is not specified", func() {
+		When("master db client is not specified", func() {
 			It("should return error", func() {
 				res, err := repository_mysql.NewFileRepository()
 
@@ -29,10 +29,21 @@ var _ = Describe("File Repository", func() {
 			})
 		})
 
+		When("replica db client is not specified", func() {
+			It("should return error", func() {
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				res, err := repository_mysql.NewFileRepository(mOpt)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid db client specified")))
+			})
+		})
+
 		When("required parameter is specified", func() {
 			It("should return result", func() {
-				opt := repository_mysql.WithDbClient(&sql.DB{})
-				res, err := repository_mysql.NewFileRepository(opt)
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
+				res, err := repository_mysql.NewFileRepository(mOpt, rOpt)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
@@ -42,8 +53,9 @@ var _ = Describe("File Repository", func() {
 		When("clock is specified", func() {
 			It("should return result", func() {
 				clockOpt := repository_mysql.WithClock(&mock.MockClock{})
-				dbOpt := repository_mysql.WithDbClient(&sql.DB{})
-				res, err := repository_mysql.NewFileRepository(clockOpt, dbOpt)
+				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
+				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
+				res, err := repository_mysql.NewFileRepository(clockOpt, mOpt, rOpt)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
@@ -80,8 +92,9 @@ var _ = Describe("File Repository", func() {
 			dbClient = mock
 
 			clockOpt := repository_mysql.WithClock(clock)
-			dbOpt := repository_mysql.WithDbClient(db)
-			repo, _ = repository_mysql.NewFileRepository(clockOpt, dbOpt)
+			mOpt := repository_mysql.WithDbMaster(db)
+			rOpt := repository_mysql.WithDbReplica(db)
+			repo, _ = repository_mysql.NewFileRepository(clockOpt, mOpt, rOpt)
 
 			p = repository.DeleteFileParam{
 				UniqueId: "mock-unique-id",
@@ -446,8 +459,9 @@ var _ = Describe("File Repository", func() {
 			}
 
 			ctx = context.Background()
-			dbOpt := repository_mysql.WithDbClient(client)
-			repo, _ = repository_mysql.NewFileRepository(dbOpt)
+			mOpt := repository_mysql.WithDbMaster(client)
+			rOpt := repository_mysql.WithDbReplica(client)
+			repo, _ = repository_mysql.NewFileRepository(mOpt, rOpt)
 		})
 
 		BeforeEach(func() {
@@ -525,8 +539,9 @@ var _ = Describe("File Repository", func() {
 			}
 			dbClient = mock
 
-			dbOpt := repository_mysql.WithDbClient(db)
-			repo, _ = repository_mysql.NewFileRepository(dbOpt)
+			mOpt := repository_mysql.WithDbMaster(db)
+			rOpt := repository_mysql.WithDbReplica(db)
+			repo, _ = repository_mysql.NewFileRepository(mOpt, rOpt)
 
 			p = repository.RetrieveFileParam{
 				UniqueId: "mock-unique-id",
@@ -681,9 +696,10 @@ var _ = Describe("File Repository", func() {
 			}
 			dbClient = mock
 
-			dbOpt := repository_mysql.WithDbClient(db)
 			clockOpt := repository_mysql.WithClock(clock)
-			repo, _ = repository_mysql.NewFileRepository(dbOpt, clockOpt)
+			mOpt := repository_mysql.WithDbMaster(db)
+			rOpt := repository_mysql.WithDbReplica(db)
+			repo, _ = repository_mysql.NewFileRepository(clockOpt, mOpt, rOpt)
 
 			p = repository.CreateFileParam{
 				UniqueId:  "mock-unique-id",
