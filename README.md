@@ -7,11 +7,10 @@
 No doc right now
 
 ## Todo
-1. Separate db write and read
-2. Add docker image
-3. Deploy dev
-4. Add deployment script
-5. Add `repository-mongo` implementation
+1. Add docker image
+2. Deploy dev
+3. Add deployment script
+4. Add `repository-mongo` implementation
 
 ## Nice to have
 1. Separate findFile query in DeleteFile and RetrieveFile
