@@ -11,6 +11,7 @@ No doc right now
 2. Deploy dev
 3. Add deployment script
 4. Add `repository-mongo` implementation
+5. Add `grpc-app` implementation
 
 ## Nice to have
 1. Separate findFile query in DeleteFile and RetrieveFile
@@ -21,19 +22,18 @@ No doc right now
 6. Change NewDailyRotate using optional param
 7. Resize image capability (?width=720&height=480)
 8. Add `repository-postgre` implementation
-9. Add grpc app
-10. Add hybrid app
-11. Inject logger to mysql instance
-12. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
+9. Add `hybrid-app`
+10. Inject logger to mysql instance
+11. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
 
 ## Technical Stack
 1. Transport layer
 - rest
-- grpc
+- grpc (TBA)
 2. Database
 - mysql
-- postgres
-- mongo
+- mongo (TBA)
+- postgre (TBA)
 3. Config
 - system environment
 - file (config/*.toml and .env)
@@ -89,6 +89,7 @@ This command should run all the test available on this project.
 ```
 
 ### Development
+#### First time setup
 1. Copy `.env.example` to `.env`
 
 2. Create docker compose
@@ -96,31 +97,13 @@ This command should run all the test available on this project.
   $ docker-compose up -d
 ```
 
-3. MySQL master 1 database: 
+3. Setup MySQL replication
 ```
- $ docker-compose up mysql-db
- $ docker-compose stop mysql-db
-```
-
-4. MySQL replica 1 database: 
-```
- $ docker-compose up mysql-db-r1
- $ docker-compose stop mysql-db-r1
+  $ ./development/mysql/replication.sh
 ```
 
-5. MySQL replica 2 database: 
-```
- $ docker-compose up mysql-db-r2
- $ docker-compose stop mysql-db-r2
-```
-
-6. MySQL test database:
-```
- $ docker-compose up mysql-db-test
- $ docker-compose stop mysql-db-test
-```
-
-7. MySQL Migration
+#### Running database migration
+1. MySQL Migration
 ```bash
   $ migrate-mysql-create [args] # args e.g: migrate-mysql-create file-table
   $ migrate-mysql [args] # args e.g: migrate-mysql up
