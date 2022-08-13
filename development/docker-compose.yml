@@ -105,7 +105,7 @@ services:
     container_name: "haproxy"
     restart: always
     volumes:
-      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
       - 8020:80 # stats
       - 3300:3300 # mysql master
