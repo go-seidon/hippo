@@ -52,6 +52,24 @@ services:
     networks:
       mysql-net:
         ipv4_address: 172.20.0.22
+  mysql-db-r3:
+    image: "mariadb:10.4"
+    container_name: mysql-db-r3
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_ROOT_PASSWORD=toor
+    depends_on:
+      - mysql-db-r1
+    volumes:
+      - mysql-db-r3-data:/var/lib/mysql
+      - ./mysql/r3.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3313:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.23
   mysql-db-test:
     image: "mariadb:10.4"
     container_name: mysql-db-test
@@ -72,11 +90,12 @@ services:
     ports:
       - 8010:80
     environment:
-      - PMA_HOSTS=mysql-db,mysql-db-r1,mysql-db-r2,mysql-db-test
+      - PMA_HOSTS=mysql-db,mysql-db-r1,mysql-db-r2,mysql-db-r3,mysql-db-test
     depends_on:
       - mysql-db
       - mysql-db-r1
       - mysql-db-r2
+      - mysql-db-r3
       - mysql-db-test
     networks:
       mysql-net:
@@ -98,6 +117,7 @@ volumes:
   mysql-db-data:
   mysql-db-r1-data:
   mysql-db-r2-data:
+  mysql-db-r3-data:
 networks:
   mysql-net:
     driver: bridge
