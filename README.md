@@ -7,11 +7,10 @@
 No doc right now
 
 ## Todo
-1. Add docker image
-2. Deploy dev
-3. Add deployment script
-4. Add `repository-mongo` implementation
-5. Add `grpc-app` implementation
+1. Deploy dev
+2. Add deployment script
+3. Add `repository-mongo` implementation
+4. Add `grpc-app` implementation
 
 ## Nice to have
 1. Separate findFile query in DeleteFile and RetrieveFile
@@ -22,9 +21,8 @@ No doc right now
 6. Change NewDailyRotate using optional param
 7. Resize image capability (?width=720&height=480)
 8. Add `repository-postgre` implementation
-9. Add `hybrid-app`
-10. Inject logger to mysql instance
-11. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
+9. Inject logger to mysql instance
+10. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
 
 ## Technical Stack
 1. Transport layer
@@ -71,21 +69,62 @@ This command should run all the test available on this project.
 1. REST App
 
 ```
-  $ run-rest-app
-  $ build-rest-app
+  $ make run-rest-app
+  $ make build-rest-app
 ```
 
 2. GRPC App
 
 ```
-  $ run-grpc-app
-  $ build-grpc-app
+  $ make run-grpc-app
+  $ make build-grpc-app
 ```
 
 3. Hybrid App
 
 ```
-  TBA
+  $ make run-hybrid-app
+  $ make build-hybrid-app
+```
+
+### Docker
+1. Build docker image
+```
+  $ docker build -t goseidon-local .
+```
+
+2. Check build result
+```
+  $ docker images
+```
+
+3. Create docker container
+```
+  $ docker container create --name goseidon-local-app ^
+    -e REST_APP_HOST="0.0.0.0" ^
+    -e REST_APP_PORT=3000 ^
+    -e RPC_APP_HOST="0.0.0.0" ^
+    -e RPC_APP_PORT=5000 ^
+    -e MYSQL_MASTER_HOST="host.docker.internal" ^
+    -e MYSQL_REPLICA_HOST="host.docker.internal" ^
+    -p 3000:3000 -p 5000:5000 ^
+    -v D:\startup\goseidon\local\storage:/storage ^
+    goseidon-local
+```
+
+4. Check container
+```
+  $ docker container ls -a
+```
+
+5. Start container
+```
+  $ docker container start goseidon-local-app
+```
+
+6. Check container status
+```
+  $ docker container ls
 ```
 
 ### Development
