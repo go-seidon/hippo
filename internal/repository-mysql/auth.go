@@ -10,7 +10,7 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 )
 
-type oAuthRepository struct {
+type authRepository struct {
 	mClient *sql.DB
 	rClient *sql.DB
 	clock   datetime.Clock
@@ -18,11 +18,11 @@ type oAuthRepository struct {
 
 // @note: use master client to avoid
 // unable to modify state when replica database is down
-func (r *oAuthRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
+func (r *authRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
 	sqlQuery := `
 		SELECT 
 			client_id, client_secret
-		FROM oauth_client
+		FROM auth_client
 		WHERE client_id = ?
 	`
 
@@ -42,7 +42,7 @@ func (r *oAuthRepository) FindClient(ctx context.Context, p repository.FindClien
 	return nil, err
 }
 
-func NewOAuthRepository(opts ...RepoOption) (*oAuthRepository, error) {
+func NewOAuthRepository(opts ...RepoOption) (*authRepository, error) {
 	option := RepositoryOption{}
 	for _, opt := range opts {
 		opt(&option)
@@ -62,7 +62,7 @@ func NewOAuthRepository(opts ...RepoOption) (*oAuthRepository, error) {
 		clock = option.clock
 	}
 
-	r := &oAuthRepository{
+	r := &authRepository{
 		mClient: option.mClient,
 		rClient: option.rClient,
 		clock:   clock,

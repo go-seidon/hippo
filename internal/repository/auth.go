@@ -2,7 +2,7 @@ package repository
 
 import "context"
 
-type OAuthRepository interface {
+type AuthRepository interface {
 	FindClient(ctx context.Context, p FindClientParam) (*FindClientResult, error)
 }
 
