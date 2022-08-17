@@ -65,7 +65,7 @@ var _ = Describe("OAuth Repository", func() {
 		var (
 			ctx             context.Context
 			dbClient        sqlmock.Sqlmock
-			repo            repository.OAuthRepository
+			repo            repository.AuthRepository
 			p               repository.FindClientParam
 			findClientQuery string
 		)
@@ -89,7 +89,7 @@ var _ = Describe("OAuth Repository", func() {
 			findClientQuery = regexp.QuoteMeta(`
 				SELECT 
 					client_id, client_secret
-				FROM oauth_client
+				FROM auth_client
 				WHERE client_id = ?
 			`)
 		})

@@ -21,7 +21,7 @@ var _ = Describe("Basic Auth Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo := mock.NewMockOAuthRepository(ctrl)
+			oAuthRepo := mock.NewMockAuthRepository(ctrl)
 			encoder := mock.NewMockEncoder(ctrl)
 			hasher := mock.NewMockHasher(ctrl)
 			p = auth.NewBasicAuthParam{
@@ -31,13 +31,13 @@ var _ = Describe("Basic Auth Package", func() {
 			}
 		})
 
-		When("oauth repo is not specified", func() {
+		When("auth repo is not specified", func() {
 			It("should return error", func() {
 				p.OAuthRepo = nil
 				res, err := auth.NewBasicAuth(p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("oauth repo is not specified")))
+				Expect(err).To(Equal(fmt.Errorf("auth repo is not specified")))
 			})
 		})
 
@@ -74,7 +74,7 @@ var _ = Describe("Basic Auth Package", func() {
 	Context("ParseAuthToken function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			oAuthRepo *mock.MockOAuthRepository
+			oAuthRepo *mock.MockAuthRepository
 			encoder   *mock.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
@@ -85,7 +85,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo = mock.NewMockOAuthRepository(ctrl)
+			oAuthRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
@@ -191,7 +191,7 @@ var _ = Describe("Basic Auth Package", func() {
 	Context("CheckCredential function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			oAuthRepo *mock.MockOAuthRepository
+			oAuthRepo *mock.MockAuthRepository
 			encoder   *mock.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
@@ -204,7 +204,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo = mock.NewMockOAuthRepository(ctrl)
+			oAuthRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{

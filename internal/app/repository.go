@@ -60,7 +60,7 @@ func newMySQLRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
 		return nil, err
 	}
 
-	oauthRepo, err := repository_mysql.NewOAuthRepository(
+	authRepo, err := repository_mysql.NewOAuthRepository(
 		repository_mysql.WithDbMaster(masterClient),
 		repository_mysql.WithDbReplica(replicaClient),
 	)
@@ -70,7 +70,7 @@ func newMySQLRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
 
 	r := &NewRepositoryResult{
 		FileRepo:  fileRepo,
-		OAuthRepo: oauthRepo,
+		OAuthRepo: authRepo,
 	}
 	return r, nil
 }
@@ -97,7 +97,7 @@ type NewRepositoryOption struct {
 
 type NewRepositoryResult struct {
 	FileRepo  repository.FileRepository
-	OAuthRepo repository.OAuthRepository
+	OAuthRepo repository.AuthRepository
 }
 
 type MySQLConn struct {

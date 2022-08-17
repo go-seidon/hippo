@@ -33,7 +33,7 @@ type ParseAuthTokenResult struct {
 }
 
 type basicAuth struct {
-	oAuthRepo repository.OAuthRepository
+	oAuthRepo repository.AuthRepository
 	encoder   encoding.Encoder
 	hasher    hashing.Hasher
 }
@@ -98,14 +98,14 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 }
 
 type NewBasicAuthParam struct {
-	OAuthRepo repository.OAuthRepository
+	OAuthRepo repository.AuthRepository
 	Encoder   encoding.Encoder
 	Hasher    hashing.Hasher
 }
 
 func NewBasicAuth(p NewBasicAuthParam) (*basicAuth, error) {
 	if p.OAuthRepo == nil {
-		return nil, fmt.Errorf("oauth repo is not specified")
+		return nil, fmt.Errorf("auth repo is not specified")
 	}
 	if p.Encoder == nil {
 		return nil, fmt.Errorf("encoder is not specified")

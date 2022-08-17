@@ -1,5 +1,5 @@
 
-CREATE TABLE `oauth_client` (
+CREATE TABLE `auth_client` (
   `id` VARCHAR(128) NOT NULL,
   `name` VARCHAR(128) NOT NULL,
   `client_id` VARCHAR(256) NOT NULL,
