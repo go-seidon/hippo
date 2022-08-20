@@ -1,0 +1,39 @@
+[
+  {
+    "create": "file",
+    "validator": {
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "bsonType": "string"
+        },
+        "name": {
+          "bsonType": "string"
+        },
+        "path": {
+          "bsonType": "string"
+        },
+        "mimetype": {
+          "bsonType": "string"
+        },
+        "extension": {
+          "bsonType": "string"
+        },
+        "size": {
+          "bsonType": "integer"
+        },
+        "created_at": {
+          "bsonType": "date"
+        },
+        "updated_at": {
+          "bsonType": "date"
+        },
+        "deleted_at": {
+          "bsonType": "date"
+        }
+      }
+    }
+  }
+]
