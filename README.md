@@ -7,22 +7,27 @@
 No doc right now
 
 ## Todo
-1. Deploy dev
-2. Add deployment script
-3. Add `repository-mongo` implementation
-4. Add `grpc-app` implementation
+1. Add `repository-mongo` implementation
+2. Add DbConfig in repository-mysql (db_name)
+3. Add `repository-mongo` master replica setting
+...
+1. Add `grpc-app` implementation
+2. Deploy dev
+3. Add deployment script
 
 ## Nice to have
+1. File meta for storing file related data, e.g: user_id, feature, category, etc
+2. File setting: (visibility, upload location default to daily rotator)
+3. Access file using custom link with certain limitation such as access duration, attribute user_id, etc
+4. Resize image capability (?width=720&height=480)
+5. Add repo: `repository-postgre`
+6. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
+7. Inject logger to mysql instance (if possible)
+
+## Tech Debt
 1. Separate findFile query in DeleteFile and RetrieveFile
-2. File meta for storing file related data, e.g: user_id, feature, category, etc
-3. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
-4. File setting: (visibility, upload location default to daily rotator)
-5. Access file using custom link with certain limitation such as access duration, attribute user_id, etc
-6. Change NewDailyRotate using optional param
-7. Resize image capability (?width=720&height=480)
-8. Add `repository-postgre` implementation
-9. Inject logger to mysql instance
-10. Add `logging.WithReqCtx(ctx)` to parse `correlationId`
+2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
+3. Change NewDailyRotate using optional param
 
 ## Technical Stack
 1. Transport layer
