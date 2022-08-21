@@ -55,8 +55,7 @@ jobs:
       - name: Run MySQL migration
         run: migrate -database 'mysql://admin:123456@tcp(localhost:3307)/goseidon_local_test?x-tls-insecure-skip-verify=true' -path ./migration/mysql up
       - name: Prepare Mongo
-        run: |
-          mongo --username root --password toor --host localhost/admin --port 27020 --eval "db.auth('$MONGO_INITDB_ROOT_USERNAME', '$MONGO_INITDB_ROOT_PASSWORD'); db = db.getSiblingDB('$MONGO_INITDB_DATABASE'); db.createUser({ user: '$MONGO_INITDB_USERNAME', pwd: '$MONGO_INITDB_PASSWORD', roles: [{ role: 'readWrite', db: '$MONGO_INITDB_DATABASE' }] });"
+        run: docker-compose up --exit-code-from mongo-test-db
       - name: Run Mongo migration
         run: migrate -database 'mongodb://admin:123456@localhost:27020/goseidon_local_test' -path ./migration/mongo up
       - name: Run test
