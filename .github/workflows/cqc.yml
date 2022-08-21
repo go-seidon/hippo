@@ -56,8 +56,7 @@ jobs:
         run: migrate -database 'mysql://admin:123456@tcp(localhost:3307)/goseidon_local_test?x-tls-insecure-skip-verify=true' -path ./migration/mysql up
       - name: Prepare Mongo
         run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/workflows/init.sh"
-          "${GITHUB_WORKSPACE}/.github/workflows/init.sh"
+          mongo --username root --password toor --authenticationDatabase admin --host localhost --port 27020 --eval "db.auth('$MONGO_INITDB_ROOT_USERNAME', '$MONGO_INITDB_ROOT_PASSWORD'); db = db.getSiblingDB('$MONGO_INITDB_DATABASE'); db.createUser({ user: '$MONGO_INITDB_USERNAME', pwd: '$MONGO_INITDB_PASSWORD', roles: [{ role: 'readWrite', db: '$MONGO_INITDB_DATABASE' }] });"
       - name: Run Mongo migration
         run: migrate -database 'mongodb://admin:123456@localhost:27020/goseidon_local' -path ./migration/mongo up
       - name: Run test
