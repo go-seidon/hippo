@@ -94,3 +94,62 @@ func InsertAuthClient(dbClient *mongo.Client, p InsertAuthClientParam) error {
 	}
 	return nil
 }
+
+type InsertFileParam struct {
+	Id        string
+	Name      string
+	Path      string
+	Mimetype  string
+	Extension string
+	Size      int
+	CreatedAt int64
+	UpdatedAt int64
+	DbName    string
+}
+
+func InsertFile(dbClient *mongo.Client, p InsertFileParam) error {
+	cl := dbClient.Database(p.DbName).Collection("file")
+	ctx := context.Background()
+	createdAt := time.UnixMilli(p.CreatedAt).UTC()
+	updatedAt := time.UnixMilli(p.UpdatedAt).UTC()
+	data := bson.D{
+		{
+			Key:   "_id",
+			Value: p.Id,
+		},
+		{
+			Key:   "name",
+			Value: p.Name,
+		},
+		{
+			Key:   "path",
+			Value: p.Path,
+		},
+		{
+			Key:   "mimetype",
+			Value: p.Mimetype,
+		},
+		{
+			Key:   "extension",
+			Value: p.Extension,
+		},
+		{
+			Key:   "size",
+			Value: p.Size,
+		},
+		{
+			Key:   "created_at",
+			Value: createdAt,
+		},
+		{
+			Key:   "updated_at",
+			Value: updatedAt,
+		},
+	}
+
+	_, err := cl.InsertOne(ctx, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
