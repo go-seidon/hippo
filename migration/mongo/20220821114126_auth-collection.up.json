@@ -1,6 +1,6 @@
 [
   {
-    "create": "file",
+    "create": "auth_client",
     "validator": {
       "$jsonSchema": {
         "bsonType": "object",
@@ -11,28 +11,24 @@
           "name": {
             "bsonType": "string"
           },
-          "path": {
+          "client_id": {
             "bsonType": "string"
           },
-          "mimetype": {
+          "client_secret": {
             "bsonType": "string"
-          },
-          "extension": {
-            "bsonType": "string"
-          },
-          "size": {
-            "bsonType": "int"
           },
           "created_at": {
             "bsonType": "date"
           },
           "updated_at": {
             "bsonType": "date"
-          },
-          "deleted_at": {
-            "bsonType": "date"
           }
-        }
+        },
+        "required": [
+          "name",
+          "client_id",
+          "client_secret"
+        ]
       }
     }
   }
