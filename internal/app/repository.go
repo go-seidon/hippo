@@ -1,12 +1,17 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/go-seidon/local/internal/repository"
+	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
 	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
 	_ "github.com/go-sql-driver/mysql"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -26,6 +31,8 @@ func NewRepository(o ...RepositoryOption) (*NewRepositoryResult, error) {
 
 	if p.Provider == DB_PROVIDER_MYSQL {
 		return newMySQLRepository(p)
+	} else if p.Provider == DB_PROVIDER_MONGO {
+		return newMongoRepository(p)
 	}
 
 	return nil, fmt.Errorf("db provider is not supported")
@@ -60,9 +67,42 @@ func newMySQLRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
 		return nil, err
 	}
 
-	authRepo, err := repository_mysql.NewOAuthRepository(
+	authRepo, err := repository_mysql.NewAuthRepository(
 		repository_mysql.WithDbMaster(masterClient),
 		repository_mysql.WithDbReplica(replicaClient),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &NewRepositoryResult{
+		FileRepo:  fileRepo,
+		OAuthRepo: authRepo,
+	}
+	return r, nil
+}
+
+func newMongoRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
+	dbDsn := fmt.Sprintf("mongodb://%s:%s@%s:%d", p.MongoUser, p.MongoPassword, p.MongoHost, p.MongoPort)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	dbClient, err := mongo.Connect(ctx, options.Client().ApplyURI(dbDsn))
+	if err != nil {
+		return nil, err
+	}
+
+	dbConfig := &repository_mongo.DbConfig{DbName: p.MongoDBName}
+	authRepo, err := repository_mongo.NewAuthRepository(
+		repository_mongo.WithDbClient(dbClient),
+		repository_mongo.WithDbConfig(dbConfig),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	fileRepo, err := repository_mongo.NewFileRepository(
+		repository_mongo.WithDbClient(dbClient),
+		repository_mongo.WithDbConfig(dbConfig),
 	)
 	if err != nil {
 		return nil, err
@@ -93,6 +133,12 @@ type NewRepositoryOption struct {
 	MySQLReplicaUser     string
 	MySQLReplicaPassword string
 	MySQLReplicaDBName   string
+
+	MongoHost     string
+	MongoPort     int
+	MongoUser     string
+	MongoPassword string
+	MongoDBName   string
 }
 
 type NewRepositoryResult struct {
@@ -149,5 +195,31 @@ func WithMySQL(mConn MySQLConn, rConn MySQLConn) *mysqlOption {
 		replicaDbName:   rConn.DbName,
 		replicaHost:     rConn.Host,
 		replicaPort:     rConn.Port,
+	}
+}
+
+type MongoConn struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DbName   string
+}
+
+type mongoOption struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DbName   string
+}
+
+func WithMongo(mConn MongoConn) *mongoOption {
+	return &mongoOption{
+		Host:     mConn.Host,
+		Port:     mConn.Port,
+		User:     mConn.User,
+		Password: mConn.Password,
+		DbName:   mConn.DbName,
 	}
 }
