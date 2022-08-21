@@ -72,7 +72,36 @@ func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFile
 }
 
 func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
-	return nil, fmt.Errorf("unimplemented")
+	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
+	findFilter := bson.D{
+		{
+			Key:   "_id",
+			Value: p.UniqueId,
+		},
+	}
+	file := struct {
+		Id        string `bson:"_id"`
+		Name      string `bson:"name"`
+		Path      string `bson:"path"`
+		Mimetype  string `bson:"mimetype"`
+		Extension string `bson:"extension"`
+	}{}
+	err := cl.FindOne(ctx, findFilter).Decode(&file)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, repository.ErrorRecordNotFound
+		}
+		return nil, err
+	}
+
+	res := &repository.RetrieveFileResult{
+		UniqueId:  file.Id,
+		Name:      file.Name,
+		Path:      file.Path,
+		MimeType:  file.Mimetype,
+		Extension: file.Extension,
+	}
+	return res, nil
 }
 
 func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
