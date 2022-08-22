@@ -55,7 +55,7 @@ jobs:
       - name: Run MySQL migration
         run: migrate -database 'mysql://admin:123456@tcp(localhost:3307)/goseidon_local_test?x-tls-insecure-skip-verify=true' -path ./migration/mysql up
       - name: Prepare Mongo
-        run: docker-compose -f ./development/docker-compose.yml up -d mongo-test-db --exit-code-from mongo-test-db
+        run: docker-compose -f ./development/docker-compose.yml -d mongo-test-db up --exit-code-from mongo-test-db
       - name: Run Mongo migration
         run: migrate -database 'mongodb://admin:123456@localhost:27020/goseidon_local_test' -path ./migration/mongo up
       - name: Run test
