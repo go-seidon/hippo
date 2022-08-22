@@ -7,9 +7,8 @@
 No doc right now
 
 ## Todo
-1. Add `repository-mongo` implementation
-2. Add DbConfig in repository-mysql (db_name)
-3. Add `repository-mongo` master replica setting
+1. Add DbConfig in repository-mysql (db_name)
+2. Add `repository-mongo` master replica setting
 ...
 1. Add `grpc-app` implementation
 2. Deploy dev
