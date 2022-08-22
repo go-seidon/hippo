@@ -21,7 +21,7 @@
             "bsonType": "string"
           },
           "size": {
-            "bsonType": "int"
+            "bsonType": "long"
           },
           "created_at": {
             "bsonType": "date"
