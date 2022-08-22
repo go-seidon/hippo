@@ -15,7 +15,7 @@ import (
 
 func OpenDb(dsn string) (*mongo.Client, error) {
 	if dsn == "" {
-		dsn = "mongodb://admin:123456@localhost:27018/goseidon_local_test"
+		dsn = "mongodb://admin:123456@localhost:27020/goseidon_local_test"
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
