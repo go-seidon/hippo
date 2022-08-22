@@ -131,7 +131,7 @@ dummy: ## used by migrate script as do-nothing targets
 
 
 MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3308)/goseidon_local?x-tls-insecure-skip-verify=true
-MONGO_DB_URI=mongodb://admin:123456@localhost:27020/goseidon_local
+MONGO_DB_URI=mongodb://admin:123456@localhost:27030/goseidon_local
 
 .PHONY: migrate-mysql
 migrate-mysql:
