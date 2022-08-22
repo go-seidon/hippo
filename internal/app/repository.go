@@ -214,6 +214,15 @@ type mongoOption struct {
 	DbName   string
 }
 
+func (o *mongoOption) Apply(p *NewRepositoryOption) {
+	p.MongoDBName = o.DbName
+	p.MongoHost = o.Host
+	p.MongoPort = o.Port
+	p.MongoUser = o.User
+	p.MongoPassword = o.Password
+	p.Provider = DB_PROVIDER_MONGO
+}
+
 func WithMongo(mConn MongoConn) *mongoOption {
 	return &mongoOption{
 		Host:     mConn.Host,

@@ -64,5 +64,21 @@ var _ = Describe("Repository Package", func() {
 				Expect(err).To(BeNil())
 			})
 		})
+
+		When("success create mongo repository", func() {
+			It("should return result", func() {
+				dbClientOpt := app.WithMongo(app.MongoConn{
+					Host:     "mock-host",
+					Port:     27017,
+					User:     "mock-user",
+					Password: "mock-password",
+					DbName:   "mock-db",
+				})
+				res, err := app.NewRepository(dbClientOpt)
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
 	})
 })
