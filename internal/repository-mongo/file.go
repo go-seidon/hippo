@@ -105,7 +105,64 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 }
 
 func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
-	return nil, fmt.Errorf("unimplemented")
+	err := p.CreateFn(ctx, repository.CreateFnParam{
+		FilePath: p.Path,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	currentTimestamp := r.clock.Now()
+	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
+	data := bson.D{
+		{
+			Key:   "_id",
+			Value: p.UniqueId,
+		},
+		{
+			Key:   "name",
+			Value: p.Name,
+		},
+		{
+			Key:   "path",
+			Value: p.Path,
+		},
+		{
+			Key:   "mimetype",
+			Value: p.Mimetype,
+		},
+		{
+			Key:   "extension",
+			Value: p.Extension,
+		},
+		{
+			Key:   "size",
+			Value: p.Size,
+		},
+		{
+			Key:   "created_at",
+			Value: currentTimestamp,
+		},
+		{
+			Key:   "updated_at",
+			Value: currentTimestamp,
+		},
+	}
+	_, err = cl.InsertOne(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &repository.CreateFileResult{
+		UniqueId:  p.UniqueId,
+		Name:      p.Name,
+		Path:      p.Path,
+		Mimetype:  p.Mimetype,
+		Extension: p.Extension,
+		Size:      p.Size,
+		CreatedAt: currentTimestamp,
+	}
+	return res, nil
 }
 
 func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {

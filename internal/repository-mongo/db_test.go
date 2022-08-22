@@ -101,7 +101,7 @@ type InsertFileParam struct {
 	Path      string
 	Mimetype  string
 	Extension string
-	Size      int
+	Size      int64
 	CreatedAt int64
 	UpdatedAt int64
 	DbName    string

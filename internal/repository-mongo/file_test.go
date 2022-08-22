@@ -3,6 +3,7 @@ package repository_mongo_test
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
@@ -256,6 +257,144 @@ var _ = Describe("File Repository", func() {
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
+			})
+		})
+	})
+
+	Context("CreateFile function", Label("integration"), Ordered, func() {
+		var (
+			ctx    context.Context
+			client *mongo.Client
+			repo   repository.FileRepository
+			p      repository.CreateFileParam
+		)
+
+		BeforeAll(func() {
+			dbClient, err := OpenDb("")
+			if err != nil {
+				AbortSuite("failed open test db: " + err.Error())
+			}
+			client = dbClient
+
+			err = RunDbMigration(dbClient, RunDbMigrationParam{
+				DbName: "goseidon_local_test",
+			})
+			if err != nil {
+				AbortSuite("failed prepare db migration: " + err.Error())
+			}
+			ctx = context.Background()
+			dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
+				DbName: "goseidon_local_test",
+			})
+			dbClientOpt := repository_mongo.WithDbClient(client)
+			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
+		})
+
+		BeforeEach(func() {
+			p = repository.CreateFileParam{
+				UniqueId:  "mock-unique-id",
+				Name:      "image",
+				Path:      "/file/2022",
+				Mimetype:  "image/jpeg",
+				Extension: "jpeg",
+				Size:      200,
+				CreateFn: func(ctx context.Context, p repository.CreateFnParam) error {
+					return nil
+				},
+			}
+		})
+
+		AfterEach(func() {
+			_, err := client.
+				Database("goseidon_local_test").
+				Collection("file").
+				DeleteOne(ctx, bson.D{
+					{
+						Key:   "_id",
+						Value: "mock-unique-id",
+					},
+				})
+			if err != nil {
+				AbortSuite("failed cleaning seed data: " + err.Error())
+			}
+		})
+
+		AfterAll(func() {
+			err := client.Disconnect(ctx)
+			if err != nil {
+				AbortSuite("failed close test db: " + err.Error())
+			}
+		})
+
+		When("failed proceed callback", func() {
+			It("shold return error", func() {
+				p.CreateFn = func(ctx context.Context, p repository.CreateFnParam) error {
+					return fmt.Errorf("failed proceed callback")
+				}
+				res, err := repo.CreateFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("failed proceed callback")))
+			})
+		})
+
+		When("success create file", func() {
+			It("shold return error", func() {
+				res, err := repo.CreateFile(ctx, p)
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed create file", func() {
+			It("shold return error", func() {
+				currentTimestamp := time.Now()
+				_, err := client.
+					Database("goseidon_local_test").
+					Collection("file").
+					InsertOne(ctx, bson.D{
+						{
+							Key:   "_id",
+							Value: p.UniqueId,
+						},
+						{
+							Key:   "name",
+							Value: p.Name,
+						},
+						{
+							Key:   "path",
+							Value: p.Path,
+						},
+						{
+							Key:   "mimetype",
+							Value: p.Mimetype,
+						},
+						{
+							Key:   "extension",
+							Value: p.Extension,
+						},
+						{
+							Key:   "size",
+							Value: p.Size,
+						},
+						{
+							Key:   "created_at",
+							Value: currentTimestamp,
+						},
+						{
+							Key:   "updated_at",
+							Value: currentTimestamp,
+						},
+					})
+				if err != nil {
+					AbortSuite("failed prepare dummy data: " + err.Error())
+				}
+
+				res, err := repo.CreateFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).ToNot(BeNil())
 			})
 		})
 	})
