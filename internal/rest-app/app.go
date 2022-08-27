@@ -66,7 +66,8 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 	if option.Config == nil {
 		return nil, fmt.Errorf("invalid rest app config")
 	}
-	if option.Config.DBProvider != app.DB_PROVIDER_MYSQL {
+	if option.Config.DBProvider != app.DB_PROVIDER_MYSQL &&
+		option.Config.DBProvider != app.DB_PROVIDER_MONGO {
 		return nil, fmt.Errorf("unsupported db provider")
 	}
 
@@ -138,6 +139,14 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 			User:     option.Config.MySQLReplicaUser,
 			Password: option.Config.MySQLReplicaPassword,
 			DbName:   option.Config.MySQLReplicaDBName,
+		})
+	} else if option.Config.DBProvider == app.DB_PROVIDER_MONGO {
+		repoOpt = app.WithMongo(app.MongoConn{
+			Host:     option.Config.MongoMasterHost,
+			Port:     option.Config.MongoMasterPort,
+			User:     option.Config.MongoMasterUser,
+			Password: option.Config.MongoMasterPassword,
+			DbName:   option.Config.MongoMasterDBName,
 		})
 	}
 	repo, err := app.NewRepository(repoOpt)

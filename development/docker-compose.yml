@@ -100,6 +100,54 @@ services:
     networks:
       mysql-net:
         ipv4_address: 172.20.0.101
+  mongo-db:
+    image: "mongo:4.4"
+    container_name: mongo-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=toor
+      - MONGO_INITDB_USERNAME=admin
+      - MONGO_INITDB_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=goseidon_local
+    volumes:
+      - mongo-db-data:/data/db
+      - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
+    ports:
+      - 27030:27017
+    networks:
+      mongo-net:
+        ipv4_address: 172.30.0.11
+  mongo-test-db:
+    image: "mongo:4.4"
+    container_name: mongo-test-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=toor
+      - MONGO_INITDB_USERNAME=admin
+      - MONGO_INITDB_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=goseidon_local_test
+    volumes:
+      - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
+    ports:
+      - 27020:27017
+    networks:
+      mongo-net:
+        ipv4_address: 172.30.0.99
+  mongo-client:
+    image: "mongo-express:1.0.0-alpha"
+    container_name: mongo-client
+    restart: always
+    ports:
+      - 9010:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=toor
+      - ME_CONFIG_MONGODB_URL=mongodb://root:toor@172.30.0.11:27017/
+    depends_on:
+      - mongo-db
+    networks:
+      mongo-net:
+        ipv4_address: 172.30.0.101
   proxy:
     image: "haproxy:2.6"
     container_name: "haproxy"
@@ -118,9 +166,15 @@ volumes:
   mysql-db-r1-data:
   mysql-db-r2-data:
   mysql-db-r3-data:
+  mongo-db-data:
 networks:
   mysql-net:
     driver: bridge
     ipam:
       config:
         - subnet: 172.20.0.0/16
+  mongo-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16

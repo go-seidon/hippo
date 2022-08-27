@@ -16,8 +16,6 @@ type authRepository struct {
 	clock   datetime.Clock
 }
 
-// @note: use master client to avoid
-// unable to modify state when replica database is down
 func (r *authRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
 	sqlQuery := `
 		SELECT 
@@ -42,7 +40,7 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 	return nil, err
 }
 
-func NewOAuthRepository(opts ...RepoOption) (*authRepository, error) {
+func NewAuthRepository(opts ...RepoOption) (*authRepository, error) {
 	option := RepositoryOption{}
 	for _, opt := range opts {
 		opt(&option)

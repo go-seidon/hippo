@@ -10,13 +10,13 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 )
 
-type FileRepository struct {
+type fileRepository struct {
 	mClient *sql.DB
 	rClient *sql.DB
 	clock   datetime.Clock
 }
 
-func (r *FileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
+func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
 	currentTimestamp := r.clock.Now()
 
 	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{
@@ -98,7 +98,7 @@ func (r *FileRepository) DeleteFile(ctx context.Context, p repository.DeleteFile
 	return res, nil
 }
 
-func (r *FileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
+func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
 	file, err := r.findFile(ctx, findFileParam{
 		UniqueId: p.UniqueId,
 	})
@@ -120,7 +120,7 @@ func (r *FileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 	return res, nil
 }
 
-func (r *FileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
+func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
 	currentTimestamp := r.clock.Now()
 
 	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{})
@@ -184,7 +184,7 @@ func (r *FileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 
 // @note: using replica client by default
 // when transaction occured switch to master client (through `DbTransaction`)
-func (r *FileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
+func (r *fileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
 	var q Query
 	q = r.rClient
 
@@ -245,7 +245,7 @@ type findFileResult struct {
 	DeletedAt *int64
 }
 
-func NewFileRepository(opts ...RepoOption) (*FileRepository, error) {
+func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
 	option := RepositoryOption{}
 	for _, opt := range opts {
 		opt(&option)
@@ -265,7 +265,7 @@ func NewFileRepository(opts ...RepoOption) (*FileRepository, error) {
 		clock = option.clock
 	}
 
-	r := &FileRepository{
+	r := &fileRepository{
 		mClient: option.mClient,
 		rClient: option.rClient,
 		clock:   clock,

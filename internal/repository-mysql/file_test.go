@@ -69,7 +69,7 @@ var _ = Describe("File Repository", func() {
 			currentTimestamp time.Time
 			clock            *mock.MockClock
 			dbClient         sqlmock.Sqlmock
-			repo             *repository_mysql.FileRepository
+			repo             repository.FileRepository
 			p                repository.DeleteFileParam
 			findFileQuery    string
 			deleteFileQuery  string
@@ -442,7 +442,7 @@ var _ = Describe("File Repository", func() {
 		var (
 			ctx    context.Context
 			client *sql.DB
-			repo   *repository_mysql.FileRepository
+			repo   repository.FileRepository
 			p      repository.DeleteFileParam
 		)
 
@@ -524,7 +524,7 @@ var _ = Describe("File Repository", func() {
 		var (
 			ctx           context.Context
 			dbClient      sqlmock.Sqlmock
-			repo          *repository_mysql.FileRepository
+			repo          repository.FileRepository
 			p             repository.RetrieveFileParam
 			findFileQuery string
 			fileRows      *sqlmock.Rows
@@ -673,7 +673,7 @@ var _ = Describe("File Repository", func() {
 			ctx              context.Context
 			currentTimestamp time.Time
 			dbClient         sqlmock.Sqlmock
-			repo             *repository_mysql.FileRepository
+			repo             repository.FileRepository
 			p                repository.CreateFileParam
 			insertSqlQuery   string
 		)

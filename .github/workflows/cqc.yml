@@ -22,6 +22,21 @@ jobs:
           MYSQL_PASSWORD: 123456
           MYSQL_DATABASE: goseidon_local_test
           MYSQL_ROOT_PASSWORD: toor
+      # mongo:
+      #   image: mongo:4.4
+      #   ports:
+      #     - 27020:27017
+      #   options: >-
+      #     --health-cmd mongo
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
+      #   env:
+      #     MONGO_INITDB_ROOT_USERNAME: root
+      #     MONGO_INITDB_ROOT_PASSWORD: toor
+      #     MONGO_INITDB_USERNAME: admin
+      #     MONGO_INITDB_PASSWORD: 123456
+      #     MONGO_INITDB_DATABASE: goseidon_local_test
 
     steps:
       - name: Checkout code
@@ -39,6 +54,10 @@ jobs:
           which migrate
       - name: Run MySQL migration
         run: migrate -database 'mysql://admin:123456@tcp(localhost:3307)/goseidon_local_test?x-tls-insecure-skip-verify=true' -path ./migration/mysql up
+      - name: Prepare Mongo
+        run: docker-compose -f ./development/docker-compose.yml up -d mongo-test-db
+      - name: Run Mongo migration
+        run: migrate -database 'mongodb://admin:123456@localhost:27020/goseidon_local_test' -path ./migration/mongo up
       - name: Run test
         run: make test
       - name: SonarCloud Scan
