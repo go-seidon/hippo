@@ -9,10 +9,8 @@ No doc right now
 ## Todo
 1. Add DbConfig in repository-mysql (db_name)
 2. Add `repository-mongo` master replica setting
-...
-1. Add `grpc-app` implementation
-2. Deploy dev
-3. Add deployment script
+3. Add `grpc-app` implementation
+4. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. File meta for storing file related data, e.g: user_id, feature, category, etc
@@ -22,6 +20,7 @@ No doc right now
 5. Add repo: `repository-postgre`
 6. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
 7. Inject logger to mysql instance (if possible)
+8. Update github action services mongo (instead of running docker-compose)
 
 ## Tech Debt
 1. Separate findFile query in DeleteFile and RetrieveFile
@@ -34,13 +33,13 @@ No doc right now
 - grpc (TBA)
 2. Database
 - mysql
-- mongo (TBA)
+- mongo
 - postgre (TBA)
 3. Config
 - system environment
 - file (config/*.toml and .env)
 
-## Run
+## How to Run?
 ### Test
 1. Unit test
 
@@ -131,8 +130,8 @@ This command should run all the test available on this project.
   $ docker container ls
 ```
 
-### Development
-#### First time setup
+## Development
+### First time setup
 1. Copy `.env.example` to `.env`
 
 2. Create docker compose
@@ -145,9 +144,15 @@ This command should run all the test available on this project.
   $ ./development/mysql/replication.sh
 ```
 
-#### Running database migration
+### Database migration
 1. MySQL Migration
 ```bash
   $ migrate-mysql-create [args] # args e.g: migrate-mysql-create file-table
   $ migrate-mysql [args] # args e.g: migrate-mysql up
+```
+
+2. Mongo Migration
+```bash
+  $ migrate-mongo-create [args] # args e.g: migrate-mongo-create file-table
+  $ migrate-mongo [args] # args e.g: migrate-mongo up
 ```
