@@ -26,6 +26,12 @@ type Config struct {
 	MySQLReplicaPassword string `env:"MYSQL_REPLICA_PASSWORD"`
 	MySQLReplicaDBName   string `env:"MYSQL_REPLICA_DB_NAME"`
 
+	MongoMasterHost     string `env:"MONGO_HOST"`
+	MongoMasterPort     int    `env:"MONGO_PORT"`
+	MongoMasterUser     string `env:"MONGO_USER"`
+	MongoMasterPassword string `env:"MONGO_PASSWORD"`
+	MongoMasterDBName   string `env:"MONGO_DB_NAME"`
+
 	UploadFormSize  int64  `env:"UPLOAD_FORM_SIZE"`
 	UploadDirectory string `env:"UPLOAD_DIRECTORY"`
 }

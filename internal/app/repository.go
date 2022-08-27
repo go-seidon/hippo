@@ -83,7 +83,10 @@ func newMySQLRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
 }
 
 func newMongoRepository(p NewRepositoryOption) (*NewRepositoryResult, error) {
-	dbDsn := fmt.Sprintf("mongodb://%s:%s@%s:%d", p.MongoUser, p.MongoPassword, p.MongoHost, p.MongoPort)
+	dbDsn := fmt.Sprintf(
+		"mongodb://%s:%s@%s:%d/?authSource=%s",
+		p.MongoUser, p.MongoPassword, p.MongoHost, p.MongoPort, p.MongoDBName,
+	)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	dbClient, err := mongo.Connect(ctx, options.Client().ApplyURI(dbDsn))
