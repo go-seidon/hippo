@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-seidon/local/internal/auth"
 	mock_encoding "github.com/go-seidon/local/internal/encoding/mock"
+	mock_hashing "github.com/go-seidon/local/internal/hashing/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/golang/mock/gomock"
@@ -24,7 +25,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctrl := gomock.NewController(t)
 			authRepo := mock.NewMockAuthRepository(ctrl)
 			encoder := mock_encoding.NewMockEncoder(ctrl)
-			hasher := mock.NewMockHasher(ctrl)
+			hasher := mock_hashing.NewMockHasher(ctrl)
 			p = auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
 				Encoder:  encoder,
@@ -77,7 +78,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx       context.Context
 			authRepo  *mock.MockAuthRepository
 			encoder   *mock_encoding.MockEncoder
-			hasher    *mock.MockHasher
+			hasher    *mock_hashing.MockHasher
 			basicAuth auth.BasicAuth
 			p         auth.ParseAuthTokenParam
 		)
@@ -88,7 +89,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctrl := gomock.NewController(t)
 			authRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock_encoding.NewMockEncoder(ctrl)
-			hasher = mock.NewMockHasher(ctrl)
+			hasher = mock_hashing.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
 				Encoder:  encoder,
@@ -194,7 +195,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx       context.Context
 			authRepo  *mock.MockAuthRepository
 			encoder   *mock_encoding.MockEncoder
-			hasher    *mock.MockHasher
+			hasher    *mock_hashing.MockHasher
 			basicAuth auth.BasicAuth
 			p         auth.CheckCredentialParam
 			findParam repository.FindClientParam
@@ -207,7 +208,7 @@ var _ = Describe("Basic Auth Package", func() {
 			ctrl := gomock.NewController(t)
 			authRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock_encoding.NewMockEncoder(ctrl)
-			hasher = mock.NewMockHasher(ctrl)
+			hasher = mock_hashing.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
 				Encoder:  encoder,
