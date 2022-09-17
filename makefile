@@ -72,7 +72,7 @@ generate-mock:
 	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
 	mockgen -package=mock_retrieving -source internal/retrieving/retriever.go -destination=internal/retrieving/mock/retriever_mock.go
 	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
-	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
+	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
 	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
 	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go
 
