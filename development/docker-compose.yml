@@ -100,9 +100,9 @@ services:
     networks:
       mysql-net:
         ipv4_address: 172.20.0.101
-  mongo-db:
+  mongo-db-1:
     image: "mongo:4.4"
-    container_name: mongo-db
+    container_name: mongo-db-1
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=toor
@@ -110,13 +110,75 @@ services:
       - MONGO_INITDB_PASSWORD=123456
       - MONGO_INITDB_DATABASE=goseidon_local
     volumes:
-      - mongo-db-data:/data/db
+      - mongo-db-1-data:/data/db
+      - ./mongo/mongodb.key:/data/auth/mongodb.key
       - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
+      - ./mongo/rs-init.sh:/data/script/rs-init.sh
+    entrypoint:
+      - bash
+      - -c
+      - |
+          chmod 400 /data/auth/mongodb.key
+          chown 999:999 /data/auth/mongodb.key
+          exec docker-entrypoint.sh $$@
+    command: mongod --bind_ip_all --port 27031 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
     ports:
-      - 27030:27017
+      - 27031:27031
     networks:
       mongo-net:
         ipv4_address: 172.30.0.11
+  mongo-db-2:
+    image: "mongo:4.4"
+    container_name: mongo-db-2
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=toor
+      - MONGO_INITDB_USERNAME=admin
+      - MONGO_INITDB_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=goseidon_local
+    volumes:
+      - mongo-db-2-data:/data/db
+      - ./mongo/mongodb.key:/data/auth/mongodb.key
+      - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
+    entrypoint:
+      - bash
+      - -c
+      - |
+          chmod 400 /data/auth/mongodb.key
+          chown 999:999 /data/auth/mongodb.key
+          exec docker-entrypoint.sh $$@
+    command: mongod --bind_ip_all --port 27032 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
+    ports:
+      - 27032:27032
+    networks:
+      mongo-net:
+        ipv4_address: 172.30.0.12
+  mongo-db-3:
+    image: "mongo:4.4"
+    container_name: mongo-db-3
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=toor
+      - MONGO_INITDB_USERNAME=admin
+      - MONGO_INITDB_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=goseidon_local
+    volumes:
+      - mongo-db-3-data:/data/db
+      - ./mongo/mongodb.key:/data/auth/mongodb.key
+      - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
+    entrypoint:
+      - bash
+      - -c
+      - |
+          chmod 400 /data/auth/mongodb.key
+          chown 999:999 /data/auth/mongodb.key
+          exec docker-entrypoint.sh $$@
+    command: mongod --bind_ip_all --port 27033 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
+    ports:
+      - 27033:27033
+    networks:
+      mongo-net:
+        ipv4_address: 172.30.0.13
   mongo-test-db:
     image: "mongo:4.4"
     container_name: mongo-test-db
@@ -133,21 +195,6 @@ services:
     networks:
       mongo-net:
         ipv4_address: 172.30.0.99
-  mongo-client:
-    image: "mongo-express:1.0.0-alpha"
-    container_name: mongo-client
-    restart: always
-    ports:
-      - 9010:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=toor
-      - ME_CONFIG_MONGODB_URL=mongodb://root:toor@172.30.0.11:27017/
-    depends_on:
-      - mongo-db
-    networks:
-      mongo-net:
-        ipv4_address: 172.30.0.101
   proxy:
     image: "haproxy:2.6"
     container_name: "haproxy"
@@ -166,7 +213,9 @@ volumes:
   mysql-db-r1-data:
   mysql-db-r2-data:
   mysql-db-r3-data:
-  mongo-db-data:
+  mongo-db-1-data:
+  mongo-db-2-data:
+  mongo-db-3-data:
 networks:
   mysql-net:
     driver: bridge
