@@ -3,6 +3,7 @@ package rest_app_test
 import (
 	"context"
 	"fmt"
+
 	"net/http"
 	"testing"
 
@@ -12,6 +13,9 @@ import (
 
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/mock"
+
+	"github.com/go-seidon/local/internal/repository"
+	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 )
 
@@ -20,7 +24,7 @@ func TestRestApp(t *testing.T) {
 	RunSpecs(t, "Rest App Package")
 }
 
-var _ = Describe("Response Package", func() {
+var _ = Describe("App Package", func() {
 
 	Context("NewRestApp function", Label("unit"), func() {
 		var (
@@ -44,16 +48,16 @@ var _ = Describe("Response Package", func() {
 			})
 		})
 
-		When("db provider is not supported", func() {
+		When("config is not valid", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithConfig(app.Config{
-						DBProvider: "invalid db provider",
+						DBProvider: "invalid",
 					}),
 				)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("unsupported db provider")))
+				Expect(err).To(Equal(fmt.Errorf("invalid config")))
 			})
 		})
 
@@ -61,8 +65,36 @@ var _ = Describe("Response Package", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithConfig(app.Config{
-						DBProvider: app.DB_PROVIDER_MYSQL,
+						DBProvider: repository.DB_PROVIDER_MYSQL,
+					}),
+				)
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("debug is enabled", func() {
+			It("should return result", func() {
+				res, err := rest_app.NewRestApp(
+					rest_app.WithConfig(app.Config{
+						DBProvider: repository.DB_PROVIDER_MYSQL,
 						AppDebug:   true,
+					}),
+				)
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("env is specified", func() {
+			It("should return result", func() {
+				res, err := rest_app.NewRestApp(
+					rest_app.WithConfig(app.Config{
+						DBProvider: repository.DB_PROVIDER_MYSQL,
+						AppDebug:   true,
+						AppEnv:     "local",
 					}),
 				)
 
@@ -81,8 +113,10 @@ var _ = Describe("Response Package", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithLogger(log),
 					rest_app.WithConfig(app.Config{
-						DBProvider: app.DB_PROVIDER_MYSQL,
-						AppEnv:     "local",
+						DBProvider:    repository.DB_PROVIDER_MONGO,
+						AppEnv:        "local",
+						MongoMode:     "standalone",
+						MongoAuthMode: "basic",
 					}),
 				)
 
@@ -137,6 +171,8 @@ var _ = Describe("Response Package", func() {
 			logger        *mock.MockLogger
 			server        *mock.MockServer
 			healthService *mock.MockHealthCheck
+			repo          *mock_repository.MockProvider
+			ctx           context.Context
 		)
 
 		BeforeEach(func() {
@@ -145,6 +181,12 @@ var _ = Describe("Response Package", func() {
 			logger = mock.NewMockLogger(ctrl)
 			healthService = mock.NewMockHealthCheck(ctrl)
 			server = mock.NewMockServer(ctrl)
+			repo = mock_repository.NewMockProvider(ctrl)
+			fileRepo := mock.NewMockFileRepository(ctrl)
+			authRepo := mock.NewMockAuthRepository(ctrl)
+			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
+			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
+
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(app.Config{
 					AppName:     "mock-name",
@@ -156,7 +198,10 @@ var _ = Describe("Response Package", func() {
 				rest_app.WithLogger(logger),
 				rest_app.WithServer(server),
 				rest_app.WithService(healthService),
+				rest_app.WithRepository(repo),
 			)
+
+			ctx = context.Background()
 		})
 
 		When("failed start healthcehck", func() {
@@ -178,6 +223,31 @@ var _ = Describe("Response Package", func() {
 			})
 		})
 
+		When("failed init repo", func() {
+			It("should return error", func() {
+				logger.
+					EXPECT().
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Times(1)
+
+				healthService.
+					EXPECT().
+					Start().
+					Return(nil).
+					Times(1)
+
+				repo.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
+					Return(fmt.Errorf("db error")).
+					Times(1)
+
+				err := ra.Run()
+
+				Expect(err).To(Equal(fmt.Errorf("db error")))
+			})
+		})
+
 		When("failed listen and serve", func() {
 			It("should return error", func() {
 				logger.
@@ -188,6 +258,12 @@ var _ = Describe("Response Package", func() {
 				healthService.
 					EXPECT().
 					Start().
+					Return(nil).
+					Times(1)
+
+				repo.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -218,6 +294,12 @@ var _ = Describe("Response Package", func() {
 				healthService.
 					EXPECT().
 					Start().
+					Return(nil).
+					Times(1)
+
+				repo.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
