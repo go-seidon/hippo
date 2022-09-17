@@ -55,6 +55,7 @@ test-watch-integration:
 .PHONY: generate-mock
 generate-mock:
 	mockgen -package=mock_app -source internal/app/server.go -destination=internal/app/mock/server_mock.go
+	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/datetime/clock.go -destination=internal/mock/datetime_clock_mock.go
 	mockgen -package=mock -source internal/logging/log.go -destination=internal/mock/logging_log_mock.go
@@ -71,7 +72,6 @@ generate-mock:
 	mockgen -package=mock -source internal/retrieving/retriever.go -destination=internal/mock/retrieving_retriever_mock.go
 	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
 	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go
-	mockgen -package=mock -source internal/auth/basic.go -destination=internal/mock/auth_basic_mock.go
 	mockgen -package=mock -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 
