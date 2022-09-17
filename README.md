@@ -7,13 +7,12 @@
 No doc right now
 
 ## Todo
-1. Move mock to its own package
-2. Move mysql client to db-mysql package
-3. Change response body `code` to `integer` (status package)
+1. Move mysql client to db-mysql package
+2. Change response body `code` to `integer` (status package)
+3. Change `app.Run` and `app.Stop` to receive ctx
 4. Add `grpc-app` implementation
 5. Stream instead of load the entire files to the memory
-6. Change `app.Run` and `app.Stop` to receive ctx
-7. Deploy dev, stg, prod (deployment script)
+6. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-seidon/local/internal/deleting"
 	"github.com/go-seidon/local/internal/filesystem"
+	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/golang/mock/gomock"
@@ -25,7 +26,7 @@ var _ = Describe("Deleter Service", func() {
 	Context("NewDeleter function", Label("unit"), func() {
 		var (
 			fileRepo    *mock.MockFileRepository
-			fileManager *mock.MockFileManager
+			fileManager *mock_filesystem.MockFileManager
 			logger      *mock.MockLogger
 			p           deleting.NewDeleterParam
 		)
@@ -34,7 +35,7 @@ var _ = Describe("Deleter Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			logger = mock.NewMockLogger(ctrl)
 			p = deleting.NewDeleterParam{
 				FileRepo:    fileRepo,
@@ -88,7 +89,7 @@ var _ = Describe("Deleter Service", func() {
 			ctx         context.Context
 			p           deleting.DeleteFileParam
 			fileRepo    *mock.MockFileRepository
-			fileManager *mock.MockFileManager
+			fileManager *mock_filesystem.MockFileManager
 			log         *mock.MockLogger
 			s           deleting.Deleter
 			deleteRes   *repository.DeleteFileResult
@@ -104,7 +105,7 @@ var _ = Describe("Deleter Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			log = mock.NewMockLogger(ctrl)
 			s, _ = deleting.NewDeleter(deleting.NewDeleterParam{
 				FileRepo:    fileRepo,
@@ -185,7 +186,7 @@ var _ = Describe("Deleter Service", func() {
 	Context("NewDeleteFn function", Label("unit"), func() {
 		var (
 			ctx               context.Context
-			fileManager       *mock.MockFileManager
+			fileManager       *mock_filesystem.MockFileManager
 			fn                repository.DeleteFn
 			deleteFnParam     repository.DeleteFnParam
 			isFileExistsParam filesystem.IsFileExistsParam
@@ -198,7 +199,7 @@ var _ = Describe("Deleter Service", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileManager = mock.NewMockFileManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			fn = deleting.NewDeleteFn(fileManager)
 			deleteFnParam = repository.DeleteFnParam{
 				FilePath: "mock/path",

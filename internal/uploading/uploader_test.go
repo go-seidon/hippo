@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/filesystem"
+	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/uploading"
@@ -25,8 +26,8 @@ var _ = Describe("Uploader Service", func() {
 	Context("NewUploader function", Label("unit"), func() {
 		var (
 			fileRepo    *mock.MockFileRepository
-			fileManager *mock.MockFileManager
-			dirManager  *mock.MockDirectoryManager
+			fileManager *mock_filesystem.MockFileManager
+			dirManager  *mock_filesystem.MockDirectoryManager
 			logger      *mock.MockLogger
 			identifier  *mock.MockIdentifier
 			p           uploading.NewUploaderParam
@@ -36,8 +37,8 @@ var _ = Describe("Uploader Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
-			dirManager = mock.NewMockDirectoryManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock.NewMockLogger(ctrl)
 			identifier = mock.NewMockIdentifier(ctrl)
 			p = uploading.NewUploaderParam{
@@ -113,7 +114,7 @@ var _ = Describe("Uploader Service", func() {
 		var (
 			ctx           context.Context
 			data          []byte
-			fileManager   *mock.MockFileManager
+			fileManager   *mock_filesystem.MockFileManager
 			fn            repository.CreateFn
 			createFnParam repository.CreateFnParam
 			existsParam   filesystem.IsFileExistsParam
@@ -125,7 +126,7 @@ var _ = Describe("Uploader Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			data = []byte{}
-			fileManager = mock.NewMockFileManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			fn = uploading.NewCreateFn(data, fileManager)
 			createFnParam = repository.CreateFnParam{
 				FilePath: "mock/path/name.jpg",
@@ -215,8 +216,8 @@ var _ = Describe("Uploader Service", func() {
 			ctx              context.Context
 			currentTimestamp time.Time
 			fileRepo         *mock.MockFileRepository
-			fileManager      *mock.MockFileManager
-			dirManager       *mock.MockDirectoryManager
+			fileManager      *mock_filesystem.MockFileManager
+			dirManager       *mock_filesystem.MockDirectoryManager
 			logger           *mock.MockLogger
 			reader           *mock.MockReader
 			identifier       *mock.MockIdentifier
@@ -233,8 +234,8 @@ var _ = Describe("Uploader Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
-			dirManager = mock.NewMockDirectoryManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock.NewMockLogger(ctrl)
 			identifier = mock.NewMockIdentifier(ctrl)
 			reader = mock.NewMockReader(ctrl)
