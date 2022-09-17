@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
+	mock_io "github.com/go-seidon/local/internal/io/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
@@ -222,7 +222,7 @@ var _ = Describe("Uploader Service", func() {
 			fileManager      *mock_filesystem.MockFileManager
 			dirManager       *mock_filesystem.MockDirectoryManager
 			logger           *mock_logging.MockLogger
-			reader           *mock.MockReader
+			reader           *mock_io.MockReader
 			identifier       *mock_text.MockIdentifier
 			s                uploading.Uploader
 			dirExistsParam   filesystem.IsDirectoryExistsParam
@@ -241,7 +241,7 @@ var _ = Describe("Uploader Service", func() {
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
-			reader = mock.NewMockReader(ctrl)
+			reader = mock_io.NewMockReader(ctrl)
 			s, _ = uploading.NewUploader(uploading.NewUploaderParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,

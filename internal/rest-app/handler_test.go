@@ -14,8 +14,8 @@ import (
 	mock_deleting "github.com/go-seidon/local/internal/deleting/mock"
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	mock_io "github.com/go-seidon/local/internal/io/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	"github.com/go-seidon/local/internal/retrieving"
@@ -495,7 +495,7 @@ var _ = Describe("Handler Package", func() {
 			log             *mock_logging.MockLogger
 			serializer      *mock_serialization.MockSerializer
 			retrieveService *mock_retrieving.MockRetriever
-			fileData        *mock.MockReadCloser
+			fileData        *mock_io.MockReadCloser
 			p               retrieving.RetrieveFileParam
 		)
 
@@ -510,7 +510,7 @@ var _ = Describe("Handler Package", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			retrieveService = mock_retrieving.NewMockRetriever(ctrl)
-			fileData = mock.NewMockReadCloser(ctrl)
+			fileData = mock_io.NewMockReadCloser(ctrl)
 			handler = rest_app.NewRetrieveFileHandler(log, serializer, retrieveService)
 			p = retrieving.RetrieveFileParam{
 				FileId: "mock-file-id",
