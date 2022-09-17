@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/local/internal/datetime"
+	db_mysql "github.com/go-seidon/local/internal/db-mysql"
 	"github.com/go-seidon/local/internal/repository"
 )
 
@@ -185,7 +186,7 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 // @note: using replica client by default
 // when transaction occured switch to master client (through `DbTransaction`)
 func (r *fileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
-	var q Query
+	var q db_mysql.Query
 	q = r.rClient
 
 	if p.DbTransaction != nil {
