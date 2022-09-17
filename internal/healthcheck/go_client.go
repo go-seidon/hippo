@@ -17,8 +17,9 @@ func (c *goHealthClient) AddChecks(cfgs []*HealthConfig) error {
 
 	hcfgs := []*health.Config{}
 	for _, cfg := range cfgs {
-		onComplete := func(state *health.State) {
-			if cfg.OnComplete != nil {
+		var onComplete func(state *health.State)
+		if cfg.OnComplete != nil {
+			onComplete = func(state *health.State) {
 				cfg.OnComplete(&HealthState{
 					Name:               state.Name,
 					Status:             state.Status,
