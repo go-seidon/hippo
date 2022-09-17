@@ -58,6 +58,7 @@ generate-mock:
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
 	mockgen -package=mock_datetime -source internal/datetime/clock.go -destination=internal/datetime/mock/clock_mock.go
+	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/logging/log.go -destination=internal/mock/logging_log_mock.go
 	mockgen -package=mock -source internal/serialization/serializer.go -destination=internal/mock/serialization_serializer_mock.go
@@ -73,7 +74,6 @@ generate-mock:
 	mockgen -package=mock -source internal/retrieving/retriever.go -destination=internal/mock/retrieving_retriever_mock.go
 	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
 	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go
-	mockgen -package=mock -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 
 .PHONY: run-grpc-app
