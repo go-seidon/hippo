@@ -1,12 +1,20 @@
 package healthcheck
 
-import "github.com/InVisionApp/go-health"
+import (
+	"fmt"
+
+	"github.com/InVisionApp/go-health"
+)
 
 type goHealthClient struct {
 	h *health.Health
 }
 
 func (c *goHealthClient) AddChecks(cfgs []*HealthConfig) error {
+	if len(cfgs) == 0 {
+		return fmt.Errorf("configs are invalid")
+	}
+
 	hcfgs := []*health.Config{}
 	for _, cfg := range cfgs {
 		hcfgs = append(hcfgs, &health.Config{
@@ -55,4 +63,11 @@ func (c *goHealthClient) State() (map[string]HealthState, bool, error) {
 		}
 	}
 	return hs, success, err
+}
+
+func NewGohealthClient(h *health.Health) (*goHealthClient, error) {
+	if h == nil {
+		return nil, fmt.Errorf("invalid health client")
+	}
+	return &goHealthClient{h}, nil
 }
