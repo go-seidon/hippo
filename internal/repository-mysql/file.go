@@ -246,28 +246,28 @@ type findFileResult struct {
 }
 
 func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
-	option := RepositoryOption{}
+	p := RepositoryParam{}
 	for _, opt := range opts {
-		opt(&option)
+		opt(&p)
 	}
 
-	if option.mClient == nil {
+	if p.mClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
-	if option.rClient == nil {
+	if p.rClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
 
 	var clock datetime.Clock
-	if option.clock == nil {
+	if p.clock == nil {
 		clock = datetime.NewClock()
 	} else {
-		clock = option.clock
+		clock = p.clock
 	}
 
 	r := &fileRepository{
-		mClient: option.mClient,
-		rClient: option.rClient,
+		mClient: p.mClient,
+		rClient: p.rClient,
 		clock:   clock,
 	}
 	return r, nil
