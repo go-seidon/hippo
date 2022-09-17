@@ -10,6 +10,26 @@ import (
 )
 
 var _ = Describe("Go Client", func() {
+	Context("NewGohealthClient function", Label("unit"), func() {
+		When("health is not specified", func() {
+			It("should return error", func() {
+				res, err := healthcheck.NewGohealthClient(nil)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid health client")))
+			})
+		})
+
+		When("parameter is specified", func() {
+			It("should return error", func() {
+				res, err := healthcheck.NewGohealthClient(&health.Health{})
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+	})
+
 	Context("AddChecks function", Label("unit"), func() {
 		var (
 			c healthcheck.HealthClient
@@ -28,11 +48,24 @@ var _ = Describe("Go Client", func() {
 			})
 		})
 
-		When("success add config", func() {
+		When("oncomplete is not specified", func() {
 			It("should return result", func() {
 				err := c.AddChecks([]*healthcheck.HealthConfig{
 					{
 						Name: "check-mock",
+					},
+				})
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("success add config", func() {
+			It("should return result", func() {
+				err := c.AddChecks([]*healthcheck.HealthConfig{
+					{
+						Name:       "check-mock",
+						OnComplete: func(state *healthcheck.HealthState) {},
 					},
 				})
 
