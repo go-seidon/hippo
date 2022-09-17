@@ -4,8 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 
+	"context"
+
 	_ "github.com/go-sql-driver/mysql"
 )
+
+type Client interface {
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	Query
+}
+
+type Transaction interface {
+	Commit() error
+	Rollback() error
+	Query
+}
+
+type Query interface {
+	QueryRow(query string, args ...interface{}) *sql.Row
+	Exec(query string, args ...interface{}) (sql.Result, error)
+}
 
 type ClientOption = func(*ClientParam)
 
