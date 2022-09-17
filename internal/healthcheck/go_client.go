@@ -17,12 +17,8 @@ func (c *goHealthClient) AddChecks(cfgs []*HealthConfig) error {
 
 	hcfgs := []*health.Config{}
 	for _, cfg := range cfgs {
-		hcfgs = append(hcfgs, &health.Config{
-			Name:     cfg.Name,
-			Checker:  cfg.Checker,
-			Interval: cfg.Interval,
-			Fatal:    cfg.Fatal,
-			OnComplete: func(state *health.State) {
+		onComplete := func(state *health.State) {
+			if cfg.OnComplete != nil {
 				cfg.OnComplete(&HealthState{
 					Name:               state.Name,
 					Status:             state.Status,
@@ -33,7 +29,14 @@ func (c *goHealthClient) AddChecks(cfgs []*HealthConfig) error {
 					ContiguousFailures: state.ContiguousFailures,
 					TimeOfFirstFailure: state.TimeOfFirstFailure,
 				})
-			},
+			}
+		}
+		hcfgs = append(hcfgs, &health.Config{
+			Name:       cfg.Name,
+			Checker:    cfg.Checker,
+			Interval:   cfg.Interval,
+			Fatal:      cfg.Fatal,
+			OnComplete: onComplete,
 		})
 	}
 	return c.h.AddChecks(hcfgs)
