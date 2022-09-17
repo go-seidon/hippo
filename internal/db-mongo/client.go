@@ -45,7 +45,9 @@ type ClientLocation struct {
 }
 
 type ClientConfig struct {
-	DbName string
+	DbName   string
+	DbMode   string
+	AuthMode string
 }
 
 func (p *ClientParam) ModeStandalone() bool {
@@ -95,7 +97,15 @@ func WithBasicAuth(username, password, source string) ClientOption {
 
 func WithConfig(cfg ClientConfig) ClientOption {
 	return func(cp *ClientParam) {
-		cp.DbName = cfg.DbName
+		if cfg.DbName != "" {
+			cp.DbName = cfg.DbName
+		}
+		if cfg.AuthMode != "" {
+			cp.AuthMode = cfg.AuthMode
+		}
+		if cfg.DbMode != "" {
+			cp.DbMode = cfg.DbMode
+		}
 	}
 }
 

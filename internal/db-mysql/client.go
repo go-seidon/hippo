@@ -10,12 +10,12 @@ import (
 type ClientOption = func(*ClientParam)
 
 type ClientParam struct {
-	Host      string
-	Port      int
-	Username  string
-	Password  string
-	DbName    string
-	ParseTime bool
+	Host            string
+	Port            int
+	Username        string
+	Password        string
+	DbName          string
+	ShouldParseTime bool
 }
 
 type ClientConfig struct {
@@ -24,7 +24,7 @@ type ClientConfig struct {
 
 func ParseTime() ClientOption {
 	return func(cp *ClientParam) {
-		cp.ParseTime = true
+		cp.ShouldParseTime = true
 	}
 }
 
@@ -55,9 +55,13 @@ func NewClient(opts ...ClientOption) (*sql.DB, error) {
 	}
 
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true",
+		"%s:%s@tcp(%s:%d)/%s",
 		p.Username, p.Password,
 		p.Host, p.Port, p.DbName,
 	)
+
+	if p.ShouldParseTime {
+		dsn = fmt.Sprintf("%s?parseTime=true", dsn)
+	}
 	return sql.Open("mysql", dsn)
 }
