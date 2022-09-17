@@ -7,25 +7,29 @@
 No doc right now
 
 ## Todo
-1. Add DbConfig in repository-mysql (db_name)
-2. Add `repository-mongo` master replica setting
-3. Add `grpc-app` implementation
-4. Deploy dev, stg, prod (deployment script)
+1. Move mock to its own package
+2. Move mysql client to db-mysql package
+3. Change response body `code` to `integer` (status package)
+4. Add `grpc-app` implementation
+5. Stream instead of load the entire files to the memory
+6. Change `app.Run` and `app.Stop` to receive ctx
+7. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
-1. File meta for storing file related data, e.g: user_id, feature, category, etc
-2. File setting: (visibility, upload location default to daily rotator)
-3. Access file using custom link with certain limitation such as access duration, attribute user_id, etc
-4. Resize image capability (?width=720&height=480)
-5. Add repo: `repository-postgre`
-6. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
-7. Inject logger to mysql instance (if possible)
-8. Update github action services mongo (instead of running docker-compose)
+1. Upload location strategy
+2. Add repo: `repository-postgre`
+3. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
+4. Inject logger to mysql instance (if possible)
+5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
+6. Seperate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
 1. Separate findFile query in DeleteFile and RetrieveFile
 2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
 3. Change NewDailyRotate using optional param
+
+## Note
+1. Router: CORS setting
 
 ## Technical Stack
 1. Transport layer
@@ -34,7 +38,7 @@ No doc right now
 2. Database
 - mysql
 - mongo
-- postgre (TBA)
+- postgre (NTH)
 3. Config
 - system environment
 - file (config/*.toml and .env)
@@ -135,13 +139,8 @@ This command should run all the test available on this project.
 1. Copy `.env.example` to `.env`
 
 2. Create docker compose
-```
+```bash
   $ docker-compose up -d
-```
-
-3. Setup MySQL replication
-```
-  $ ./development/mysql/replication.sh
 ```
 
 ### Database migration
@@ -155,4 +154,40 @@ This command should run all the test available on this project.
 ```bash
   $ migrate-mongo-create [args] # args e.g: migrate-mongo-create file-table
   $ migrate-mongo [args] # args e.g: migrate-mongo up
+```
+
+### MySQL Replication Setup
+1. Run setup
+```bash
+  $ ./development/mysql/replication.sh
+```
+
+### MongoDB Replication Setup
+1. Generate keyFile (if necessary)
+```bash
+  $ cd /development/mongo
+  $ openssl rand -base64 741 > mongodb.key
+  $ chmod 400 mongodb.key
+```
+
+2. Setting local hosts
+- Window
+C:\Windows\System32\drivers\etc\hosts
+```md
+  127.0.0.1 mongo-db-1
+  127.0.0.1 mongo-db-2
+  127.0.0.1 mongo-db-3
+```
+
+- Linux
+etc\hosts
+```md
+  127.0.0.1 mongo-db-1
+  127.0.0.1 mongo-db-2
+  127.0.0.1 mongo-db-3
+```
+
+3. Run setup
+```bash
+  $ ./development/mongo/replication.sh
 ```
