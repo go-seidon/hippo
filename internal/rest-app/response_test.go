@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
+	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -16,14 +17,14 @@ var _ = Describe("Response Package", func() {
 	Context("WithWriterSerializer function", Label("unit"), func() {
 		var (
 			w *mock.MockResponseWriter
-			s *mock.MockSerializer
+			s *mock_serialization.MockSerializer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			w = mock.NewMockResponseWriter(ctrl)
-			s = mock.NewMockSerializer(ctrl)
+			s = mock_serialization.NewMockSerializer(ctrl)
 		})
 
 		When("writer is not specified", func() {
@@ -150,14 +151,14 @@ var _ = Describe("Response Package", func() {
 	Context("Response function", Label("unit"), func() {
 		var (
 			w *mock.MockResponseWriter
-			s *mock.MockSerializer
+			s *mock_serialization.MockSerializer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			w = mock.NewMockResponseWriter(ctrl)
-			s = mock.NewMockSerializer(ctrl)
+			s = mock_serialization.NewMockSerializer(ctrl)
 		})
 
 		When("writer is not specified", func() {

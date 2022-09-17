@@ -12,6 +12,7 @@ import (
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
+	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -61,7 +62,7 @@ var _ = Describe("Middleware Package", func() {
 	Context("NewBasicAuthMiddleware", Label("unit"), func() {
 		var (
 			a       *mock_auth.MockBasicAuth
-			s       *mock.MockSerializer
+			s       *mock_serialization.MockSerializer
 			handler *mock.MockHandler
 			m       http.Handler
 
@@ -73,7 +74,7 @@ var _ = Describe("Middleware Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			a = mock_auth.NewMockBasicAuth(ctrl)
-			s = mock.NewMockSerializer(ctrl)
+			s = mock_serialization.NewMockSerializer(ctrl)
 			handler = mock.NewMockHandler(ctrl)
 			fn := rest_app.NewBasicAuthMiddleware(a, s)
 			m = fn(handler)
