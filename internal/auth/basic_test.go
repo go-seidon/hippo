@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/local/internal/auth"
+	mock_encoding "github.com/go-seidon/local/internal/encoding/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/golang/mock/gomock"
@@ -22,7 +23,7 @@ var _ = Describe("Basic Auth Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			authRepo := mock.NewMockAuthRepository(ctrl)
-			encoder := mock.NewMockEncoder(ctrl)
+			encoder := mock_encoding.NewMockEncoder(ctrl)
 			hasher := mock.NewMockHasher(ctrl)
 			p = auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
@@ -75,7 +76,7 @@ var _ = Describe("Basic Auth Package", func() {
 		var (
 			ctx       context.Context
 			authRepo  *mock.MockAuthRepository
-			encoder   *mock.MockEncoder
+			encoder   *mock_encoding.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
 			p         auth.ParseAuthTokenParam
@@ -86,7 +87,7 @@ var _ = Describe("Basic Auth Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			authRepo = mock.NewMockAuthRepository(ctrl)
-			encoder = mock.NewMockEncoder(ctrl)
+			encoder = mock_encoding.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
@@ -192,7 +193,7 @@ var _ = Describe("Basic Auth Package", func() {
 		var (
 			ctx       context.Context
 			authRepo  *mock.MockAuthRepository
-			encoder   *mock.MockEncoder
+			encoder   *mock_encoding.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
 			p         auth.CheckCredentialParam
@@ -205,7 +206,7 @@ var _ = Describe("Basic Auth Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			authRepo = mock.NewMockAuthRepository(ctrl)
-			encoder = mock.NewMockEncoder(ctrl)
+			encoder = mock_encoding.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,

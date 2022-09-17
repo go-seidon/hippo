@@ -60,10 +60,10 @@ generate-mock:
 	mockgen -package=mock_datetime -source internal/datetime/clock.go -destination=internal/datetime/mock/clock_mock.go
 	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock_deleting -source internal/deleting/deleter.go -destination=internal/deleting/mock/deleter_mock.go
+	mockgen -package=mock_encoding -source internal/encoding/encoder.go -destination=internal/encoding/mock/encoder_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/logging/log.go -destination=internal/mock/logging_log_mock.go
 	mockgen -package=mock -source internal/serialization/serializer.go -destination=internal/mock/serialization_serializer_mock.go
-	mockgen -package=mock -source internal/encoding/encoder.go -destination=internal/mock/encoding_encoder_mock.go
 	mockgen -package=mock -source internal/hashing/hasher.go -destination=internal/mock/hashing_hasher_mock.go
 	mockgen -package=mock -source internal/filesystem/file.go -destination=internal/mock/filesystem_file_mock.go
 	mockgen -package=mock -source internal/filesystem/directory.go -destination=internal/mock/filesystem_directory_mock.go
