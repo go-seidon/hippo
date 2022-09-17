@@ -6,42 +6,33 @@ import (
 	"github.com/InVisionApp/go-health"
 )
 
-type GoHealthCheck struct {
-	Client HealthClient
+type goHealthCheck struct {
+	client HealthClient
 	jobs   []*HealthJob
 }
 
-type HealthClient interface {
-	AddChecks(cfgs []*health.Config) error
-	Start() error
-	Stop() error
-	State() (map[string]health.State, bool, error)
-}
-
-func (s *GoHealthCheck) Start() error {
-
-	cfgs := []*health.Config{}
+func (s *goHealthCheck) Start() error {
+	cfgs := []*HealthConfig{}
 	for _, job := range s.jobs {
-		cfgs = append(cfgs, &health.Config{
+		cfgs = append(cfgs, &HealthConfig{
 			Name:     job.Name,
 			Checker:  job.Checker,
 			Interval: job.Interval,
 		})
 	}
-	err := s.Client.AddChecks(cfgs)
+	err := s.client.AddChecks(cfgs)
 	if err != nil {
 		return err
 	}
-
-	return s.Client.Start()
+	return s.client.Start()
 }
 
-func (s *GoHealthCheck) Stop() error {
-	return s.Client.Stop()
+func (s *goHealthCheck) Stop() error {
+	return s.client.Stop()
 }
 
-func (s *GoHealthCheck) Check() (*CheckResult, error) {
-	states, isFailed, err := s.Client.State()
+func (s *goHealthCheck) Check() (*CheckResult, error) {
+	states, isFailed, err := s.client.State()
 	if err != nil {
 		return nil, err
 	}
@@ -81,28 +72,34 @@ func (s *GoHealthCheck) Check() (*CheckResult, error) {
 	return res, nil
 }
 
-func NewGoHealthCheck(opts ...Option) (*GoHealthCheck, error) {
-	option := HealthCheckOption{
+func NewGoHealthCheck(opts ...Option) (*goHealthCheck, error) {
+	p := HealthCheckParam{
 		Jobs: []*HealthJob{},
 	}
 	for _, opt := range opts {
-		opt(&option)
+		opt(&p)
 	}
-	if len(option.Jobs) == 0 {
+	if len(p.Jobs) == 0 {
 		return nil, fmt.Errorf("invalid jobs specified")
 	}
-	if option.Logger == nil {
+	if p.Logger == nil {
 		return nil, fmt.Errorf("invalid logger specified")
 	}
 
-	c := health.New()
-	c.Logger = &GoHealthLog{
-		Client: option.Logger,
+	client := p.Client
+	if client == nil {
+		h := health.New()
+		hlog, err := NewGoHealthLog(p.Logger)
+		if err != nil {
+			return nil, err
+		}
+		h.Logger = hlog
+		client = &goHealthClient{h: h}
 	}
 
-	s := &GoHealthCheck{
-		Client: c,
-		jobs:   option.Jobs,
+	s := &goHealthCheck{
+		client: client,
+		jobs:   p.Jobs,
 	}
 	return s, nil
 }

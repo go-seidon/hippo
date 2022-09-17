@@ -33,7 +33,7 @@ var _ = Describe("Health Check Job", func() {
 			It("should append logger", func() {
 				opt := healthcheck.WithLogger(logger)
 
-				var option healthcheck.HealthCheckOption
+				var option healthcheck.HealthCheckParam
 				opt(&option)
 
 				Expect(option.Logger).To(Equal(logger))
@@ -58,7 +58,7 @@ var _ = Describe("Health Check Job", func() {
 			It("should append job", func() {
 				opt := healthcheck.AddJob(job)
 
-				var option healthcheck.HealthCheckOption
+				var option healthcheck.HealthCheckParam
 				opt(&option)
 
 				Expect(option.Logger).To(BeNil())
@@ -70,7 +70,7 @@ var _ = Describe("Health Check Job", func() {
 			It("should append job", func() {
 				opt := healthcheck.AddJob(job)
 
-				var option healthcheck.HealthCheckOption
+				var option healthcheck.HealthCheckParam
 				option.Jobs = append(option.Jobs, job)
 				opt(&option)
 
@@ -98,7 +98,7 @@ var _ = Describe("Health Check Job", func() {
 			It("should add jobs", func() {
 				opt := healthcheck.WithJobs(jobs)
 
-				var option healthcheck.HealthCheckOption
+				var option healthcheck.HealthCheckParam
 
 				opt(&option)
 
@@ -111,7 +111,7 @@ var _ = Describe("Health Check Job", func() {
 			It("should replace jobs", func() {
 				opt := healthcheck.WithJobs(jobs)
 
-				var option healthcheck.HealthCheckOption
+				var option healthcheck.HealthCheckParam
 				option.Jobs = []*healthcheck.HealthJob{job}
 
 				opt(&option)

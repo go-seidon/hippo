@@ -18,9 +18,7 @@ var _ = Describe("Health Check Log", func() {
 		t := GinkgoT()
 		ctrl := gomock.NewController(t)
 		client = mock.NewMockLogger(ctrl)
-		log = &healthcheck.GoHealthLog{
-			Client: client,
-		}
+		log, _ = healthcheck.NewGoHealthLog(client)
 	})
 
 	Context("Info function", Label("unit"), func() {

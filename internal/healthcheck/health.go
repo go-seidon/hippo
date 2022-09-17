@@ -32,6 +32,12 @@ type CheckResultItem struct {
 	CheckedAt time.Time
 }
 
+type HealthCheckParam struct {
+	Jobs   []*HealthJob
+	Logger logging.Logger
+	Client HealthClient
+}
+
 type HealthJob struct {
 	Name     string
 	Checker  Checker
@@ -42,27 +48,28 @@ type Checker interface {
 	Status() (interface{}, error)
 }
 
-type HealthCheckOption struct {
-	Jobs   []*HealthJob
-	Logger logging.Logger
-}
-
-type Option func(*HealthCheckOption)
+type Option func(*HealthCheckParam)
 
 func WithLogger(logger logging.Logger) Option {
-	return func(hco *HealthCheckOption) {
-		hco.Logger = logger
+	return func(p *HealthCheckParam) {
+		p.Logger = logger
 	}
 }
 
 func AddJob(job *HealthJob) Option {
-	return func(hco *HealthCheckOption) {
-		hco.Jobs = append(hco.Jobs, job)
+	return func(p *HealthCheckParam) {
+		p.Jobs = append(p.Jobs, job)
 	}
 }
 
 func WithJobs(jobs []*HealthJob) Option {
-	return func(hco *HealthCheckOption) {
-		hco.Jobs = jobs
+	return func(p *HealthCheckParam) {
+		p.Jobs = jobs
+	}
+}
+
+func WithClient(client HealthClient) Option {
+	return func(p *HealthCheckParam) {
+		p.Client = client
 	}
 }

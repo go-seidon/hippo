@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-seidon/local/internal/app"
 	mock_app "github.com/go-seidon/local/internal/app/mock"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	"github.com/go-seidon/local/internal/mock"
 
 	"github.com/go-seidon/local/internal/repository"
@@ -171,7 +172,7 @@ var _ = Describe("App Package", func() {
 			ra            app.App
 			logger        *mock.MockLogger
 			server        *mock_app.MockServer
-			healthService *mock.MockHealthCheck
+			healthService *mock_healthcheck.MockHealthCheck
 			repo          *mock_repository.MockProvider
 			ctx           context.Context
 		)
@@ -180,7 +181,7 @@ var _ = Describe("App Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			logger = mock.NewMockLogger(ctrl)
-			healthService = mock.NewMockHealthCheck(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_app.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
 			fileRepo := mock.NewMockFileRepository(ctrl)
@@ -328,14 +329,14 @@ var _ = Describe("App Package", func() {
 			ra            app.App
 			logger        *mock.MockLogger
 			server        *mock_app.MockServer
-			healthService *mock.MockHealthCheck
+			healthService *mock_healthcheck.MockHealthCheck
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			logger = mock.NewMockLogger(ctrl)
-			healthService = mock.NewMockHealthCheck(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_app.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(app.Config{

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/InVisionApp/go-health"
 	"github.com/go-seidon/local/internal/healthcheck"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -81,15 +81,15 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Start function", Label("unit"), func() {
 		var (
-			client *mock.MockHealthClient
-			s      *healthcheck.GoHealthCheck
+			client *mock_healthcheck.MockHealthClient
+			s      healthcheck.HealthCheck
 			logger *mock.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			client = mock.NewMockHealthClient(ctrl)
+			client = mock_healthcheck.NewMockHealthClient(ctrl)
 			jobs := []*healthcheck.HealthJob{
 				{
 					Name:     "mock-job",
@@ -101,8 +101,8 @@ var _ = Describe("Go Health Check", func() {
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),
+				healthcheck.WithClient(client),
 			)
-			s.Client = client
 		})
 
 		When("failed add checkers", func() {
@@ -162,15 +162,15 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Stop function", Label("unit"), func() {
 		var (
-			client *mock.MockHealthClient
-			s      *healthcheck.GoHealthCheck
+			client *mock_healthcheck.MockHealthClient
+			s      healthcheck.HealthCheck
 			logger *mock.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			client = mock.NewMockHealthClient(ctrl)
+			client = mock_healthcheck.NewMockHealthClient(ctrl)
 			jobs := []*healthcheck.HealthJob{
 				{
 					Name:     "mock-job",
@@ -182,8 +182,8 @@ var _ = Describe("Go Health Check", func() {
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),
+				healthcheck.WithClient(client),
 			)
-			s.Client = client
 		})
 
 		When("failed stop app", func() {
@@ -217,8 +217,8 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Check function", Label("unit"), func() {
 		var (
-			client           *mock.MockHealthClient
-			s                *healthcheck.GoHealthCheck
+			client           *mock_healthcheck.MockHealthClient
+			s                healthcheck.HealthCheck
 			currentTimestamp time.Time
 			logger           *mock.MockLogger
 		)
@@ -226,7 +226,7 @@ var _ = Describe("Go Health Check", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			client = mock.NewMockHealthClient(ctrl)
+			client = mock_healthcheck.NewMockHealthClient(ctrl)
 			jobs := []*healthcheck.HealthJob{
 				{
 					Name:     "mock-job",
@@ -238,8 +238,8 @@ var _ = Describe("Go Health Check", func() {
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),
+				healthcheck.WithClient(client),
 			)
-			s.Client = client
 			currentTimestamp = time.Now()
 		})
 
@@ -279,8 +279,8 @@ var _ = Describe("Go Health Check", func() {
 
 		When("all check is ok", func() {
 			It("should return result", func() {
-				states := map[string]health.State{
-					"mock-job": health.State{
+				states := map[string]healthcheck.HealthState{
+					"mock-job": {
 						Name:      "mock-job",
 						Status:    "ok",
 						Err:       "",
@@ -301,7 +301,7 @@ var _ = Describe("Go Health Check", func() {
 				expected := &healthcheck.CheckResult{
 					Status: "OK",
 					Items: map[string]healthcheck.CheckResultItem{
-						"mock-job": healthcheck.CheckResultItem{
+						"mock-job": {
 							Name:      "mock-job",
 							Status:    "OK",
 							Error:     "",
@@ -318,8 +318,8 @@ var _ = Describe("Go Health Check", func() {
 
 		When("all check is failed", func() {
 			It("should return result", func() {
-				states := map[string]health.State{
-					"mock-job": health.State{
+				states := map[string]healthcheck.HealthState{
+					"mock-job": {
 						Name:      "mock-job",
 						Status:    "failed",
 						Err:       "some error",
@@ -340,7 +340,7 @@ var _ = Describe("Go Health Check", func() {
 				expected := &healthcheck.CheckResult{
 					Status: "FAILED",
 					Items: map[string]healthcheck.CheckResultItem{
-						"mock-job": healthcheck.CheckResultItem{
+						"mock-job": {
 							Name:      "mock-job",
 							Status:    "FAILED",
 							Error:     "some error",
@@ -357,7 +357,7 @@ var _ = Describe("Go Health Check", func() {
 
 		When("some check is failed", func() {
 			It("should return result", func() {
-				states := map[string]health.State{
+				states := map[string]healthcheck.HealthState{
 					"mock-job": {
 						Name:      "mock-job",
 						Status:    "failed",

@@ -64,13 +64,13 @@ generate-mock:
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_hashing -source internal/hashing/hasher.go -destination=internal/hashing/mock/hasher_mock.go
+	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
+	mockgen -package=mock_healthcheck -source internal/healthcheck/client.go -destination=internal/healthcheck/mock/client_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/logging/log.go -destination=internal/mock/logging_log_mock.go
 	mockgen -package=mock -source internal/serialization/serializer.go -destination=internal/mock/serialization_serializer_mock.go
 	mockgen -package=mock -source internal/repository/file.go -destination=internal/mock/repository_file_mock.go
 	mockgen -package=mock -source internal/repository/auth.go -destination=internal/mock/repository_auth_mock.go
-	mockgen -package=mock -source internal/healthcheck/health.go -destination=internal/mock/healthcheck_health_mock.go
-	mockgen -package=mock -source internal/healthcheck/go_health.go -destination=internal/mock/healthcheck_go_health_mock.go
 	mockgen -package=mock -source internal/retrieving/retriever.go -destination=internal/mock/retrieving_retriever_mock.go
 	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
 	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go

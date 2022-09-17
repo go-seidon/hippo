@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/local/internal/deleting"
 	mock_deleting "github.com/go-seidon/local/internal/deleting/mock"
 	"github.com/go-seidon/local/internal/healthcheck"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	"github.com/go-seidon/local/internal/retrieving"
@@ -199,7 +200,7 @@ var _ = Describe("Handler Package", func() {
 			w             *mock.MockResponseWriter
 			log           *mock.MockLogger
 			serializer    *mock.MockSerializer
-			healthService *mock.MockHealthCheck
+			healthService *mock_healthcheck.MockHealthCheck
 		)
 
 		BeforeEach(func() {
@@ -209,7 +210,7 @@ var _ = Describe("Handler Package", func() {
 			w = mock.NewMockResponseWriter(ctrl)
 			log = mock.NewMockLogger(ctrl)
 			serializer = mock.NewMockSerializer(ctrl)
-			healthService = mock.NewMockHealthCheck(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			handler = rest_app.NewHealthCheckHandler(log, serializer, healthService)
 		})
 
