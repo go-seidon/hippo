@@ -73,8 +73,8 @@ generate-mock:
 	mockgen -package=mock_retrieving -source internal/retrieving/retriever.go -destination=internal/retrieving/mock/retriever_mock.go
 	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
 	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
-	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
-	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go
+	mockgen -package=mock_uploading -source internal/uploading/uploader.go -destination=internal/uploading/mock/uploader_mock.go
+	mockgen -package=mock_uploading -source internal/uploading/location.go -destination=internal/uploading/mock/location_mock.go
 
 .PHONY: run-grpc-app
 run-grpc-app:
