@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -76,35 +77,36 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 		return nil, err
 	}
 
+	res := &CheckCredentialResult{
+		TokenValid: false,
+	}
 	oClient, err := a.oAuthRepo.FindClient(ctx, repository.FindClientParam{
 		ClientId: client.ClientId,
 	})
 	if err != nil {
+		if errors.Is(err, repository.ErrorRecordNotFound) {
+			return res, nil
+		}
 		return nil, err
 	}
 
 	err = a.hasher.Verify(oClient.ClientSecret, client.ClientSecret)
 	if err != nil {
-		res := &CheckCredentialResult{
-			TokenValid: false,
-		}
 		return res, nil
 	}
 
-	res := &CheckCredentialResult{
-		TokenValid: true,
-	}
+	res.TokenValid = true
 	return res, nil
 }
 
 type NewBasicAuthParam struct {
-	OAuthRepo repository.AuthRepository
-	Encoder   encoding.Encoder
-	Hasher    hashing.Hasher
+	AuthRepo repository.AuthRepository
+	Encoder  encoding.Encoder
+	Hasher   hashing.Hasher
 }
 
 func NewBasicAuth(p NewBasicAuthParam) (*basicAuth, error) {
-	if p.OAuthRepo == nil {
+	if p.AuthRepo == nil {
 		return nil, fmt.Errorf("auth repo is not specified")
 	}
 	if p.Encoder == nil {
@@ -115,7 +117,7 @@ func NewBasicAuth(p NewBasicAuthParam) (*basicAuth, error) {
 	}
 
 	a := &basicAuth{
-		oAuthRepo: p.OAuthRepo,
+		oAuthRepo: p.AuthRepo,
 		encoder:   p.Encoder,
 		hasher:    p.Hasher,
 	}
