@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
-	"github.com/go-seidon/local/internal/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,13 +17,13 @@ var _ = Describe("Go Health Check", func() {
 	Context("NewGoHealthCheck function", Label("unit"), func() {
 		var (
 			jobs   []*healthcheck.HealthJob
-			logger *mock.MockLogger
+			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			jobs = []*healthcheck.HealthJob{
 				{
 					Name:     "mock-job",
@@ -83,7 +83,7 @@ var _ = Describe("Go Health Check", func() {
 		var (
 			client *mock_healthcheck.MockHealthClient
 			s      healthcheck.HealthCheck
-			logger *mock.MockLogger
+			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
@@ -97,7 +97,7 @@ var _ = Describe("Go Health Check", func() {
 					Interval: 1,
 				},
 			}
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),
@@ -164,7 +164,7 @@ var _ = Describe("Go Health Check", func() {
 		var (
 			client *mock_healthcheck.MockHealthClient
 			s      healthcheck.HealthCheck
-			logger *mock.MockLogger
+			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
@@ -178,7 +178,7 @@ var _ = Describe("Go Health Check", func() {
 					Interval: 1,
 				},
 			}
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),
@@ -220,7 +220,7 @@ var _ = Describe("Go Health Check", func() {
 			client           *mock_healthcheck.MockHealthClient
 			s                healthcheck.HealthCheck
 			currentTimestamp time.Time
-			logger           *mock.MockLogger
+			logger           *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
@@ -234,7 +234,7 @@ var _ = Describe("Go Health Check", func() {
 					Interval: 1,
 				},
 			}
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			s, _ = healthcheck.NewGoHealthCheck(
 				healthcheck.WithJobs(jobs),
 				healthcheck.WithLogger(logger),

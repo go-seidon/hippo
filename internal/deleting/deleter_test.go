@@ -9,6 +9,7 @@ import (
 	"github.com/go-seidon/local/internal/deleting"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/golang/mock/gomock"
@@ -27,7 +28,7 @@ var _ = Describe("Deleter Service", func() {
 		var (
 			fileRepo    *mock.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
-			logger      *mock.MockLogger
+			logger      *mock_logging.MockLogger
 			p           deleting.NewDeleterParam
 		)
 
@@ -36,7 +37,7 @@ var _ = Describe("Deleter Service", func() {
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			p = deleting.NewDeleterParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
@@ -90,7 +91,7 @@ var _ = Describe("Deleter Service", func() {
 			p           deleting.DeleteFileParam
 			fileRepo    *mock.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
-			log         *mock.MockLogger
+			log         *mock_logging.MockLogger
 			s           deleting.Deleter
 			deleteRes   *repository.DeleteFileResult
 			finalRes    *deleting.DeleteFileResult
@@ -106,7 +107,7 @@ var _ = Describe("Deleter Service", func() {
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			log = mock.NewMockLogger(ctrl)
+			log = mock_logging.NewMockLogger(ctrl)
 			s, _ = deleting.NewDeleter(deleting.NewDeleterParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/retrieving"
@@ -26,7 +27,7 @@ var _ = Describe("Retriever Service", func() {
 		var (
 			fileRepo    *mock.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
-			logger      *mock.MockLogger
+			logger      *mock_logging.MockLogger
 			p           retrieving.NewRetrieverParam
 		)
 
@@ -35,7 +36,7 @@ var _ = Describe("Retriever Service", func() {
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			p = retrieving.NewRetrieverParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
@@ -90,7 +91,7 @@ var _ = Describe("Retriever Service", func() {
 			r             *retrieving.RetrieveFileResult
 			fileRepo      *mock.MockFileRepository
 			fileManager   *mock_filesystem.MockFileManager
-			log           *mock.MockLogger
+			log           *mock_logging.MockLogger
 			s             retrieving.Retriever
 			retrieveParam repository.RetrieveFileParam
 			retrieveRes   *repository.RetrieveFileResult
@@ -107,7 +108,7 @@ var _ = Describe("Retriever Service", func() {
 			ctrl := gomock.NewController(t)
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			log = mock.NewMockLogger(ctrl)
+			log = mock_logging.NewMockLogger(ctrl)
 			s, _ = retrieving.NewRetriever(retrieving.NewRetrieverParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,

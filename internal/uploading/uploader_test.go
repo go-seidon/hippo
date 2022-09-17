@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/uploading"
@@ -28,7 +29,7 @@ var _ = Describe("Uploader Service", func() {
 			fileRepo    *mock.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
 			dirManager  *mock_filesystem.MockDirectoryManager
-			logger      *mock.MockLogger
+			logger      *mock_logging.MockLogger
 			identifier  *mock.MockIdentifier
 			p           uploading.NewUploaderParam
 		)
@@ -39,7 +40,7 @@ var _ = Describe("Uploader Service", func() {
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock.NewMockIdentifier(ctrl)
 			p = uploading.NewUploaderParam{
 				FileRepo:    fileRepo,
@@ -218,7 +219,7 @@ var _ = Describe("Uploader Service", func() {
 			fileRepo         *mock.MockFileRepository
 			fileManager      *mock_filesystem.MockFileManager
 			dirManager       *mock_filesystem.MockDirectoryManager
-			logger           *mock.MockLogger
+			logger           *mock_logging.MockLogger
 			reader           *mock.MockReader
 			identifier       *mock.MockIdentifier
 			s                uploading.Uploader
@@ -236,7 +237,7 @@ var _ = Describe("Uploader Service", func() {
 			fileRepo = mock.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock.NewMockIdentifier(ctrl)
 			reader = mock.NewMockReader(ctrl)
 			s, _ = uploading.NewUploader(uploading.NewUploaderParam{

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/healthcheck"
-	"github.com/go-seidon/local/internal/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,13 +20,13 @@ var _ = Describe("Health Check Job", func() {
 
 	Context("WithLogger function", Label("unit"), func() {
 		var (
-			logger *mock.MockLogger
+			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 		})
 
 		When("logger is specified", func() {

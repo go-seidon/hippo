@@ -14,6 +14,7 @@ import (
 	"github.com/go-seidon/local/internal/app"
 	mock_app "github.com/go-seidon/local/internal/app/mock"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 
 	"github.com/go-seidon/local/internal/repository"
@@ -30,13 +31,13 @@ var _ = Describe("App Package", func() {
 
 	Context("NewRestApp function", Label("unit"), func() {
 		var (
-			log *mock.MockLogger
+			log *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			log = mock.NewMockLogger(ctrl)
+			log = mock_logging.NewMockLogger(ctrl)
 		})
 
 		When("config is not specified", func() {
@@ -170,7 +171,7 @@ var _ = Describe("App Package", func() {
 	Context("Run function", Label("unit"), func() {
 		var (
 			ra            app.App
-			logger        *mock.MockLogger
+			logger        *mock_logging.MockLogger
 			server        *mock_app.MockServer
 			healthService *mock_healthcheck.MockHealthCheck
 			repo          *mock_repository.MockProvider
@@ -180,7 +181,7 @@ var _ = Describe("App Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_app.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
@@ -327,7 +328,7 @@ var _ = Describe("App Package", func() {
 	Context("Stop function", Label("unit"), func() {
 		var (
 			ra            app.App
-			logger        *mock.MockLogger
+			logger        *mock_logging.MockLogger
 			server        *mock_app.MockServer
 			healthService *mock_healthcheck.MockHealthCheck
 		)
@@ -335,7 +336,7 @@ var _ = Describe("App Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_app.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(

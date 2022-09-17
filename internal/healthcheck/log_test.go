@@ -2,7 +2,7 @@ package healthcheck_test
 
 import (
 	"github.com/go-seidon/local/internal/healthcheck"
-	"github.com/go-seidon/local/internal/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -11,13 +11,13 @@ import (
 var _ = Describe("Health Check Log", func() {
 	var (
 		log    *healthcheck.GoHealthLog
-		client *mock.MockLogger
+		client *mock_logging.MockLogger
 	)
 
 	BeforeEach(func() {
 		t := GinkgoT()
 		ctrl := gomock.NewController(t)
-		client = mock.NewMockLogger(ctrl)
+		client = mock_logging.NewMockLogger(ctrl)
 		log, _ = healthcheck.NewGoHealthLog(client)
 	})
 
