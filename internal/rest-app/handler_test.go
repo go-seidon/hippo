@@ -18,6 +18,7 @@ import (
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	"github.com/go-seidon/local/internal/retrieving"
+	mock_retrieving "github.com/go-seidon/local/internal/retrieving/mock"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/uploading"
 	"github.com/golang/mock/gomock"
@@ -490,7 +491,7 @@ var _ = Describe("Handler Package", func() {
 			w               *mock.MockResponseWriter
 			log             *mock_logging.MockLogger
 			serializer      *mock.MockSerializer
-			retrieveService *mock.MockRetriever
+			retrieveService *mock_retrieving.MockRetriever
 			fileData        *mock.MockReadCloser
 			p               retrieving.RetrieveFileParam
 		)
@@ -505,7 +506,7 @@ var _ = Describe("Handler Package", func() {
 			w = mock.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock.NewMockSerializer(ctrl)
-			retrieveService = mock.NewMockRetriever(ctrl)
+			retrieveService = mock_retrieving.NewMockRetriever(ctrl)
 			fileData = mock.NewMockReadCloser(ctrl)
 			handler = rest_app.NewRetrieveFileHandler(log, serializer, retrieveService)
 			p = retrieving.RetrieveFileParam{
