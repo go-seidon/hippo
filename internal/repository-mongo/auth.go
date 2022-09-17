@@ -69,11 +69,9 @@ func NewAuthRepository(opts ...RepoOption) (*authRepository, error) {
 		return nil, fmt.Errorf("invalid db config specified")
 	}
 
-	var clock datetime.Clock
-	if p.clock == nil {
+	clock := p.clock
+	if clock == nil {
 		clock = datetime.NewClock()
-	} else {
-		clock = p.clock
 	}
 
 	r := &authRepository{

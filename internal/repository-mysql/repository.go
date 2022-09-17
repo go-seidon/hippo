@@ -65,11 +65,9 @@ func NewRepository(opts ...RepoOption) (*provider, error) {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
 
-	var clock datetime.Clock
-	if p.clock == nil {
+	clock := p.clock
+	if clock == nil {
 		clock = datetime.NewClock()
-	} else {
-		clock = p.clock
 	}
 
 	authRepo := &authRepository{
