@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/go-seidon/local/internal/app"
+	mock_app "github.com/go-seidon/local/internal/app/mock"
 	"github.com/go-seidon/local/internal/mock"
 
 	"github.com/go-seidon/local/internal/repository"
@@ -169,7 +170,7 @@ var _ = Describe("App Package", func() {
 		var (
 			ra            app.App
 			logger        *mock.MockLogger
-			server        *mock.MockServer
+			server        *mock_app.MockServer
 			healthService *mock.MockHealthCheck
 			repo          *mock_repository.MockProvider
 			ctx           context.Context
@@ -180,7 +181,7 @@ var _ = Describe("App Package", func() {
 			ctrl := gomock.NewController(t)
 			logger = mock.NewMockLogger(ctrl)
 			healthService = mock.NewMockHealthCheck(ctrl)
-			server = mock.NewMockServer(ctrl)
+			server = mock_app.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
 			fileRepo := mock.NewMockFileRepository(ctrl)
 			authRepo := mock.NewMockAuthRepository(ctrl)
@@ -326,7 +327,7 @@ var _ = Describe("App Package", func() {
 		var (
 			ra            app.App
 			logger        *mock.MockLogger
-			server        *mock.MockServer
+			server        *mock_app.MockServer
 			healthService *mock.MockHealthCheck
 		)
 
@@ -335,7 +336,7 @@ var _ = Describe("App Package", func() {
 			ctrl := gomock.NewController(t)
 			logger = mock.NewMockLogger(ctrl)
 			healthService = mock.NewMockHealthCheck(ctrl)
-			server = mock.NewMockServer(ctrl)
+			server = mock_app.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(app.Config{
 					AppName:     "mock-name",
