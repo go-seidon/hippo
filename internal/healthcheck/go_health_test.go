@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/InVisionApp/go-health"
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
@@ -279,7 +280,7 @@ var _ = Describe("Go Health Check", func() {
 
 		When("all check is ok", func() {
 			It("should return result", func() {
-				states := map[string]healthcheck.HealthState{
+				states := map[string]health.State{
 					"mock-job": {
 						Name:      "mock-job",
 						Status:    "ok",
@@ -318,7 +319,7 @@ var _ = Describe("Go Health Check", func() {
 
 		When("all check is failed", func() {
 			It("should return result", func() {
-				states := map[string]healthcheck.HealthState{
+				states := map[string]health.State{
 					"mock-job": {
 						Name:      "mock-job",
 						Status:    "failed",
@@ -357,7 +358,7 @@ var _ = Describe("Go Health Check", func() {
 
 		When("some check is failed", func() {
 			It("should return result", func() {
-				states := map[string]healthcheck.HealthState{
+				states := map[string]health.State{
 					"mock-job": {
 						Name:      "mock-job",
 						Status:    "failed",

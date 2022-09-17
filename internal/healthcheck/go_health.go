@@ -6,15 +6,22 @@ import (
 	"github.com/InVisionApp/go-health"
 )
 
+type HealthClient interface {
+	AddChecks(cfgs []*health.Config) error
+	Start() error
+	Stop() error
+	State() (map[string]health.State, bool, error)
+}
+
 type goHealthCheck struct {
 	client HealthClient
 	jobs   []*HealthJob
 }
 
 func (s *goHealthCheck) Start() error {
-	cfgs := []*HealthConfig{}
+	cfgs := []*health.Config{}
 	for _, job := range s.jobs {
-		cfgs = append(cfgs, &HealthConfig{
+		cfgs = append(cfgs, &health.Config{
 			Name:     job.Name,
 			Checker:  job.Checker,
 			Interval: job.Interval,
@@ -94,7 +101,7 @@ func NewGoHealthCheck(opts ...Option) (*goHealthCheck, error) {
 			return nil, err
 		}
 		h.Logger = hlog
-		client = &goHealthClient{h: h}
+		client = h
 	}
 
 	s := &goHealthCheck{
