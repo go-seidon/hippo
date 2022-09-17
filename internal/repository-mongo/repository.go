@@ -1,12 +1,16 @@
 package repository_mongo
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/go-seidon/local/internal/datetime"
-	"go.mongodb.org/mongo-driver/mongo"
+	db_mongo "github.com/go-seidon/local/internal/db-mongo"
+	"github.com/go-seidon/local/internal/repository"
 )
 
-type RepositoryOption struct {
-	dbClient *mongo.Client
+type RepositoryParam struct {
+	dbClient db_mongo.Client
 	dbConfig *DbConfig
 	clock    datetime.Clock
 }
@@ -15,22 +19,81 @@ type DbConfig struct {
 	DbName string
 }
 
-type RepoOption = func(*RepositoryOption)
+type RepoOption = func(*RepositoryParam)
 
-func WithDbClient(dbClient *mongo.Client) RepoOption {
-	return func(ro *RepositoryOption) {
+func WithDbClient(dbClient db_mongo.Client) RepoOption {
+	return func(ro *RepositoryParam) {
 		ro.dbClient = dbClient
 	}
 }
 
 func WithDbConfig(dbConfig *DbConfig) RepoOption {
-	return func(ro *RepositoryOption) {
+	return func(ro *RepositoryParam) {
 		ro.dbConfig = dbConfig
 	}
 }
 
 func WithClock(clock datetime.Clock) RepoOption {
-	return func(ro *RepositoryOption) {
+	return func(ro *RepositoryParam) {
 		ro.clock = clock
 	}
+}
+
+type provider struct {
+	dbClient db_mongo.Client
+	authRepo *authRepository
+	fileRepo *fileRepository
+}
+
+func (p *provider) Init(ctx context.Context) error {
+	err := p.dbClient.Connect(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *provider) GetAuthRepo() repository.AuthRepository {
+	return p.authRepo
+}
+
+func (p *provider) GetFileRepo() repository.FileRepository {
+	return p.fileRepo
+}
+
+func NewRepository(opts ...RepoOption) (*provider, error) {
+	p := RepositoryParam{}
+	for _, opt := range opts {
+		opt(&p)
+	}
+
+	if p.dbClient == nil {
+		return nil, fmt.Errorf("invalid db client specified")
+	}
+	if p.dbConfig == nil {
+		return nil, fmt.Errorf("invalid db config specified")
+	}
+
+	clock := p.clock
+	if clock == nil {
+		clock = datetime.NewClock()
+	}
+
+	authRepo := &authRepository{
+		dbConfig: p.dbConfig,
+		dbClient: p.dbClient,
+		clock:    clock,
+	}
+	fileRepo := &fileRepository{
+		dbConfig: p.dbConfig,
+		dbClient: p.dbClient,
+		clock:    clock,
+	}
+
+	repo := &provider{
+		dbClient: p.dbClient,
+		authRepo: authRepo,
+		fileRepo: fileRepo,
+	}
+	return repo, nil
 }

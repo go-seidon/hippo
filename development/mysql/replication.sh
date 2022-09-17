@@ -36,7 +36,8 @@ docker-ip() {
 
 # 1. turn off docker-compose (if any)
 echo "[1] turning off docker compose...  "
-docker-compose down
+docker-compose stop mysql-db mysql-db-r1 mysql-db-r2 mysql-db-r3
+docker-compose rm -v -f mysql-db-r1 mysql-db-r2 mysql-db-r3
 printf "[DONE]\n\n"
 
 # 2. remove mysql-db replica data volume (if any)
@@ -51,6 +52,8 @@ echo "[3] rebuilding docker compose...  "
 docker-compose build
 docker-compose up -d
 printf "[DONE]\n\n"
+
+sleep 3
 
 # 4. try to connect to m1 db
 echo "[4] connecting to $m1_ct_name...  "
@@ -79,6 +82,8 @@ m1_log_position=`echo $m1_status_res | awk '{print $6}'`
 echo "log file            : $m1_log_file"
 echo "log position        : $m1_log_position"
 printf "[DONE]\n\n"
+
+sleep 3
 
 # 7. try to connect to r1 db
 echo "[7] connecting to $r1_ct_name...  "
@@ -142,6 +147,8 @@ r1_log_position=`echo $r1_status_res | awk '{print $6}'`
 echo "log file            : $r1_log_file"
 echo "log position        : $r1_log_position"
 printf "[DONE]\n\n"
+
+sleep 3
 
 # 13. try to connect to r2 db
 echo "[13] connecting to $r2_ct_name...  "

@@ -21,19 +21,19 @@ var _ = Describe("Basic Auth Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo := mock.NewMockAuthRepository(ctrl)
+			authRepo := mock.NewMockAuthRepository(ctrl)
 			encoder := mock.NewMockEncoder(ctrl)
 			hasher := mock.NewMockHasher(ctrl)
 			p = auth.NewBasicAuthParam{
-				OAuthRepo: oAuthRepo,
-				Encoder:   encoder,
-				Hasher:    hasher,
+				AuthRepo: authRepo,
+				Encoder:  encoder,
+				Hasher:   hasher,
 			}
 		})
 
 		When("auth repo is not specified", func() {
 			It("should return error", func() {
-				p.OAuthRepo = nil
+				p.AuthRepo = nil
 				res, err := auth.NewBasicAuth(p)
 
 				Expect(res).To(BeNil())
@@ -74,7 +74,7 @@ var _ = Describe("Basic Auth Package", func() {
 	Context("ParseAuthToken function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			oAuthRepo *mock.MockAuthRepository
+			authRepo  *mock.MockAuthRepository
 			encoder   *mock.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
@@ -85,13 +85,13 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo = mock.NewMockAuthRepository(ctrl)
+			authRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
-				OAuthRepo: oAuthRepo,
-				Encoder:   encoder,
-				Hasher:    hasher,
+				AuthRepo: authRepo,
+				Encoder:  encoder,
+				Hasher:   hasher,
 			})
 			p = auth.ParseAuthTokenParam{
 				Token: "mock-token",
@@ -191,7 +191,7 @@ var _ = Describe("Basic Auth Package", func() {
 	Context("CheckCredential function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			oAuthRepo *mock.MockAuthRepository
+			authRepo  *mock.MockAuthRepository
 			encoder   *mock.MockEncoder
 			hasher    *mock.MockHasher
 			basicAuth auth.BasicAuth
@@ -204,13 +204,13 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			oAuthRepo = mock.NewMockAuthRepository(ctrl)
+			authRepo = mock.NewMockAuthRepository(ctrl)
 			encoder = mock.NewMockEncoder(ctrl)
 			hasher = mock.NewMockHasher(ctrl)
 			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
-				OAuthRepo: oAuthRepo,
-				Encoder:   encoder,
-				Hasher:    hasher,
+				AuthRepo: authRepo,
+				Encoder:  encoder,
+				Hasher:   hasher,
 			})
 			p = auth.CheckCredentialParam{
 				AuthToken: "mock-token",
@@ -242,7 +242,7 @@ var _ = Describe("Basic Auth Package", func() {
 					Return([]byte("client_id:client_secret"), nil).
 					Times(1)
 
-				oAuthRepo.
+				authRepo.
 					EXPECT().
 					FindClient(gomock.Eq(ctx), gomock.Eq(findParam)).
 					Return(nil, fmt.Errorf("db error")).
@@ -255,6 +255,30 @@ var _ = Describe("Basic Auth Package", func() {
 			})
 		})
 
+		When("client is not found", func() {
+			It("should return error", func() {
+				encoder.
+					EXPECT().
+					Decode(gomock.Eq(p.AuthToken)).
+					Return([]byte("client_id:client_secret"), nil).
+					Times(1)
+
+				authRepo.
+					EXPECT().
+					FindClient(gomock.Eq(ctx), gomock.Eq(findParam)).
+					Return(nil, repository.ErrorRecordNotFound).
+					Times(1)
+
+				res, err := basicAuth.CheckCredential(ctx, p)
+
+				expectedRes := &auth.CheckCredentialResult{
+					TokenValid: false,
+				}
+				Expect(res).To(Equal(expectedRes))
+				Expect(err).To(BeNil())
+			})
+		})
+
 		When("client secret is invalid", func() {
 			It("should return error", func() {
 				encoder.
@@ -263,7 +287,7 @@ var _ = Describe("Basic Auth Package", func() {
 					Return([]byte("client_id:client_secret"), nil).
 					Times(1)
 
-				oAuthRepo.
+				authRepo.
 					EXPECT().
 					FindClient(gomock.Eq(ctx), gomock.Eq(findParam)).
 					Return(findRes, nil).
@@ -293,7 +317,7 @@ var _ = Describe("Basic Auth Package", func() {
 					Return([]byte("client_id:client_secret"), nil).
 					Times(1)
 
-				oAuthRepo.
+				authRepo.
 					EXPECT().
 					FindClient(gomock.Eq(ctx), gomock.Eq(findParam)).
 					Return(findRes, nil).

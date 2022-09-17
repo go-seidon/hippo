@@ -41,28 +41,26 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 }
 
 func NewAuthRepository(opts ...RepoOption) (*authRepository, error) {
-	option := RepositoryOption{}
+	p := RepositoryParam{}
 	for _, opt := range opts {
-		opt(&option)
+		opt(&p)
 	}
 
-	if option.mClient == nil {
+	if p.mClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
-	if option.rClient == nil {
+	if p.rClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
 
-	var clock datetime.Clock
-	if option.clock == nil {
+	clock := p.clock
+	if clock == nil {
 		clock = datetime.NewClock()
-	} else {
-		clock = option.clock
 	}
 
 	r := &authRepository{
-		mClient: option.mClient,
-		rClient: option.rClient,
+		mClient: p.mClient,
+		rClient: p.rClient,
 		clock:   clock,
 	}
 	return r, nil

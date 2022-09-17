@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/local/internal/datetime"
+	db_mongo "github.com/go-seidon/local/internal/db-mongo"
 	"github.com/go-seidon/local/internal/repository"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,7 +13,7 @@ import (
 
 type fileRepository struct {
 	dbConfig *DbConfig
-	dbClient *mongo.Client
+	dbClient db_mongo.Client
 	clock    datetime.Clock
 }
 
@@ -166,28 +167,26 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 }
 
 func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
-	option := RepositoryOption{}
+	p := RepositoryParam{}
 	for _, opt := range opts {
-		opt(&option)
+		opt(&p)
 	}
 
-	if option.dbClient == nil {
+	if p.dbClient == nil {
 		return nil, fmt.Errorf("invalid db client specified")
 	}
-	if option.dbConfig == nil {
+	if p.dbConfig == nil {
 		return nil, fmt.Errorf("invalid db config specified")
 	}
 
-	var clock datetime.Clock
-	if option.clock == nil {
+	clock := p.clock
+	if clock == nil {
 		clock = datetime.NewClock()
-	} else {
-		clock = option.clock
 	}
 
 	r := &fileRepository{
-		dbClient: option.dbClient,
-		dbConfig: option.dbConfig,
+		dbClient: p.dbClient,
+		dbConfig: p.dbConfig,
 		clock:    clock,
 	}
 	return r, nil
