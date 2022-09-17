@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
+	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -16,14 +16,14 @@ var _ = Describe("Response Package", func() {
 
 	Context("WithWriterSerializer function", Label("unit"), func() {
 		var (
-			w *mock.MockResponseWriter
+			w *mock_restapp.MockResponseWriter
 			s *mock_serialization.MockSerializer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			s = mock_serialization.NewMockSerializer(ctrl)
 		})
 
@@ -150,14 +150,14 @@ var _ = Describe("Response Package", func() {
 
 	Context("Response function", Label("unit"), func() {
 		var (
-			w *mock.MockResponseWriter
+			w *mock_restapp.MockResponseWriter
 			s *mock_serialization.MockSerializer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			s = mock_serialization.NewMockSerializer(ctrl)
 		})
 

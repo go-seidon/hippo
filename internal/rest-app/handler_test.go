@@ -17,6 +17,7 @@ import (
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
+	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	"github.com/go-seidon/local/internal/retrieving"
 	mock_retrieving "github.com/go-seidon/local/internal/retrieving/mock"
 	"github.com/go-seidon/local/internal/serialization"
@@ -35,7 +36,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler    http.HandlerFunc
 			r          *http.Request
-			w          *mock.MockResponseWriter
+			w          *mock_restapp.MockResponseWriter
 			log        *mock_logging.MockLogger
 			serializer *mock_serialization.MockSerializer
 		)
@@ -44,7 +45,7 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			r = &http.Request{}
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			handler = rest_app.NewNotFoundHandler(log, serializer)
@@ -89,7 +90,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler    http.HandlerFunc
 			r          *http.Request
-			w          *mock.MockResponseWriter
+			w          *mock_restapp.MockResponseWriter
 			log        *mock_logging.MockLogger
 			serializer *mock_serialization.MockSerializer
 		)
@@ -98,7 +99,7 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			r = &http.Request{}
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			handler = rest_app.NewMethodNotAllowedHandler(log, serializer)
@@ -143,7 +144,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler    http.HandlerFunc
 			r          *http.Request
-			w          *mock.MockResponseWriter
+			w          *mock_restapp.MockResponseWriter
 			log        *mock_logging.MockLogger
 			serializer *mock_serialization.MockSerializer
 		)
@@ -152,7 +153,7 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			r = &http.Request{}
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			cfg := &rest_app.RestAppConfig{
@@ -201,7 +202,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler       http.HandlerFunc
 			r             *http.Request
-			w             *mock.MockResponseWriter
+			w             *mock_restapp.MockResponseWriter
 			log           *mock_logging.MockLogger
 			serializer    *mock_serialization.MockSerializer
 			healthService *mock_healthcheck.MockHealthCheck
@@ -211,7 +212,7 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			r = &http.Request{}
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
@@ -348,7 +349,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler       http.HandlerFunc
 			r             *http.Request
-			w             *mock.MockResponseWriter
+			w             *mock_restapp.MockResponseWriter
 			log           *mock_logging.MockLogger
 			serializer    *mock_serialization.MockSerializer
 			deleteService *mock_deleting.MockDeleter
@@ -361,7 +362,7 @@ var _ = Describe("Handler Package", func() {
 				"id": "mock-file-id",
 			})
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			deleteService = mock_deleting.NewMockDeleter(ctrl)
@@ -490,7 +491,7 @@ var _ = Describe("Handler Package", func() {
 			ctx             context.Context
 			handler         http.HandlerFunc
 			r               *http.Request
-			w               *mock.MockResponseWriter
+			w               *mock_restapp.MockResponseWriter
 			log             *mock_logging.MockLogger
 			serializer      *mock_serialization.MockSerializer
 			retrieveService *mock_retrieving.MockRetriever
@@ -505,7 +506,7 @@ var _ = Describe("Handler Package", func() {
 				"id": "mock-file-id",
 			})
 			ctrl := gomock.NewController(t)
-			w = mock.NewMockResponseWriter(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			retrieveService = mock_retrieving.NewMockRetriever(ctrl)

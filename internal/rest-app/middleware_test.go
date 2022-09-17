@@ -10,8 +10,8 @@ import (
 	mock_auth "github.com/go-seidon/local/internal/auth/mock"
 	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
+	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -23,9 +23,9 @@ var _ = Describe("Middleware Package", func() {
 	Context("DefaultHeaderMiddleware", Label("unit"), func() {
 		var (
 			r           *http.Request
-			w           *mock.MockResponseWriter
+			w           *mock_restapp.MockResponseWriter
 			middleware  http.Handler
-			httpHandler *mock.MockHandler
+			httpHandler *mock_restapp.MockHandler
 		)
 
 		BeforeEach(func() {
@@ -33,8 +33,8 @@ var _ = Describe("Middleware Package", func() {
 			ctrl := gomock.NewController(t)
 
 			r = &http.Request{}
-			w = mock.NewMockResponseWriter(ctrl)
-			httpHandler = mock.NewMockHandler(ctrl)
+			w = mock_restapp.NewMockResponseWriter(ctrl)
+			httpHandler = mock_restapp.NewMockHandler(ctrl)
 			fn := rest_app.NewDefaultMiddleware(rest_app.DefaultMiddlewareParam{
 				CorrelationIdHeaderKey: "X-Correlation-Id",
 				CorrelationIdCtxKey:    rest_app.CorrelationIdCtxKey,
@@ -63,10 +63,10 @@ var _ = Describe("Middleware Package", func() {
 		var (
 			a       *mock_auth.MockBasicAuth
 			s       *mock_serialization.MockSerializer
-			handler *mock.MockHandler
+			handler *mock_restapp.MockHandler
 			m       http.Handler
 
-			rw  *mock.MockResponseWriter
+			rw  *mock_restapp.MockResponseWriter
 			req *http.Request
 		)
 
@@ -75,11 +75,11 @@ var _ = Describe("Middleware Package", func() {
 			ctrl := gomock.NewController(t)
 			a = mock_auth.NewMockBasicAuth(ctrl)
 			s = mock_serialization.NewMockSerializer(ctrl)
-			handler = mock.NewMockHandler(ctrl)
+			handler = mock_restapp.NewMockHandler(ctrl)
 			fn := rest_app.NewBasicAuthMiddleware(a, s)
 			m = fn(handler)
 
-			rw = mock.NewMockResponseWriter(ctrl)
+			rw = mock_restapp.NewMockResponseWriter(ctrl)
 			req = &http.Request{
 				Header: http.Header{},
 			}
@@ -209,10 +209,10 @@ var _ = Describe("Middleware Package", func() {
 		var (
 			logger  *mock_logging.MockLogger
 			clock   *mock_datetime.MockClock
-			handler *mock.MockHandler
+			handler *mock_restapp.MockHandler
 			m       http.Handler
 
-			rw               *mock.MockResponseWriter
+			rw               *mock_restapp.MockResponseWriter
 			req              *http.Request
 			currentTimestamp time.Time
 		)
@@ -222,14 +222,14 @@ var _ = Describe("Middleware Package", func() {
 			ctrl := gomock.NewController(t)
 			logger = mock_logging.NewMockLogger(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
-			handler = mock.NewMockHandler(ctrl)
+			handler = mock_restapp.NewMockHandler(ctrl)
 			fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
 				Logger: logger,
 				Clock:  clock,
 			})
 			m = fn(handler)
 
-			rw = mock.NewMockResponseWriter(ctrl)
+			rw = mock_restapp.NewMockResponseWriter(ctrl)
 			req = &http.Request{
 				Header:     http.Header{},
 				Method:     http.MethodPost,
