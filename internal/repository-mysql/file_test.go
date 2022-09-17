@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-seidon/local/internal/mock"
+	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	"github.com/go-seidon/local/internal/repository"
 	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
 	"github.com/golang/mock/gomock"
@@ -52,7 +52,7 @@ var _ = Describe("File Repository", func() {
 
 		When("clock is specified", func() {
 			It("should return result", func() {
-				clockOpt := repository_mysql.WithClock(&mock.MockClock{})
+				clockOpt := repository_mysql.WithClock(&mock_datetime.MockClock{})
 				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
 				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
 				res, err := repository_mysql.NewFileRepository(clockOpt, mOpt, rOpt)
@@ -67,7 +67,7 @@ var _ = Describe("File Repository", func() {
 		var (
 			ctx              context.Context
 			currentTimestamp time.Time
-			clock            *mock.MockClock
+			clock            *mock_datetime.MockClock
 			dbClient         sqlmock.Sqlmock
 			repo             repository.FileRepository
 			p                repository.DeleteFileParam
@@ -82,7 +82,7 @@ var _ = Describe("File Repository", func() {
 
 			currentTimestamp = time.Now()
 			ctrl := gomock.NewController(t)
-			clock = mock.NewMockClock(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 			clock.EXPECT().Now().Return(currentTimestamp)
 
 			db, mock, err := sqlmock.New()
@@ -683,7 +683,7 @@ var _ = Describe("File Repository", func() {
 			ctrl := gomock.NewController(t)
 			ctx = context.Background()
 			currentTimestamp = time.Now()
-			clock := mock.NewMockClock(ctrl)
+			clock := mock_datetime.NewMockClock(ctrl)
 			clock.
 				EXPECT().
 				Now().

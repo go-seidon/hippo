@@ -35,7 +35,7 @@ const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
 type RestApp struct {
 	config *RestAppConfig
-	server app.Server
+	server Server
 	logger logging.Logger
 	repo   repository.Provider
 

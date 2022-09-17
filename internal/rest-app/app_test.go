@@ -12,7 +12,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/go-seidon/local/internal/app"
-	"github.com/go-seidon/local/internal/mock"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
+	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
@@ -28,13 +30,13 @@ var _ = Describe("App Package", func() {
 
 	Context("NewRestApp function", Label("unit"), func() {
 		var (
-			log *mock.MockLogger
+			log *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			log = mock.NewMockLogger(ctrl)
+			log = mock_logging.NewMockLogger(ctrl)
 		})
 
 		When("config is not specified", func() {
@@ -168,9 +170,9 @@ var _ = Describe("App Package", func() {
 	Context("Run function", Label("unit"), func() {
 		var (
 			ra            app.App
-			logger        *mock.MockLogger
-			server        *mock.MockServer
-			healthService *mock.MockHealthCheck
+			logger        *mock_logging.MockLogger
+			server        *mock_restapp.MockServer
+			healthService *mock_healthcheck.MockHealthCheck
 			repo          *mock_repository.MockProvider
 			ctx           context.Context
 		)
@@ -178,12 +180,12 @@ var _ = Describe("App Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
-			healthService = mock.NewMockHealthCheck(ctrl)
-			server = mock.NewMockServer(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
+			server = mock_restapp.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock.NewMockFileRepository(ctrl)
-			authRepo := mock.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFileRepository(ctrl)
+			authRepo := mock_repository.NewMockAuthRepository(ctrl)
 			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
@@ -325,17 +327,17 @@ var _ = Describe("App Package", func() {
 	Context("Stop function", Label("unit"), func() {
 		var (
 			ra            app.App
-			logger        *mock.MockLogger
-			server        *mock.MockServer
-			healthService *mock.MockHealthCheck
+			logger        *mock_logging.MockLogger
+			server        *mock_restapp.MockServer
+			healthService *mock_healthcheck.MockHealthCheck
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock.NewMockLogger(ctrl)
-			healthService = mock.NewMockHealthCheck(ctrl)
-			server = mock.NewMockServer(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
+			server = mock_restapp.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(app.Config{
 					AppName:     "mock-name",

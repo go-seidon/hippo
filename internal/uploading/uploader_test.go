@@ -8,8 +8,12 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/filesystem"
-	"github.com/go-seidon/local/internal/mock"
+	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
+	mock_io "github.com/go-seidon/local/internal/io/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/repository"
+	mock_repository "github.com/go-seidon/local/internal/repository/mock"
+	mock_text "github.com/go-seidon/local/internal/text/mock"
 	"github.com/go-seidon/local/internal/uploading"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,22 +28,22 @@ func TestUploading(t *testing.T) {
 var _ = Describe("Uploader Service", func() {
 	Context("NewUploader function", Label("unit"), func() {
 		var (
-			fileRepo    *mock.MockFileRepository
-			fileManager *mock.MockFileManager
-			dirManager  *mock.MockDirectoryManager
-			logger      *mock.MockLogger
-			identifier  *mock.MockIdentifier
+			fileRepo    *mock_repository.MockFileRepository
+			fileManager *mock_filesystem.MockFileManager
+			dirManager  *mock_filesystem.MockDirectoryManager
+			logger      *mock_logging.MockLogger
+			identifier  *mock_text.MockIdentifier
 			p           uploading.NewUploaderParam
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
-			dirManager = mock.NewMockDirectoryManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
-			identifier = mock.NewMockIdentifier(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
+			identifier = mock_text.NewMockIdentifier(ctrl)
 			p = uploading.NewUploaderParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
@@ -113,7 +117,7 @@ var _ = Describe("Uploader Service", func() {
 		var (
 			ctx           context.Context
 			data          []byte
-			fileManager   *mock.MockFileManager
+			fileManager   *mock_filesystem.MockFileManager
 			fn            repository.CreateFn
 			createFnParam repository.CreateFnParam
 			existsParam   filesystem.IsFileExistsParam
@@ -125,7 +129,7 @@ var _ = Describe("Uploader Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			data = []byte{}
-			fileManager = mock.NewMockFileManager(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			fn = uploading.NewCreateFn(data, fileManager)
 			createFnParam = repository.CreateFnParam{
 				FilePath: "mock/path/name.jpg",
@@ -214,12 +218,12 @@ var _ = Describe("Uploader Service", func() {
 		var (
 			ctx              context.Context
 			currentTimestamp time.Time
-			fileRepo         *mock.MockFileRepository
-			fileManager      *mock.MockFileManager
-			dirManager       *mock.MockDirectoryManager
-			logger           *mock.MockLogger
-			reader           *mock.MockReader
-			identifier       *mock.MockIdentifier
+			fileRepo         *mock_repository.MockFileRepository
+			fileManager      *mock_filesystem.MockFileManager
+			dirManager       *mock_filesystem.MockDirectoryManager
+			logger           *mock_logging.MockLogger
+			reader           *mock_io.MockReader
+			identifier       *mock_text.MockIdentifier
 			s                uploading.Uploader
 			dirExistsParam   filesystem.IsDirectoryExistsParam
 			createDirParam   filesystem.CreateDirParam
@@ -232,12 +236,12 @@ var _ = Describe("Uploader Service", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
-			fileManager = mock.NewMockFileManager(ctrl)
-			dirManager = mock.NewMockDirectoryManager(ctrl)
-			logger = mock.NewMockLogger(ctrl)
-			identifier = mock.NewMockIdentifier(ctrl)
-			reader = mock.NewMockReader(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
+			logger = mock_logging.NewMockLogger(ctrl)
+			identifier = mock_text.NewMockIdentifier(ctrl)
+			reader = mock_io.NewMockReader(ctrl)
 			s, _ = uploading.NewUploader(uploading.NewUploaderParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,

@@ -5,7 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 
-	"github.com/go-seidon/local/internal/mock"
+	mock_io "github.com/go-seidon/local/internal/io/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -109,14 +109,14 @@ var _ = Describe("Multipart Package", func() {
 
 	Context("ParseMultipartFile function", Label("unit"), func() {
 		var (
-			f  *mock.MockReadSeeker
+			f  *mock_io.MockReadSeeker
 			fh *multipart.FileHeader
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			f = mock.NewMockReadSeeker(ctrl)
+			f = mock_io.NewMockReadSeeker(ctrl)
 			fh = &multipart.FileHeader{
 				Filename: "dolpin.jpeg",
 				Size:     200,

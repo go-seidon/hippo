@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-seidon/local/internal/mock"
+	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	"github.com/go-seidon/local/internal/repository"
 	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -52,7 +52,7 @@ var _ = Describe("Auth Repository", func() {
 
 		When("clock is specified", func() {
 			It("should return result", func() {
-				clockOpt := repository_mongo.WithClock(&mock.MockClock{})
+				clockOpt := repository_mongo.WithClock(&mock_datetime.MockClock{})
 				dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
 					DbName: "db_name",
 				})

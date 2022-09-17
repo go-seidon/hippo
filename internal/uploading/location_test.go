@@ -3,7 +3,7 @@ package uploading_test
 import (
 	"time"
 
-	"github.com/go-seidon/local/internal/mock"
+	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	"github.com/go-seidon/local/internal/uploading"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -14,13 +14,13 @@ var _ = Describe("Daily Rotate Service", func() {
 	Context("NewDailyRotate function", Label("unit"), func() {
 		var (
 			p     uploading.NewDailyRotateParam
-			clock *mock.MockClock
+			clock *mock_datetime.MockClock
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			clock = mock.NewMockClock(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 			p = uploading.NewDailyRotateParam{}
 		})
 
@@ -45,13 +45,13 @@ var _ = Describe("Daily Rotate Service", func() {
 	Context("GetLocation function", Label("unit"), func() {
 		var (
 			s     uploading.UploadLocation
-			clock *mock.MockClock
+			clock *mock_datetime.MockClock
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			clock = mock.NewMockClock(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 
 			s = uploading.NewDailyRotate(uploading.NewDailyRotateParam{
 				Clock: clock,
