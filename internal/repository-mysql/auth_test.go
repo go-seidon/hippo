@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-seidon/local/internal/mock"
+	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	"github.com/go-seidon/local/internal/repository"
 	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
 
@@ -50,7 +50,7 @@ var _ = Describe("Auth Repository", func() {
 
 		When("clock is specified", func() {
 			It("should return result", func() {
-				clockOpt := repository_mysql.WithClock(&mock.MockClock{})
+				clockOpt := repository_mysql.WithClock(&mock_datetime.MockClock{})
 				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
 				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
 				res, err := repository_mysql.NewAuthRepository(clockOpt, mOpt, rOpt)

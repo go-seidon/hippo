@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-seidon/local/internal/auth"
 	mock_auth "github.com/go-seidon/local/internal/auth/mock"
+	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	"github.com/golang/mock/gomock"
@@ -205,7 +206,7 @@ var _ = Describe("Middleware Package", func() {
 	Context("NewRequestLogMiddleware", Label("unit"), func() {
 		var (
 			logger  *mock.MockLogger
-			clock   *mock.MockClock
+			clock   *mock_datetime.MockClock
 			handler *mock.MockHandler
 			m       http.Handler
 
@@ -218,7 +219,7 @@ var _ = Describe("Middleware Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			logger = mock.NewMockLogger(ctrl)
-			clock = mock.NewMockClock(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 			handler = mock.NewMockHandler(ctrl)
 			fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
 				Logger: logger,
