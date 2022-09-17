@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/deleting"
+	mock_deleting "github.com/go-seidon/local/internal/deleting/mock"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
@@ -345,7 +346,7 @@ var _ = Describe("Handler Package", func() {
 			w             *mock.MockResponseWriter
 			log           *mock.MockLogger
 			serializer    *mock.MockSerializer
-			deleteService *mock.MockDeleter
+			deleteService *mock_deleting.MockDeleter
 			p             deleting.DeleteFileParam
 		)
 
@@ -358,7 +359,7 @@ var _ = Describe("Handler Package", func() {
 			w = mock.NewMockResponseWriter(ctrl)
 			log = mock.NewMockLogger(ctrl)
 			serializer = mock.NewMockSerializer(ctrl)
-			deleteService = mock.NewMockDeleter(ctrl)
+			deleteService = mock_deleting.NewMockDeleter(ctrl)
 			handler = rest_app.NewDeleteFileHandler(log, serializer, deleteService)
 			p = deleting.DeleteFileParam{
 				FileId: "mock-file-id",
