@@ -9,8 +9,8 @@ import (
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
+	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	"github.com/go-seidon/local/internal/retrieving"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -25,7 +25,7 @@ func TestRetrieving(t *testing.T) {
 var _ = Describe("Retriever Service", func() {
 	Context("NewRetriever function", Label("unit"), func() {
 		var (
-			fileRepo    *mock.MockFileRepository
+			fileRepo    *mock_repository.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
 			logger      *mock_logging.MockLogger
 			p           retrieving.NewRetrieverParam
@@ -34,7 +34,7 @@ var _ = Describe("Retriever Service", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			p = retrieving.NewRetrieverParam{
@@ -89,7 +89,7 @@ var _ = Describe("Retriever Service", func() {
 			ctx           context.Context
 			p             retrieving.RetrieveFileParam
 			r             *retrieving.RetrieveFileResult
-			fileRepo      *mock.MockFileRepository
+			fileRepo      *mock_repository.MockFileRepository
 			fileManager   *mock_filesystem.MockFileManager
 			log           *mock_logging.MockLogger
 			s             retrieving.Retriever
@@ -106,7 +106,7 @@ var _ = Describe("Retriever Service", func() {
 			}
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			s, _ = retrieving.NewRetriever(retrieving.NewRetrieverParam{

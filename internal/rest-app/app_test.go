@@ -15,7 +15,6 @@ import (
 	mock_app "github.com/go-seidon/local/internal/app/mock"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	"github.com/go-seidon/local/internal/mock"
 
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
@@ -185,8 +184,8 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_app.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock.NewMockFileRepository(ctrl)
-			authRepo := mock.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFileRepository(ctrl)
+			authRepo := mock_repository.NewMockAuthRepository(ctrl)
 			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 

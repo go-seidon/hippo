@@ -12,6 +12,7 @@ import (
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/mock"
 	"github.com/go-seidon/local/internal/repository"
+	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	"github.com/go-seidon/local/internal/uploading"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -26,7 +27,7 @@ func TestUploading(t *testing.T) {
 var _ = Describe("Uploader Service", func() {
 	Context("NewUploader function", Label("unit"), func() {
 		var (
-			fileRepo    *mock.MockFileRepository
+			fileRepo    *mock_repository.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
 			dirManager  *mock_filesystem.MockDirectoryManager
 			logger      *mock_logging.MockLogger
@@ -37,7 +38,7 @@ var _ = Describe("Uploader Service", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
@@ -216,7 +217,7 @@ var _ = Describe("Uploader Service", func() {
 		var (
 			ctx              context.Context
 			currentTimestamp time.Time
-			fileRepo         *mock.MockFileRepository
+			fileRepo         *mock_repository.MockFileRepository
 			fileManager      *mock_filesystem.MockFileManager
 			dirManager       *mock_filesystem.MockDirectoryManager
 			logger           *mock_logging.MockLogger
@@ -234,7 +235,7 @@ var _ = Describe("Uploader Service", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)

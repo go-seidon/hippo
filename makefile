@@ -67,14 +67,14 @@ generate-mock:
 	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/client.go -destination=internal/healthcheck/mock/client_mock.go
 	mockgen -package=mock_logging -source internal/logging/log.go -destination=internal/logging/mock/log_mock.go
+	mockgen -package=mock_repository -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
+	mockgen -package=mock_repository -source internal/repository/file.go -destination=internal/repository/mock/file_mock.go
+	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/serialization/serializer.go -destination=internal/mock/serialization_serializer_mock.go
-	mockgen -package=mock -source internal/repository/file.go -destination=internal/mock/repository_file_mock.go
-	mockgen -package=mock -source internal/repository/auth.go -destination=internal/mock/repository_auth_mock.go
 	mockgen -package=mock -source internal/retrieving/retriever.go -destination=internal/mock/retrieving_retriever_mock.go
 	mockgen -package=mock -source internal/uploading/uploader.go -destination=internal/mock/uploading_uploader_mock.go
 	mockgen -package=mock -source internal/uploading/location.go -destination=internal/mock/uploading_location_mock.go
-	mockgen -package=mock -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 
 .PHONY: run-grpc-app
 run-grpc-app:
