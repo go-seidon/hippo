@@ -56,6 +56,7 @@ test-watch-integration:
 generate-mock:
 	mockgen -package=mock_app -source internal/app/server.go -destination=internal/app/mock/server_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
+	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
 	mockgen -package=mock -source internal/text/id.go -destination=internal/mock/text_id_mock.go
 	mockgen -package=mock -source internal/datetime/clock.go -destination=internal/mock/datetime_clock_mock.go
 	mockgen -package=mock -source internal/logging/log.go -destination=internal/mock/logging_log_mock.go
