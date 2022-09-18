@@ -42,7 +42,7 @@ type RestApp struct {
 	healthService healthcheck.HealthCheck
 }
 
-func (a *RestApp) Run() error {
+func (a *RestApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
 	err := a.healthService.Start()
@@ -50,7 +50,7 @@ func (a *RestApp) Run() error {
 		return err
 	}
 
-	err = a.repo.Init(context.Background())
+	err = a.repo.Init(ctx)
 	if err != nil {
 		return err
 	}
@@ -63,9 +63,9 @@ func (a *RestApp) Run() error {
 	return nil
 }
 
-func (a *RestApp) Stop() error {
+func (a *RestApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
-	return a.server.Shutdown(context.Background())
+	return a.server.Shutdown(ctx)
 }
 
 func NewRestApp(opts ...Option) (*RestApp, error) {

@@ -219,7 +219,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("healthcheck error")).
 					Times(1)
 
-				err := ra.Run()
+				err := ra.Run(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("healthcheck error")))
 			})
@@ -244,7 +244,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("db error")).
 					Times(1)
 
-				err := ra.Run()
+				err := ra.Run(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("db error")))
 			})
@@ -280,7 +280,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("port already used")).
 					Times(1)
 
-				err := ra.Run()
+				err := ra.Run(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("port already used")))
 			})
@@ -316,7 +316,7 @@ var _ = Describe("App Package", func() {
 					Return(http.ErrServerClosed).
 					Times(1)
 
-				err := ra.Run()
+				err := ra.Run(ctx)
 
 				Expect(err).To(BeNil())
 			})
@@ -330,6 +330,7 @@ var _ = Describe("App Package", func() {
 			logger        *mock_logging.MockLogger
 			server        *mock_restapp.MockServer
 			healthService *mock_healthcheck.MockHealthCheck
+			ctx           context.Context
 		)
 
 		BeforeEach(func() {
@@ -350,6 +351,7 @@ var _ = Describe("App Package", func() {
 				rest_app.WithServer(server),
 				rest_app.WithService(healthService),
 			)
+			ctx = context.Background()
 		})
 
 		When("failed stop app", func() {
@@ -365,7 +367,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("cant stop app")).
 					Times(1)
 
-				err := ra.Stop()
+				err := ra.Stop(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("cant stop app")))
 			})
@@ -384,7 +386,7 @@ var _ = Describe("App Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := ra.Stop()
+				err := ra.Stop(ctx)
 
 				Expect(err).To(BeNil())
 			})

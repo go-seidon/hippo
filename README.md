@@ -7,10 +7,9 @@
 No doc right now
 
 ## Todo
-1. Change `app.Run` and `app.Stop` to receive ctx
-2. Add `grpc-app` implementation
-3. Stream instead of load the entire files to the memory
-4. Deploy dev, stg, prod (deployment script)
+1. Add `grpc-app` implementation
+2. Stream instead of load the entire files to the memory
+3. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy

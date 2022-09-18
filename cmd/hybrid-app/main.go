@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -42,7 +43,8 @@ func main() {
 		panic(err)
 	}
 
-	err = app.Run()
+	ctx := context.Background()
+	err = app.Run(ctx)
 	if err != nil {
 		panic(err)
 	}
