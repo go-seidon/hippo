@@ -68,7 +68,7 @@ func (a *restApp) Stop(ctx context.Context) error {
 	return a.server.Shutdown(ctx)
 }
 
-func NewRestApp(opts ...Option) (*restApp, error) {
+func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	p := RestAppParam{}
 	for _, opt := range opts {
 		opt(&p)
