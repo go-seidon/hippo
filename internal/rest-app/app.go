@@ -33,7 +33,7 @@ type ContextKey string
 const CorrelationIdKey = "correlationId"
 const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
-type RestApp struct {
+type restApp struct {
 	config *RestAppConfig
 	server Server
 	logger logging.Logger
@@ -42,7 +42,7 @@ type RestApp struct {
 	healthService healthcheck.HealthCheck
 }
 
-func (a *RestApp) Run(ctx context.Context) error {
+func (a *restApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
 	err := a.healthService.Start()
@@ -63,12 +63,12 @@ func (a *RestApp) Run(ctx context.Context) error {
 	return nil
 }
 
-func (a *RestApp) Stop(ctx context.Context) error {
+func (a *restApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
 	return a.server.Shutdown(ctx)
 }
 
-func NewRestApp(opts ...Option) (*RestApp, error) {
+func NewRestApp(opts ...Option) (*restApp, error) {
 	p := RestAppParam{}
 	for _, opt := range opts {
 		opt(&p)
@@ -320,7 +320,7 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 		}
 	}
 
-	app := &RestApp{
+	app := &restApp{
 		server:        server,
 		config:        raCfg,
 		logger:        logger,
