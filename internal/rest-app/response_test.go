@@ -108,11 +108,11 @@ var _ = Describe("Response Package", func() {
 
 	Context("WithCode function", Label("unit"), func() {
 		var (
-			code string
+			code int32
 		)
 
 		BeforeEach(func() {
-			code = "SOME_ERROR"
+			code = 1001
 		})
 
 		When("code is specified", func() {
@@ -211,7 +211,7 @@ var _ = Describe("Response Package", func() {
 		When("message is specified", func() {
 			It("should return nil", func() {
 				b := rest_app.ResponseBody{
-					Code:    "SUCCESS",
+					Code:    1000,
 					Message: "success do something",
 				}
 				s.

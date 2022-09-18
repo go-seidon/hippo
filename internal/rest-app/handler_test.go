@@ -55,7 +55,7 @@ var _ = Describe("Handler Package", func() {
 			It("should write response", func() {
 
 				b := rest_app.ResponseBody{
-					Code:    "NOT_FOUND",
+					Code:    1004,
 					Message: "resource not found",
 				}
 
@@ -109,7 +109,7 @@ var _ = Describe("Handler Package", func() {
 			It("should write response", func() {
 
 				b := rest_app.ResponseBody{
-					Code:    "ERROR",
+					Code:    1001,
 					Message: "method is not allowed",
 				}
 
@@ -167,7 +167,7 @@ var _ = Describe("Handler Package", func() {
 			It("should write response", func() {
 
 				b := rest_app.ResponseBody{
-					Code:    "SUCCESS",
+					Code:    1000,
 					Message: "success",
 					Data: struct {
 						AppName    string `json:"app_name"`
@@ -225,7 +225,7 @@ var _ = Describe("Handler Package", func() {
 				err := fmt.Errorf("failed check health")
 
 				b := rest_app.ResponseBody{
-					Code:    "ERROR",
+					Code:    1001,
 					Message: err.Error(),
 				}
 
@@ -315,7 +315,7 @@ var _ = Describe("Handler Package", func() {
 						Status:  "WARNING",
 						Details: jobs,
 					},
-					Code:    "SUCCESS",
+					Code:    1000,
 					Message: "success check service health",
 				}
 
@@ -378,7 +378,7 @@ var _ = Describe("Handler Package", func() {
 				err := fmt.Errorf("failed delete file")
 
 				b := rest_app.ResponseBody{
-					Code:    "ERROR",
+					Code:    1001,
 					Message: err.Error(),
 				}
 
@@ -414,7 +414,7 @@ var _ = Describe("Handler Package", func() {
 				err := deleting.ErrorResourceNotFound
 
 				b := rest_app.ResponseBody{
-					Code:    "NOT_FOUND",
+					Code:    1004,
 					Message: err.Error(),
 				}
 
@@ -450,7 +450,7 @@ var _ = Describe("Handler Package", func() {
 					DeletedAt: time.Now(),
 				}
 				b := rest_app.ResponseBody{
-					Code:    "SUCCESS",
+					Code:    1000,
 					Message: "success delete file",
 					Data: struct {
 						DeletedAt int64 `json:"deleted_at"`
@@ -523,7 +523,7 @@ var _ = Describe("Handler Package", func() {
 				err := fmt.Errorf("failed retrieve file")
 
 				b := rest_app.ResponseBody{
-					Code:    "ERROR",
+					Code:    1001,
 					Message: err.Error(),
 				}
 
@@ -559,7 +559,7 @@ var _ = Describe("Handler Package", func() {
 				err := retrieving.ErrorResourceNotFound
 
 				b := rest_app.ResponseBody{
-					Code:    "NOT_FOUND",
+					Code:    1004,
 					Message: err.Error(),
 				}
 
@@ -608,7 +608,7 @@ var _ = Describe("Handler Package", func() {
 				}
 
 				b := rest_app.ResponseBody{
-					Code:    "ERROR",
+					Code:    1001,
 					Message: "read error",
 				}
 
@@ -782,7 +782,7 @@ var _ = Describe("Handler Package", func() {
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
 				Expect(w.Code).To(Equal(400))
-				Expect(resBody.Code).To(Equal("ERROR"))
+				Expect(resBody.Code).To(Equal(int32(1001)))
 				Expect(resBody.Message).To(Equal("request Content-Type isn't multipart/form-data"))
 				Expect(resBody.Data).To(BeNil())
 			})
@@ -811,7 +811,7 @@ var _ = Describe("Handler Package", func() {
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
 				Expect(w.Code).To(Equal(400))
-				Expect(resBody.Code).To(Equal("ERROR"))
+				Expect(resBody.Code).To(Equal(int32(1001)))
 				Expect(resBody.Message).To(Equal("disk error"))
 				Expect(resBody.Data).To(BeNil())
 			})
@@ -857,7 +857,7 @@ var _ = Describe("Handler Package", func() {
 				}
 
 				Expect(w.Code).To(Equal(200))
-				Expect(resBody.Code).To(Equal("SUCCESS"))
+				Expect(resBody.Code).To(Equal(int32(1000)))
 				Expect(resBody.Message).To(Equal("success upload file"))
 				Expect(resBody.Data).To(Equal(data))
 			})

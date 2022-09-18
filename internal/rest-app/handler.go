@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/retrieving"
 	"github.com/go-seidon/local/internal/serialization"
+	"github.com/go-seidon/local/internal/status"
 	"github.com/go-seidon/local/internal/uploading"
 	"github.com/gorilla/mux"
 )
@@ -24,7 +25,7 @@ func NewNotFoundHandler(log logging.Logger, s serialization.Serializer) http.Han
 		Response(
 			WithWriterSerializer(w, s),
 			WithHttpCode(http.StatusNotFound),
-			WithCode(CODE_NOT_FOUND),
+			WithCode(status.RESOURCE_NOTFOUND),
 			WithMessage("resource not found"),
 		)
 	}
@@ -37,7 +38,7 @@ func NewMethodNotAllowedHandler(log logging.Logger, s serialization.Serializer) 
 		Response(
 			WithWriterSerializer(w, s),
 			WithHttpCode(http.StatusMethodNotAllowed),
-			WithCode(CODE_ERROR),
+			WithCode(status.ACTION_FAILED),
 			WithMessage("method is not allowed"),
 		)
 	}
@@ -65,7 +66,7 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 
 			Response(
 				WithWriterSerializer(w, s),
-				WithCode(CODE_ERROR),
+				WithCode(status.ACTION_FAILED),
 				WithMessage(err.Error()),
 				WithHttpCode(http.StatusBadRequest),
 			)
@@ -146,7 +147,7 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 			Response(
 				WithWriterSerializer(w, s),
 				WithHttpCode(http.StatusNotFound),
-				WithCode(CODE_NOT_FOUND),
+				WithCode(status.RESOURCE_NOTFOUND),
 				WithMessage(err.Error()),
 			)
 			return
@@ -154,7 +155,7 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 
 		Response(
 			WithWriterSerializer(w, s),
-			WithCode(CODE_ERROR),
+			WithCode(status.ACTION_FAILED),
 			WithMessage(err.Error()),
 			WithHttpCode(http.StatusBadRequest),
 		)
@@ -177,7 +178,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			if err != nil {
 				Response(
 					WithWriterSerializer(w, s),
-					WithCode(CODE_ERROR),
+					WithCode(status.ACTION_FAILED),
 					WithMessage(err.Error()),
 					WithHttpCode(http.StatusBadRequest),
 				)
@@ -198,7 +199,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			Response(
 				WithWriterSerializer(w, s),
 				WithHttpCode(http.StatusNotFound),
-				WithCode(CODE_NOT_FOUND),
+				WithCode(status.RESOURCE_NOTFOUND),
 				WithMessage(err.Error()),
 			)
 			return
@@ -206,7 +207,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 
 		Response(
 			WithWriterSerializer(w, s),
-			WithCode(CODE_ERROR),
+			WithCode(status.ACTION_FAILED),
 			WithMessage(err.Error()),
 			WithHttpCode(http.StatusBadRequest),
 		)
@@ -223,7 +224,7 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
-				WithCode(CODE_ERROR),
+				WithCode(status.ACTION_FAILED),
 				WithMessage(err.Error()),
 				WithHttpCode(http.StatusBadRequest),
 			)
@@ -235,7 +236,7 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
-				WithCode(CODE_ERROR),
+				WithCode(status.ACTION_FAILED),
 				WithMessage(err.Error()),
 				WithHttpCode(http.StatusBadRequest),
 			)
@@ -258,7 +259,7 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
-				WithCode(CODE_ERROR),
+				WithCode(status.ACTION_FAILED),
 				WithMessage(err.Error()),
 				WithHttpCode(http.StatusBadRequest),
 			)

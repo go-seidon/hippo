@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-seidon/local/internal/serialization"
+	"github.com/go-seidon/local/internal/status"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 )
 
 type ResponseBody struct {
-	Code    string      `json:"code"`
+	Code    int32       `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
@@ -28,7 +29,7 @@ type ResponseParam struct {
 	defaultHttpCode int
 	HttpCode        int
 	Message         string
-	Code            string
+	Code            int32
 	Data            interface{}
 }
 
@@ -53,7 +54,7 @@ func WithMessage(m string) ResponseOption {
 	}
 }
 
-func WithCode(c string) ResponseOption {
+func WithCode(c int32) ResponseOption {
 	return func(rp *ResponseParam) {
 		rp.Code = c
 	}
@@ -68,7 +69,7 @@ func WithData(d interface{}) ResponseOption {
 func Response(opts ...ResponseOption) error {
 	p := ResponseParam{
 		Body: ResponseBody{
-			Code:    CODE_SUCCESS,
+			Code:    status.ACTION_SUCCESS,
 			Message: "success",
 		},
 		defaultHttpCode: http.StatusOK,
@@ -93,7 +94,7 @@ func Response(opts ...ResponseOption) error {
 		p.Body.Message = p.Message
 	}
 
-	if p.Code != "" {
+	if p.Code != 0 {
 		p.Body.Code = p.Code
 	}
 
