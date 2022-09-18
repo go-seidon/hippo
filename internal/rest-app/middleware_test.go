@@ -91,7 +91,7 @@ var _ = Describe("Middleware Package", func() {
 				req.Header.Del("Authorization")
 
 				b := rest_app.ResponseBody{
-					Code:    "UNAUTHORIZED",
+					Code:    1003,
 					Message: "credential is not specified",
 				}
 				s.
@@ -124,7 +124,7 @@ var _ = Describe("Middleware Package", func() {
 					Times(1)
 
 				b := rest_app.ResponseBody{
-					Code:    "UNAUTHORIZED",
+					Code:    1003,
 					Message: "failed check credential",
 				}
 				s.
@@ -160,7 +160,7 @@ var _ = Describe("Middleware Package", func() {
 					Times(1)
 
 				b := rest_app.ResponseBody{
-					Code:    "UNAUTHORIZED",
+					Code:    1003,
 					Message: "credential is invalid",
 				}
 				s.

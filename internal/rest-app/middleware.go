@@ -11,6 +11,7 @@ import (
 	"github.com/go-seidon/local/internal/datetime"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/serialization"
+	"github.com/go-seidon/local/internal/status"
 )
 
 type DefaultMiddlewareParam struct {
@@ -43,7 +44,7 @@ func NewBasicAuthMiddleware(a auth.BasicAuth, s serialization.Serializer) func(h
 					WithWriterSerializer(w, s),
 					WithMessage("credential is not specified"),
 					WithHttpCode(http.StatusUnauthorized),
-					WithCode(CODE_UNAUTHORIZED),
+					WithCode(status.ACTION_FORBIDDEN),
 				)
 				return
 			}
@@ -55,7 +56,7 @@ func NewBasicAuthMiddleware(a auth.BasicAuth, s serialization.Serializer) func(h
 				Response(
 					WithWriterSerializer(w, s),
 					WithHttpCode(http.StatusUnauthorized),
-					WithCode(CODE_UNAUTHORIZED),
+					WithCode(status.ACTION_FORBIDDEN),
 					WithMessage("failed check credential"),
 				)
 				return
@@ -65,7 +66,7 @@ func NewBasicAuthMiddleware(a auth.BasicAuth, s serialization.Serializer) func(h
 					WithWriterSerializer(w, s),
 					WithMessage("credential is invalid"),
 					WithHttpCode(http.StatusUnauthorized),
-					WithCode(CODE_UNAUTHORIZED),
+					WithCode(status.ACTION_FORBIDDEN),
 				)
 				return
 			}
