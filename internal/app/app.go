@@ -1,5 +1,7 @@
 package app
 
+import "context"
+
 const (
 	ENV_LOCAL = "local"
 	ENV_TEST  = "test"
@@ -10,6 +12,6 @@ const (
 )
 
 type App interface {
-	Run() error
-	Stop() error
+	Run(ctx context.Context) error
+	Stop(ctx context.Context) error
 }
