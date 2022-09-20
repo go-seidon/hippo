@@ -58,7 +58,7 @@ type LogMessage struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type LogOption struct {
+type LogParam struct {
 	AppCtxEnabled bool
 	AppName       string
 	AppVersion    string
@@ -69,30 +69,30 @@ type LogOption struct {
 	StackSkip []string
 }
 
-type Option func(*LogOption)
+type LogOption func(*LogParam)
 
-func WithAppContext(name, version string) Option {
-	return func(lo *LogOption) {
+func WithAppContext(name, version string) LogOption {
+	return func(lo *LogParam) {
 		lo.AppCtxEnabled = true
 		lo.AppName = name
 		lo.AppVersion = version
 	}
 }
 
-func EnableDebugging() Option {
-	return func(lo *LogOption) {
+func EnableDebugging() LogOption {
+	return func(lo *LogParam) {
 		lo.DebuggingEnabled = true
 	}
 }
 
-func EnablePrettyPrint() Option {
-	return func(lo *LogOption) {
+func EnablePrettyPrint() LogOption {
+	return func(lo *LogParam) {
 		lo.PrettyPrintEnabled = true
 	}
 }
 
-func AddStackSkip(pkg string) Option {
-	return func(lo *LogOption) {
+func AddStackSkip(pkg string) LogOption {
+	return func(lo *LogParam) {
 		lo.StackSkip = append(lo.StackSkip, pkg)
 	}
 }

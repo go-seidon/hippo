@@ -92,32 +92,32 @@ func (l *logrusLog) WriterLevel(level string) io.Writer {
 	return l.client.WriterLevel(lvl)
 }
 
-func NewLogrusLog(opts ...Option) *logrusLog {
-	option := LogOption{
+func NewLogrusLog(opts ...LogOption) *logrusLog {
+	p := LogParam{
 		StackSkip: []string{
 			"github.com/sirupsen/logrus",
 		},
 	}
 	for _, opt := range opts {
-		opt(&option)
+		opt(&p)
 	}
 
 	client := logrus.New()
 	client.SetOutput(os.Stdout)
 	client.SetFormatter(&GoFormatter{
-		PrettyPrint: option.PrettyPrintEnabled,
-		StackSkip:   option.StackSkip,
+		PrettyPrint: p.PrettyPrintEnabled,
+		StackSkip:   p.StackSkip,
 	})
-	if option.DebuggingEnabled {
+	if p.DebuggingEnabled {
 		client.SetLevel(logrus.DebugLevel)
 	}
 
 	appCtx := logrus.Fields{}
-	if option.AppCtxEnabled {
+	if p.AppCtxEnabled {
 		appCtx = logrus.Fields{
 			FIELD_SERVICE: map[string]interface{}{
-				"name":    option.AppName,
-				"version": option.AppVersion,
+				"name":    p.AppName,
+				"version": p.AppVersion,
 			},
 		}
 	}
