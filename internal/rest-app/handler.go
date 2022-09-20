@@ -74,24 +74,21 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 		}
 
 		jobs := map[string]struct {
-			Name      string      `json:"name"`
-			Status    string      `json:"status"`
-			CheckedAt time.Time   `json:"checked_at"`
-			Error     string      `json:"error"`
-			Metadata  interface{} `json:"metadata"`
+			Name      string    `json:"name"`
+			Status    string    `json:"status"`
+			CheckedAt time.Time `json:"checked_at"`
+			Error     string    `json:"error"`
 		}{}
 		for jobName, item := range r.Items {
 			jobs[jobName] = struct {
-				Name      string      `json:"name"`
-				Status    string      `json:"status"`
-				CheckedAt time.Time   `json:"checked_at"`
-				Error     string      `json:"error"`
-				Metadata  interface{} `json:"metadata"`
+				Name      string    `json:"name"`
+				Status    string    `json:"status"`
+				CheckedAt time.Time `json:"checked_at"`
+				Error     string    `json:"error"`
 			}{
 				Name:      item.Name,
 				Status:    item.Status,
 				Error:     item.Error,
-				Metadata:  item.Metadata,
 				CheckedAt: item.CheckedAt,
 			}
 		}
@@ -99,11 +96,10 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 		d := struct {
 			Status  string `json:"status"`
 			Details map[string]struct {
-				Name      string      `json:"name"`
-				Status    string      `json:"status"`
-				CheckedAt time.Time   `json:"checked_at"`
-				Error     string      `json:"error"`
-				Metadata  interface{} `json:"metadata"`
+				Name      string    `json:"name"`
+				Status    string    `json:"status"`
+				CheckedAt time.Time `json:"checked_at"`
+				Error     string    `json:"error"`
 			} `json:"details"`
 		}{
 			Status:  r.Status,

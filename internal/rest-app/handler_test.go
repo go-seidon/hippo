@@ -267,37 +267,32 @@ var _ = Describe("Handler Package", func() {
 							Status:    "FAILED",
 							Error:     "Critical: disk usage too high 96.71 percent",
 							CheckedAt: currentTimestamp,
-							Metadata:  nil,
 						},
 						"internet-connection": {
 							Name:      "internet-connection",
 							Status:    "OK",
 							Error:     "",
 							CheckedAt: currentTimestamp,
-							Metadata:  nil,
 						},
 					},
 				}
 				jobs := map[string]struct {
-					Name      string      `json:"name"`
-					Status    string      `json:"status"`
-					CheckedAt time.Time   `json:"checked_at"`
-					Error     string      `json:"error"`
-					Metadata  interface{} `json:"metadata"`
+					Name      string    `json:"name"`
+					Status    string    `json:"status"`
+					CheckedAt time.Time `json:"checked_at"`
+					Error     string    `json:"error"`
 				}{
 					"app-disk": {
 						Name:      "app-disk",
 						Status:    "FAILED",
 						Error:     "Critical: disk usage too high 96.71 percent",
 						CheckedAt: currentTimestamp,
-						Metadata:  nil,
 					},
 					"internet-connection": {
 						Name:      "internet-connection",
 						Status:    "OK",
 						Error:     "",
 						CheckedAt: currentTimestamp,
-						Metadata:  nil,
 					},
 				}
 
@@ -305,11 +300,10 @@ var _ = Describe("Handler Package", func() {
 					Data: struct {
 						Status  string `json:"status"`
 						Details map[string]struct {
-							Name      string      `json:"name"`
-							Status    string      `json:"status"`
-							CheckedAt time.Time   `json:"checked_at"`
-							Error     string      `json:"error"`
-							Metadata  interface{} `json:"metadata"`
+							Name      string    `json:"name"`
+							Status    string    `json:"status"`
+							CheckedAt time.Time `json:"checked_at"`
+							Error     string    `json:"error"`
 						} `json:"details"`
 					}{
 						Status:  "WARNING",
