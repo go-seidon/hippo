@@ -18,6 +18,7 @@ const (
 
 type Client interface {
 	Connect(ctx context.Context) error
+	Ping(ctx context.Context, rp *readpref.ReadPref) error
 	Database(name string, opts ...*options.DatabaseOptions) *mongo.Database
 }
 
