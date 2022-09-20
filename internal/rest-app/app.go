@@ -88,12 +88,15 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		return nil, fmt.Errorf("invalid config")
 	}
 
+	var err error
 	logger := p.Logger
 	if logger == nil {
-		logger = app.NewDefaultLog(p.Config)
+		logger, err = app.NewDefaultLog(p.Config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var err error
 	healthService := p.HealthService
 	if healthService == nil {
 		healthService, err = app.NewDefaultHealthCheck(

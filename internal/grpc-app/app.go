@@ -55,13 +55,15 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	if p.Config == nil {
 		return nil, fmt.Errorf("invalid grpc app config")
 	}
-
+	var err error
 	logger := p.Logger
 	if logger == nil {
-		logger = app.NewDefaultLog(p.Config)
+		logger, err = app.NewDefaultLog(p.Config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var err error
 	healthService := p.HealthService
 	if healthService == nil {
 		healthService, err = app.NewDefaultHealthCheck(

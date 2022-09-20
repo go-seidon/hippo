@@ -1,10 +1,16 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/go-seidon/local/internal/logging"
 )
 
-func NewDefaultLog(config *Config) logging.Logger {
+func NewDefaultLog(config *Config) (logging.Logger, error) {
+	if config == nil {
+		return nil, fmt.Errorf("invalid config")
+	}
+
 	opts := []logging.LogOption{}
 
 	appOpt := logging.WithAppContext(config.AppName, config.AppVersion)
@@ -23,5 +29,5 @@ func NewDefaultLog(config *Config) logging.Logger {
 	stackSkipOpt := logging.AddStackSkip("github.com/go-seidon/local/internal/app")
 	opts = append(opts, stackSkipOpt)
 
-	return logging.NewLogrusLog(opts...)
+	return logging.NewLogrusLog(opts...), nil
 }
