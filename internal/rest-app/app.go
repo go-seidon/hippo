@@ -106,26 +106,26 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		logger = logging.NewLogrusLog(opts...)
 	}
 
-	inetPingJob, err := healthcheck.NewHttpPingJob(healthcheck.NewHttpPingJobParam{
-		Name:     "internet-connection",
-		Interval: 30 * time.Second,
-		Url:      "https://google.com",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	appDiskJob, err := healthcheck.NewDiskUsageJob(healthcheck.NewDiskUsageJobParam{
-		Name:      "app-disk",
-		Interval:  60 * time.Second,
-		Directory: "/",
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	healthService := p.HealthService
 	if healthService == nil {
+		inetPingJob, err := healthcheck.NewHttpPingJob(healthcheck.NewHttpPingJobParam{
+			Name:     "internet-connection",
+			Interval: 30 * time.Second,
+			Url:      "https://google.com",
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		appDiskJob, err := healthcheck.NewDiskUsageJob(healthcheck.NewDiskUsageJobParam{
+			Name:      "app-disk",
+			Interval:  60 * time.Second,
+			Directory: "/",
+		})
+		if err != nil {
+			return nil, err
+		}
+
 		healthService, err = healthcheck.NewGoHealthCheck(
 			healthcheck.WithLogger(logger),
 			healthcheck.AddJob(inetPingJob),
