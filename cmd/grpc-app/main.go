@@ -1,18 +1,51 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
 
+	"github.com/go-seidon/local/internal/app"
+	"github.com/go-seidon/local/internal/config"
 	grpc_app "github.com/go-seidon/local/internal/grpc-app"
 )
 
 func main() {
-	app, err := grpc_app.NewGrpcApp()
-	if err != nil {
-		fmt.Println("failed create grpc app", err)
+	appEnv := os.Getenv("APP_ENV")
+	if appEnv == "" {
+		appEnv = "local"
 	}
-	err = app.Run()
+
+	appConfig := app.Config{AppEnv: appEnv}
+
+	cfgFileName := fmt.Sprintf("config/%s.toml", appConfig.AppEnv)
+	tomlConfig, err := config.NewViperConfig(
+		config.WithFileName(cfgFileName),
+	)
 	if err != nil {
-		fmt.Println("failed run grpc app", err)
+		panic(err)
+	}
+
+	err = tomlConfig.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	err = tomlConfig.ParseConfig(&appConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	app, err := grpc_app.NewGrpcApp(
+		grpc_app.WithConfig(appConfig),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := context.Background()
+	err = app.Run(ctx)
+	if err != nil {
+		panic(err)
 	}
 }
