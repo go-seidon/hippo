@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/auth"
@@ -33,7 +32,7 @@ type ContextKey string
 const CorrelationIdKey = "correlationId"
 const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
-type RestApp struct {
+type restApp struct {
 	config *RestAppConfig
 	server Server
 	logger logging.Logger
@@ -42,7 +41,7 @@ type RestApp struct {
 	healthService healthcheck.HealthCheck
 }
 
-func (a *RestApp) Run(ctx context.Context) error {
+func (a *restApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
 	err := a.healthService.Start()
@@ -63,12 +62,18 @@ func (a *RestApp) Run(ctx context.Context) error {
 	return nil
 }
 
-func (a *RestApp) Stop(ctx context.Context) error {
+func (a *restApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
+
+	err := a.healthService.Stop()
+	if err != nil {
+		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
+	}
+
 	return a.server.Shutdown(ctx)
 }
 
-func NewRestApp(opts ...Option) (*RestApp, error) {
+func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	p := RestAppParam{}
 	for _, opt := range opts {
 		opt(&p)
@@ -83,53 +88,19 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 		return nil, fmt.Errorf("invalid config")
 	}
 
+	var err error
 	logger := p.Logger
 	if logger == nil {
-		opts := []logging.Option{}
-
-		appOpt := logging.WithAppContext(p.Config.AppName, p.Config.AppVersion)
-		opts = append(opts, appOpt)
-
-		if p.Config.AppDebug {
-			debugOpt := logging.EnableDebugging()
-			opts = append(opts, debugOpt)
+		logger, err = app.NewDefaultLog(p.Config)
+		if err != nil {
+			return nil, err
 		}
-
-		if p.Config.AppEnv == app.ENV_LOCAL || p.Config.AppEnv == app.ENV_TEST {
-			prettyOpt := logging.EnablePrettyPrint()
-			opts = append(opts, prettyOpt)
-		}
-
-		stackSkipOpt := logging.AddStackSkip("github.com/go-seidon/local/internal/logging")
-		opts = append(opts, stackSkipOpt)
-
-		logger = logging.NewLogrusLog(opts...)
-	}
-
-	inetPingJob, err := healthcheck.NewHttpPingJob(healthcheck.NewHttpPingJobParam{
-		Name:     "internet-connection",
-		Interval: 30 * time.Second,
-		Url:      "https://google.com",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	appDiskJob, err := healthcheck.NewDiskUsageJob(healthcheck.NewDiskUsageJobParam{
-		Name:      "app-disk",
-		Interval:  60 * time.Second,
-		Directory: "/",
-	})
-	if err != nil {
-		return nil, err
 	}
 
 	healthService := p.HealthService
 	if healthService == nil {
-		healthService, err = healthcheck.NewGoHealthCheck(
+		healthService, err = app.NewDefaultHealthCheck(
 			healthcheck.WithLogger(logger),
-			healthcheck.AddJob(inetPingJob),
-			healthcheck.AddJob(appDiskJob),
 		)
 		if err != nil {
 			return nil, err
@@ -320,7 +291,7 @@ func NewRestApp(opts ...Option) (*RestApp, error) {
 		}
 	}
 
-	app := &RestApp{
+	app := &restApp{
 		server:        server,
 		config:        raCfg,
 		logger:        logger,

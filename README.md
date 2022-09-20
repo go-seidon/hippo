@@ -7,9 +7,16 @@
 No doc right now
 
 ## Todo
-1. Add `grpc-app` implementation
-2. Stream instead of load the entire files to the memory
-3. Deploy dev, stg, prod (deployment script)
+1. Remove `healthcheck metadata` (don't know the type yet)
+2. Change REST healthcheck should return `unix milli checked_at`
+3. Add `repo ping healthcheck` implementation
+4. Add delete file `grpc-app` implementation
+5. Add retrieve file `grpc-app` implementation
+6. Add upload file `grpc-app` implementation
+7. Add `grpc-app` basic authentication
+8. Add `REST API versioning`
+9. Stream instead of load the entire files to the memory
+10. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy

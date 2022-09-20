@@ -37,20 +37,6 @@ func (m *MockServer) EXPECT() *MockServerMockRecorder {
 	return m.recorder
 }
 
-// Close mocks base method.
-func (m *MockServer) Close() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Close indicates an expected call of Close.
-func (mr *MockServerMockRecorder) Close() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockServer)(nil).Close))
-}
-
 // ListenAndServe mocks base method.
 func (m *MockServer) ListenAndServe() error {
 	m.ctrl.T.Helper()

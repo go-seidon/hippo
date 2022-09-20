@@ -1,74 +1,60 @@
-package rest_app_test
+package grpc_app_test
 
 import (
 	"context"
 	"fmt"
-
-	"net/http"
 	"testing"
 
+	"github.com/go-seidon/local/internal/app"
+	grpc_app "github.com/go-seidon/local/internal/grpc-app"
+	mock_grpcapp "github.com/go-seidon/local/internal/grpc-app/mock"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/go-seidon/local/internal/app"
-	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
-
-	"github.com/go-seidon/local/internal/repository"
-	mock_repository "github.com/go-seidon/local/internal/repository/mock"
-	rest_app "github.com/go-seidon/local/internal/rest-app"
+	"google.golang.org/grpc"
 )
 
-func TestRestApp(t *testing.T) {
+func TestGrpcApp(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Rest App Package")
+	RunSpecs(t, "Grpc App Package")
 }
 
 var _ = Describe("App Package", func() {
 
-	Context("NewRestApp function", Label("unit"), func() {
+	Context("NewGrpcApp function", Label("unit"), func() {
 		var (
-			log *mock_logging.MockLogger
+			cfg           app.Config
+			logger        *mock_logging.MockLogger
+			healthService *mock_healthcheck.MockHealthCheck
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			log = mock_logging.NewMockLogger(ctrl)
+			cfg = app.Config{
+				AppDebug: true,
+				AppEnv:   "local",
+			}
+			logger = mock_logging.NewMockLogger(ctrl)
+			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 		})
 
 		When("config is not specified", func() {
 			It("should return error", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithLogger(log),
-				)
+				res, err := grpc_app.NewGrpcApp()
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid rest app config")))
+				Expect(err).To(Equal(fmt.Errorf("invalid grpc app config")))
 			})
 		})
 
-		When("config is not valid", func() {
+		When("logger is specified", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
-						DBProvider: "invalid",
-					}),
-				)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid config")))
-			})
-		})
-
-		When("logger is not specified", func() {
-			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
-					}),
+				res, err := grpc_app.NewGrpcApp(
+					grpc_app.WithConfig(cfg),
+					grpc_app.WithLogger(logger),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -76,13 +62,11 @@ var _ = Describe("App Package", func() {
 			})
 		})
 
-		When("debug is enabled", func() {
+		When("health service is specified", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
-						AppDebug:   true,
-					}),
+				res, err := grpc_app.NewGrpcApp(
+					grpc_app.WithConfig(cfg),
+					grpc_app.WithService(healthService),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -90,14 +74,12 @@ var _ = Describe("App Package", func() {
 			})
 		})
 
-		When("env is specified", func() {
+		When("all parameters are specified", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
-						AppDebug:   true,
-						AppEnv:     "local",
-					}),
+				res, err := grpc_app.NewGrpcApp(
+					grpc_app.WithConfig(cfg),
+					grpc_app.WithLogger(logger),
+					grpc_app.WithService(healthService),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -105,21 +87,10 @@ var _ = Describe("App Package", func() {
 			})
 		})
 
-		When("parameter is specified", func() {
+		When("minimal parameters are specified", func() {
 			It("should return result", func() {
-				log.
-					EXPECT().
-					WriterLevel(gomock.Eq("error")).
-					Times(1)
-
-				res, err := rest_app.NewRestApp(
-					rest_app.WithLogger(log),
-					rest_app.WithConfig(app.Config{
-						DBProvider:    repository.DB_PROVIDER_MONGO,
-						AppEnv:        "local",
-						MongoMode:     "standalone",
-						MongoAuthMode: "basic",
-					}),
+				res, err := grpc_app.NewGrpcApp(
+					grpc_app.WithConfig(cfg),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -128,13 +99,13 @@ var _ = Describe("App Package", func() {
 		})
 	})
 
-	Context("RestAppConfig", Label("unit"), func() {
+	Context("GrpcAppConfig", Label("unit"), func() {
 		var (
-			cfg *rest_app.RestAppConfig
+			cfg *grpc_app.GrpcAppConfig
 		)
 
 		BeforeEach(func() {
-			cfg = &rest_app.RestAppConfig{
+			cfg = &grpc_app.GrpcAppConfig{
 				AppName:    "mock-name",
 				AppVersion: "mock-version",
 				AppHost:    "host",
@@ -169,44 +140,38 @@ var _ = Describe("App Package", func() {
 
 	Context("Run function", Label("unit"), func() {
 		var (
-			ra            app.App
-			logger        *mock_logging.MockLogger
-			server        *mock_restapp.MockServer
-			healthService *mock_healthcheck.MockHealthCheck
-			repo          *mock_repository.MockProvider
+			grpcApp       app.App
 			ctx           context.Context
+			logger        *mock_logging.MockLogger
+			healthService *mock_healthcheck.MockHealthCheck
+			server        *mock_grpcapp.MockServer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
+			cfg := app.Config{
+				AppDebug:   true,
+				AppEnv:     "local",
+				AppName:    "mock-name",
+				AppVersion: "mock-version",
+				RPCAppHost: "localhost",
+				RPCAppPort: 4949,
+			}
+
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
-			server = mock_restapp.NewMockServer(ctrl)
-			repo = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock_repository.NewMockFileRepository(ctrl)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
-			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
-			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
-
-			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(app.Config{
-					AppName:     "mock-name",
-					AppVersion:  "mock-version",
-					RESTAppHost: "localhost",
-					RESTAppPort: 4949,
-					DBProvider:  "mysql",
-				}),
-				rest_app.WithLogger(logger),
-				rest_app.WithServer(server),
-				rest_app.WithService(healthService),
-				rest_app.WithRepository(repo),
+			server = mock_grpcapp.NewMockServer(ctrl)
+			grpcApp, _ = grpc_app.NewGrpcApp(
+				grpc_app.WithConfig(cfg),
+				grpc_app.WithLogger(logger),
+				grpc_app.WithService(healthService),
+				grpc_app.WithServer(server),
 			)
-
 			ctx = context.Background()
 		})
 
-		When("failed start healthcehck", func() {
+		When("failed start health service", func() {
 			It("should return error", func() {
 				logger.
 					EXPECT().
@@ -216,37 +181,12 @@ var _ = Describe("App Package", func() {
 				healthService.
 					EXPECT().
 					Start().
-					Return(fmt.Errorf("healthcheck error")).
+					Return(fmt.Errorf("failed start healthcheck")).
 					Times(1)
 
-				err := ra.Run(ctx)
+				err := grpcApp.Run(ctx)
 
-				Expect(err).To(Equal(fmt.Errorf("healthcheck error")))
-			})
-		})
-
-		When("failed init repo", func() {
-			It("should return error", func() {
-				logger.
-					EXPECT().
-					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
-					Times(1)
-
-				healthService.
-					EXPECT().
-					Start().
-					Return(nil).
-					Times(1)
-
-				repo.
-					EXPECT().
-					Init(gomock.Eq(ctx)).
-					Return(fmt.Errorf("db error")).
-					Times(1)
-
-				err := ra.Run(ctx)
-
-				Expect(err).To(Equal(fmt.Errorf("db error")))
+				Expect(err).To(Equal(fmt.Errorf("failed start healthcheck")))
 			})
 		})
 
@@ -263,12 +203,6 @@ var _ = Describe("App Package", func() {
 					Return(nil).
 					Times(1)
 
-				repo.
-					EXPECT().
-					Init(gomock.Eq(ctx)).
-					Return(nil).
-					Times(1)
-
 				logger.
 					EXPECT().
 					Infof(gomock.Eq("Listening on: %s"), gomock.Eq("localhost:4949")).
@@ -280,7 +214,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("port already used")).
 					Times(1)
 
-				err := ra.Run(ctx)
+				err := grpcApp.Run(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("port already used")))
 			})
@@ -299,12 +233,6 @@ var _ = Describe("App Package", func() {
 					Return(nil).
 					Times(1)
 
-				repo.
-					EXPECT().
-					Init(gomock.Eq(ctx)).
-					Return(nil).
-					Times(1)
-
 				logger.
 					EXPECT().
 					Infof(gomock.Eq("Listening on: %s"), gomock.Eq("localhost:4949")).
@@ -313,10 +241,10 @@ var _ = Describe("App Package", func() {
 				server.
 					EXPECT().
 					ListenAndServe().
-					Return(http.ErrServerClosed).
+					Return(grpc.ErrServerStopped).
 					Times(1)
 
-				err := ra.Run(ctx)
+				err := grpcApp.Run(ctx)
 
 				Expect(err).To(BeNil())
 			})
@@ -325,30 +253,33 @@ var _ = Describe("App Package", func() {
 
 	Context("Stop function", Label("unit"), func() {
 		var (
-			ra            app.App
-			logger        *mock_logging.MockLogger
-			server        *mock_restapp.MockServer
-			healthService *mock_healthcheck.MockHealthCheck
+			grpcApp       app.App
 			ctx           context.Context
+			logger        *mock_logging.MockLogger
+			healthService *mock_healthcheck.MockHealthCheck
+			server        *mock_grpcapp.MockServer
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
+			cfg := app.Config{
+				AppDebug:   true,
+				AppEnv:     "local",
+				AppName:    "mock-name",
+				AppVersion: "mock-version",
+				RPCAppHost: "localhost",
+				RPCAppPort: 4949,
+			}
+
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
-			server = mock_restapp.NewMockServer(ctrl)
-			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(app.Config{
-					AppName:     "mock-name",
-					AppVersion:  "mock-version",
-					RESTAppHost: "localhost",
-					RESTAppPort: 4949,
-					DBProvider:  "mysql",
-				}),
-				rest_app.WithLogger(logger),
-				rest_app.WithServer(server),
-				rest_app.WithService(healthService),
+			server = mock_grpcapp.NewMockServer(ctrl)
+			grpcApp, _ = grpc_app.NewGrpcApp(
+				grpc_app.WithConfig(cfg),
+				grpc_app.WithLogger(logger),
+				grpc_app.WithService(healthService),
+				grpc_app.WithServer(server),
 			)
 			ctx = context.Background()
 		})
@@ -372,7 +303,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("cant stop app")).
 					Times(1)
 
-				err := ra.Stop(ctx)
+				err := grpcApp.Stop(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("cant stop app")))
 			})
@@ -397,7 +328,7 @@ var _ = Describe("App Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := ra.Stop(ctx)
+				err := grpcApp.Stop(ctx)
 
 				Expect(err).To(BeNil())
 			})
@@ -427,7 +358,7 @@ var _ = Describe("App Package", func() {
 					Return(fmt.Errorf("cant stop app")).
 					Times(1)
 
-				err := ra.Stop(ctx)
+				err := grpcApp.Stop(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("cant stop app")))
 			})

@@ -19,7 +19,7 @@ var _ = Describe("Logging Package", func() {
 		When("parameter is specified", func() {
 			It("should return result", func() {
 				opt := logging.WithAppContext("mock-name", "mock-version")
-				var res logging.LogOption
+				var res logging.LogParam
 				opt(&res)
 
 				Expect(res.AppName).To(Equal("mock-name"))
@@ -35,7 +35,7 @@ var _ = Describe("Logging Package", func() {
 		When("function is called", func() {
 			It("should return result", func() {
 				opt := logging.EnableDebugging()
-				var res logging.LogOption
+				var res logging.LogParam
 				opt(&res)
 
 				Expect(res.DebuggingEnabled).To(BeTrue())
@@ -51,7 +51,7 @@ var _ = Describe("Logging Package", func() {
 		When("function is called", func() {
 			It("should return result", func() {
 				opt := logging.EnablePrettyPrint()
-				var res logging.LogOption
+				var res logging.LogParam
 				opt(&res)
 
 				Expect(res.PrettyPrintEnabled).To(BeTrue())
@@ -67,7 +67,7 @@ var _ = Describe("Logging Package", func() {
 		When("add one stack skip", func() {
 			It("should return result", func() {
 				opt := logging.AddStackSkip("some-pkg")
-				var res logging.LogOption
+				var res logging.LogParam
 				opt(&res)
 
 				Expect(res.StackSkip).To(Equal([]string{
@@ -84,7 +84,7 @@ var _ = Describe("Logging Package", func() {
 			It("should return result", func() {
 				opt1 := logging.AddStackSkip("some-pkg-1")
 				opt2 := logging.AddStackSkip("some-pkg-2")
-				var res logging.LogOption
+				var res logging.LogParam
 				opt1(&res)
 				opt2(&res)
 

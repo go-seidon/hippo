@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/config"
+	grpc_app "github.com/go-seidon/local/internal/grpc-app"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 )
 
@@ -36,15 +37,33 @@ func main() {
 		panic(err)
 	}
 
-	app, err := rest_app.NewRestApp(
+	restApp, err := rest_app.NewRestApp(
 		rest_app.WithConfig(appConfig),
 	)
 	if err != nil {
 		panic(err)
 	}
 
-	ctx := context.Background()
-	err = app.Run(ctx)
+	grpcApp, err := grpc_app.NewGrpcApp(
+		grpc_app.WithConfig(appConfig),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	listener := make(chan error, 2)
+
+	go func() {
+		ctx := context.Background()
+		listener <- restApp.Run(ctx)
+	}()
+
+	go func() {
+		ctx := context.Background()
+		listener <- grpcApp.Run(ctx)
+	}()
+
+	err = <-listener
 	if err != nil {
 		panic(err)
 	}

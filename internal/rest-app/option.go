@@ -38,33 +38,33 @@ type RestAppParam struct {
 	HealthService healthcheck.HealthCheck
 }
 
-type Option func(*RestAppParam)
+type RestAppOption func(*RestAppParam)
 
-func WithConfig(c app.Config) Option {
+func WithConfig(cfg app.Config) RestAppOption {
 	return func(rao *RestAppParam) {
-		rao.Config = &c
+		rao.Config = &cfg
 	}
 }
 
-func WithLogger(logger logging.Logger) Option {
+func WithLogger(logger logging.Logger) RestAppOption {
 	return func(rao *RestAppParam) {
 		rao.Logger = logger
 	}
 }
 
-func WithServer(server Server) Option {
+func WithServer(server Server) RestAppOption {
 	return func(rao *RestAppParam) {
 		rao.Server = server
 	}
 }
 
-func WithService(healthService healthcheck.HealthCheck) Option {
+func WithService(healthService healthcheck.HealthCheck) RestAppOption {
 	return func(rao *RestAppParam) {
 		rao.HealthService = healthService
 	}
 }
 
-func WithRepository(repo repository.Provider) Option {
+func WithRepository(repo repository.Provider) RestAppOption {
 	return func(rao *RestAppParam) {
 		rao.Repository = repo
 	}

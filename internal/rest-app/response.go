@@ -8,13 +8,6 @@ import (
 	"github.com/go-seidon/local/internal/status"
 )
 
-const (
-	CODE_SUCCESS      = "SUCCESS"
-	CODE_ERROR        = "ERROR"
-	CODE_NOT_FOUND    = "NOT_FOUND"
-	CODE_UNAUTHORIZED = "UNAUTHORIZED"
-)
-
 type ResponseBody struct {
 	Code    int32       `json:"code"`
 	Message string      `json:"message"`
