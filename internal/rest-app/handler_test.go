@@ -277,22 +277,22 @@ var _ = Describe("Handler Package", func() {
 					},
 				}
 				jobs := map[string]struct {
-					Name      string    `json:"name"`
-					Status    string    `json:"status"`
-					CheckedAt time.Time `json:"checked_at"`
-					Error     string    `json:"error"`
+					Name      string `json:"name"`
+					Status    string `json:"status"`
+					CheckedAt int64  `json:"checked_at"`
+					Error     string `json:"error"`
 				}{
 					"app-disk": {
 						Name:      "app-disk",
 						Status:    "FAILED",
 						Error:     "Critical: disk usage too high 96.71 percent",
-						CheckedAt: currentTimestamp,
+						CheckedAt: currentTimestamp.UnixMilli(),
 					},
 					"internet-connection": {
 						Name:      "internet-connection",
 						Status:    "OK",
 						Error:     "",
-						CheckedAt: currentTimestamp,
+						CheckedAt: currentTimestamp.UnixMilli(),
 					},
 				}
 
@@ -300,10 +300,10 @@ var _ = Describe("Handler Package", func() {
 					Data: struct {
 						Status  string `json:"status"`
 						Details map[string]struct {
-							Name      string    `json:"name"`
-							Status    string    `json:"status"`
-							CheckedAt time.Time `json:"checked_at"`
-							Error     string    `json:"error"`
+							Name      string `json:"name"`
+							Status    string `json:"status"`
+							CheckedAt int64  `json:"checked_at"`
+							Error     string `json:"error"`
 						} `json:"details"`
 					}{
 						Status:  "WARNING",

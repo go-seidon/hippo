@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/go-seidon/local/internal/deleting"
 	"github.com/go-seidon/local/internal/healthcheck"
@@ -74,32 +73,32 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 		}
 
 		jobs := map[string]struct {
-			Name      string    `json:"name"`
-			Status    string    `json:"status"`
-			CheckedAt time.Time `json:"checked_at"`
-			Error     string    `json:"error"`
+			Name      string `json:"name"`
+			Status    string `json:"status"`
+			CheckedAt int64  `json:"checked_at"`
+			Error     string `json:"error"`
 		}{}
 		for jobName, item := range r.Items {
 			jobs[jobName] = struct {
-				Name      string    `json:"name"`
-				Status    string    `json:"status"`
-				CheckedAt time.Time `json:"checked_at"`
-				Error     string    `json:"error"`
+				Name      string `json:"name"`
+				Status    string `json:"status"`
+				CheckedAt int64  `json:"checked_at"`
+				Error     string `json:"error"`
 			}{
 				Name:      item.Name,
 				Status:    item.Status,
 				Error:     item.Error,
-				CheckedAt: item.CheckedAt,
+				CheckedAt: item.CheckedAt.UnixMilli(),
 			}
 		}
 
 		d := struct {
 			Status  string `json:"status"`
 			Details map[string]struct {
-				Name      string    `json:"name"`
-				Status    string    `json:"status"`
-				CheckedAt time.Time `json:"checked_at"`
-				Error     string    `json:"error"`
+				Name      string `json:"name"`
+				Status    string `json:"status"`
+				CheckedAt int64  `json:"checked_at"`
+				Error     string `json:"error"`
 			} `json:"details"`
 		}{
 			Status:  r.Status,
