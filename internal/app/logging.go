@@ -4,7 +4,7 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 )
 
-func NewDefaultLog(config Config) logging.Logger {
+func NewDefaultLog(config *Config) logging.Logger {
 	opts := []logging.LogOption{}
 
 	appOpt := logging.WithAppContext(config.AppName, config.AppVersion)
