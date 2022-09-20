@@ -321,7 +321,6 @@ var _ = Describe("App Package", func() {
 				Expect(err).To(BeNil())
 			})
 		})
-
 	})
 
 	Context("Stop function", Label("unit"), func() {
@@ -361,6 +360,12 @@ var _ = Describe("App Package", func() {
 					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
 					Times(1)
 
+				healthService.
+					EXPECT().
+					Stop().
+					Return(nil).
+					Times(1)
+
 				server.
 					EXPECT().
 					Shutdown(gomock.Eq(context.Background())).
@@ -380,6 +385,12 @@ var _ = Describe("App Package", func() {
 					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
 					Times(1)
 
+				healthService.
+					EXPECT().
+					Stop().
+					Return(nil).
+					Times(1)
+
 				server.
 					EXPECT().
 					Shutdown(gomock.Eq(context.Background())).
@@ -389,6 +400,36 @@ var _ = Describe("App Package", func() {
 				err := ra.Stop(ctx)
 
 				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed stop healthcheck", func() {
+			It("should log the error", func() {
+				logger.
+					EXPECT().
+					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
+					Times(1)
+
+				healthService.
+					EXPECT().
+					Stop().
+					Return(fmt.Errorf("routine error")).
+					Times(1)
+
+				logger.
+					EXPECT().
+					Errorf(gomock.Eq("Failed stopping healthcheck, err: %s"), gomock.Eq("routine error")).
+					Times(1)
+
+				server.
+					EXPECT().
+					Shutdown(gomock.Eq(context.Background())).
+					Return(fmt.Errorf("cant stop app")).
+					Times(1)
+
+				err := ra.Stop(ctx)
+
+				Expect(err).To(Equal(fmt.Errorf("cant stop app")))
 			})
 		})
 	})

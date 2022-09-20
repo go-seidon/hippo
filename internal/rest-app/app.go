@@ -65,6 +65,12 @@ func (a *restApp) Run(ctx context.Context) error {
 
 func (a *restApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
+
+	err := a.healthService.Stop()
+	if err != nil {
+		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
+	}
+
 	return a.server.Shutdown(ctx)
 }
 
