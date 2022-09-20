@@ -12,8 +12,8 @@ import (
 )
 
 type fileRepository struct {
-	mClient *sql.DB
-	rClient *sql.DB
+	mClient db_mysql.Client
+	rClient db_mysql.Client
 	clock   datetime.Clock
 }
 
@@ -186,7 +186,7 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 // @note: using replica client by default
 // when transaction occured switch to master client (through `DbTransaction`)
 func (r *fileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
-	var q db_mysql.Query
+	var q db_mysql.Queryable
 	q = r.rClient
 
 	if p.DbTransaction != nil {
