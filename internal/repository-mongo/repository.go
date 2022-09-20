@@ -1,12 +1,10 @@
 package repository_mongo
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/go-seidon/local/internal/datetime"
 	db_mongo "github.com/go-seidon/local/internal/db-mongo"
-	"github.com/go-seidon/local/internal/repository"
 )
 
 type RepositoryParam struct {
@@ -37,28 +35,6 @@ func WithClock(clock datetime.Clock) RepoOption {
 	return func(ro *RepositoryParam) {
 		ro.clock = clock
 	}
-}
-
-type provider struct {
-	dbClient db_mongo.Client
-	authRepo *authRepository
-	fileRepo *fileRepository
-}
-
-func (p *provider) Init(ctx context.Context) error {
-	err := p.dbClient.Connect(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *provider) GetAuthRepo() repository.AuthRepository {
-	return p.authRepo
-}
-
-func (p *provider) GetFileRepo() repository.FileRepository {
-	return p.fileRepo
 }
 
 func NewRepository(opts ...RepoOption) (*provider, error) {
