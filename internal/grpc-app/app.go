@@ -3,7 +3,6 @@ package grpc_app
 import (
 	"context"
 	"fmt"
-	"time"
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
 	"github.com/go-seidon/local/internal/app"
@@ -59,51 +58,14 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 
 	logger := p.Logger
 	if logger == nil {
-		opts := []logging.Option{}
-
-		appOpt := logging.WithAppContext(p.Config.AppName, p.Config.AppVersion)
-		opts = append(opts, appOpt)
-
-		if p.Config.AppDebug {
-			debugOpt := logging.EnableDebugging()
-			opts = append(opts, debugOpt)
-		}
-
-		if p.Config.AppEnv == app.ENV_LOCAL || p.Config.AppEnv == app.ENV_TEST {
-			prettyOpt := logging.EnablePrettyPrint()
-			opts = append(opts, prettyOpt)
-		}
-
-		stackSkipOpt := logging.AddStackSkip("github.com/go-seidon/local/internal/logging")
-		opts = append(opts, stackSkipOpt)
-
-		logger = logging.NewLogrusLog(opts...)
+		logger = app.NewDefaultLog(p.Config)
 	}
 
+	var err error
 	healthService := p.HealthService
 	if healthService == nil {
-		inetPingJob, err := healthcheck.NewHttpPingJob(healthcheck.NewHttpPingJobParam{
-			Name:     "internet-connection",
-			Interval: 30 * time.Second,
-			Url:      "https://google.com",
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		appDiskJob, err := healthcheck.NewDiskUsageJob(healthcheck.NewDiskUsageJobParam{
-			Name:      "app-disk",
-			Interval:  60 * time.Second,
-			Directory: "/",
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		healthService, err = healthcheck.NewGoHealthCheck(
+		healthService, err = app.NewDefaultHealthCheck(
 			healthcheck.WithLogger(logger),
-			healthcheck.AddJob(inetPingJob),
-			healthcheck.AddJob(appDiskJob),
 		)
 		if err != nil {
 			return nil, err
