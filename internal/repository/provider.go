@@ -9,6 +9,7 @@ const (
 
 type Provider interface {
 	Init(ctx context.Context) error
+	Ping(ctx context.Context) error
 	GetAuthRepo() AuthRepository
 	GetFileRepo() FileRepository
 }
