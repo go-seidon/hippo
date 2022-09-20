@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package health.v1;
+
+option go_package = "./generated/proto/v1/health;health_v1";
+
+message CheckHealthParam {}
+
+message CheckHealthResult {
+  int32 code = 1;
+  string message = 2;
+  CheckHealthData data = 3; 
+}
+
+message CheckHealthData {
+  string status = 1;
+  map<string, CheckHealthDetail> details = 2;
+}
+
+message CheckHealthDetail {
+  string name = 1;
+  string status = 2;
+  int64 checked_at = 3;
+  string error = 4;
+}
+
+service HealthService {
+  rpc CheckHealth(CheckHealthParam) returns (CheckHealthResult);
+}
