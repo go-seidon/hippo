@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 
 	mock_db_mongo "github.com/go-seidon/local/internal/db-mongo/mock"
 	"github.com/go-seidon/local/internal/repository"
@@ -137,6 +138,20 @@ var _ = Describe("Repository Provider", func() {
 				err := provider.Init(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("db error")))
+			})
+		})
+
+		When("already initialized", func() {
+			It("should return result", func() {
+				dbClient.
+					EXPECT().
+					Connect(gomock.Eq(ctx)).
+					Return(topology.ErrTopologyConnected).
+					Times(1)
+
+				err := provider.Init(ctx)
+
+				Expect(err).To(BeNil())
 			})
 		})
 	})

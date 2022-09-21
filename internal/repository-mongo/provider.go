@@ -2,10 +2,12 @@ package repository_mongo
 
 import (
 	"context"
+	"errors"
 
 	db_mongo "github.com/go-seidon/local/internal/db-mongo"
 	"github.com/go-seidon/local/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 )
 
 type provider struct {
@@ -16,10 +18,13 @@ type provider struct {
 
 func (p *provider) Init(ctx context.Context) error {
 	err := p.dbClient.Connect(ctx)
-	if err != nil {
-		return err
+	if err == nil {
+		return nil
 	}
-	return nil
+	if errors.Is(err, topology.ErrTopologyConnected) {
+		return nil
+	}
+	return err
 }
 
 func (p *provider) Ping(ctx context.Context) error {
