@@ -26,8 +26,10 @@ func NewDefaultLog(config *Config) (logging.Logger, error) {
 		opts = append(opts, prettyOpt)
 	}
 
-	stackSkipOpt := logging.AddStackSkip("github.com/go-seidon/local/internal/app")
-	opts = append(opts, stackSkipOpt)
+	skipApp := logging.AddStackSkip("github.com/go-seidon/local/internal/app")
+	skipLog := logging.AddStackSkip("github.com/go-seidon/local/internal/logging")
+	opts = append(opts, skipApp)
+	opts = append(opts, skipLog)
 
 	return logging.NewLogrusLog(opts...), nil
 }

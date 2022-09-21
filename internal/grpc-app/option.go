@@ -6,6 +6,7 @@ import (
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
+	"github.com/go-seidon/local/internal/repository"
 )
 
 type GrpcAppConfig struct {
@@ -31,14 +32,15 @@ type GrpcAppParam struct {
 	Config        *app.Config
 	Logger        logging.Logger
 	Server        Server
+	Repository    repository.Provider
 	HealthService healthcheck.HealthCheck
 }
 
 type GrpcAppOption = func(*GrpcAppParam)
 
-func WithConfig(cfg app.Config) GrpcAppOption {
+func WithConfig(cfg *app.Config) GrpcAppOption {
 	return func(p *GrpcAppParam) {
-		p.Config = &cfg
+		p.Config = cfg
 	}
 }
 
@@ -57,5 +59,11 @@ func WithService(healthService healthcheck.HealthCheck) GrpcAppOption {
 func WithServer(server Server) GrpcAppOption {
 	return func(p *GrpcAppParam) {
 		p.Server = server
+	}
+}
+
+func WithRepository(repo repository.Provider) GrpcAppOption {
+	return func(p *GrpcAppParam) {
+		p.Repository = repo
 	}
 }

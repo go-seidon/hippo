@@ -7,12 +7,13 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/local/internal/datetime"
+	db_mysql "github.com/go-seidon/local/internal/db-mysql"
 	"github.com/go-seidon/local/internal/repository"
 )
 
 type authRepository struct {
-	mClient *sql.DB
-	rClient *sql.DB
+	mClient db_mysql.Client
+	rClient db_mysql.Client
 	clock   datetime.Clock
 }
 

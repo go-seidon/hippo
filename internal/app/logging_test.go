@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("Logging Package", func() {
 
-	Context("NewDefaultLog function", func() {
+	Context("NewDefaultLog function", Label("unit"), func() {
 		var (
 			config *app.Config
 		)

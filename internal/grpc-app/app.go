@@ -8,6 +8,7 @@ import (
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
+	"github.com/go-seidon/local/internal/repository"
 	"google.golang.org/grpc"
 )
 
@@ -15,6 +16,7 @@ type grpcApp struct {
 	server        Server
 	config        *GrpcAppConfig
 	logger        logging.Logger
+	repository    repository.Provider
 	healthService healthcheck.HealthCheck
 }
 
@@ -22,6 +24,11 @@ func (a *grpcApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
 	err := a.healthService.Start()
+	if err != nil {
+		return err
+	}
+
+	err = a.repository.Init(ctx)
 	if err != nil {
 		return err
 	}
@@ -53,8 +60,9 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	}
 
 	if p.Config == nil {
-		return nil, fmt.Errorf("invalid grpc app config")
+		return nil, fmt.Errorf("invalid config")
 	}
+
 	var err error
 	logger := p.Logger
 	if logger == nil {
@@ -64,11 +72,17 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		}
 	}
 
+	repo := p.Repository
+	if repo == nil {
+		repo, err = app.NewDefaultRepository(p.Config)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	healthService := p.HealthService
 	if healthService == nil {
-		healthService, err = app.NewDefaultHealthCheck(
-			healthcheck.WithLogger(logger),
-		)
+		healthService, err = app.NewDefaultHealthCheck(logger, repo)
 		if err != nil {
 			return nil, err
 		}
@@ -97,6 +111,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		server:        svr,
 		logger:        logger,
 		config:        config,
+		repository:    repo,
 		healthService: healthService,
 	}
 	return app, nil

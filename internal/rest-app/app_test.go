@@ -46,19 +46,6 @@ var _ = Describe("App Package", func() {
 				)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid rest app config")))
-			})
-		})
-
-		When("config is not valid", func() {
-			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
-						DBProvider: "invalid",
-					}),
-				)
-
-				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("invalid config")))
 			})
 		})
@@ -66,7 +53,7 @@ var _ = Describe("App Package", func() {
 		When("logger is not specified", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
+					rest_app.WithConfig(&app.Config{
 						DBProvider: repository.DB_PROVIDER_MYSQL,
 					}),
 				)
@@ -79,7 +66,7 @@ var _ = Describe("App Package", func() {
 		When("debug is enabled", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
+					rest_app.WithConfig(&app.Config{
 						DBProvider: repository.DB_PROVIDER_MYSQL,
 						AppDebug:   true,
 					}),
@@ -93,7 +80,7 @@ var _ = Describe("App Package", func() {
 		When("env is specified", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(app.Config{
+					rest_app.WithConfig(&app.Config{
 						DBProvider: repository.DB_PROVIDER_MYSQL,
 						AppDebug:   true,
 						AppEnv:     "local",
@@ -114,7 +101,7 @@ var _ = Describe("App Package", func() {
 
 				res, err := rest_app.NewRestApp(
 					rest_app.WithLogger(log),
-					rest_app.WithConfig(app.Config{
+					rest_app.WithConfig(&app.Config{
 						DBProvider:    repository.DB_PROVIDER_MONGO,
 						AppEnv:        "local",
 						MongoMode:     "standalone",
@@ -190,7 +177,7 @@ var _ = Describe("App Package", func() {
 			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
 			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(app.Config{
+				rest_app.WithConfig(&app.Config{
 					AppName:     "mock-name",
 					AppVersion:  "mock-version",
 					RESTAppHost: "localhost",
@@ -339,7 +326,7 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_restapp.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(app.Config{
+				rest_app.WithConfig(&app.Config{
 					AppName:     "mock-name",
 					AppVersion:  "mock-version",
 					RESTAppHost: "localhost",

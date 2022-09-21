@@ -28,7 +28,6 @@ type CheckResultItem struct {
 	Status    string
 	Error     string
 	Fatal     bool
-	Metadata  interface{}
 	CheckedAt time.Time
 }
 

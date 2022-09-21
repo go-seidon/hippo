@@ -1,29 +1,27 @@
 package repository_mysql
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/go-seidon/local/internal/datetime"
-	"github.com/go-seidon/local/internal/repository"
+	db_mysql "github.com/go-seidon/local/internal/db-mysql"
 )
 
 type RepositoryParam struct {
-	mClient *sql.DB
-	rClient *sql.DB
+	mClient db_mysql.Client
+	rClient db_mysql.Client
 	clock   datetime.Clock
 }
 
 type RepoOption = func(*RepositoryParam)
 
-func WithDbMaster(dbClient *sql.DB) RepoOption {
+func WithDbMaster(dbClient db_mysql.Client) RepoOption {
 	return func(ro *RepositoryParam) {
 		ro.mClient = dbClient
 	}
 }
 
-func WithDbReplica(dbClient *sql.DB) RepoOption {
+func WithDbReplica(dbClient db_mysql.Client) RepoOption {
 	return func(ro *RepositoryParam) {
 		ro.rClient = dbClient
 	}
@@ -33,23 +31,6 @@ func WithClock(clock datetime.Clock) RepoOption {
 	return func(ro *RepositoryParam) {
 		ro.clock = clock
 	}
-}
-
-type provider struct {
-	authRepo *authRepository
-	fileRepo *fileRepository
-}
-
-func (p *provider) Init(ctx context.Context) error {
-	return nil
-}
-
-func (p *provider) GetAuthRepo() repository.AuthRepository {
-	return p.authRepo
-}
-
-func (p *provider) GetFileRepo() repository.FileRepository {
-	return p.fileRepo
 }
 
 func NewRepository(opts ...RepoOption) (*provider, error) {
@@ -82,6 +63,8 @@ func NewRepository(opts ...RepoOption) (*provider, error) {
 	}
 
 	repo := &provider{
+		mClient:  p.mClient,
+		rClient:  p.rClient,
 		authRepo: authRepo,
 		fileRepo: fileRepo,
 	}

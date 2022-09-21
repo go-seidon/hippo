@@ -16,12 +16,6 @@ type NewHttpPingJobParam struct {
 	Url      string
 }
 
-type NewDiskUsageJobParam struct {
-	Name      string
-	Interval  time.Duration
-	Directory string
-}
-
 func NewHttpPingJob(p NewHttpPingJobParam) (*HealthJob, error) {
 	if strings.TrimSpace(p.Name) == "" {
 		return nil, fmt.Errorf("invalid name")
@@ -41,10 +35,16 @@ func NewHttpPingJob(p NewHttpPingJobParam) (*HealthJob, error) {
 
 	job := &HealthJob{
 		Name:     p.Name,
-		Checker:  internetConnection,
 		Interval: p.Interval,
+		Checker:  internetConnection,
 	}
 	return job, err
+}
+
+type NewDiskUsageJobParam struct {
+	Name      string
+	Interval  time.Duration
+	Directory string
 }
 
 func NewDiskUsageJob(p NewDiskUsageJobParam) (*HealthJob, error) {
@@ -66,8 +66,32 @@ func NewDiskUsageJob(p NewDiskUsageJobParam) (*HealthJob, error) {
 
 	job := &HealthJob{
 		Name:     p.Name,
-		Checker:  appDiskChecker,
 		Interval: p.Interval,
+		Checker:  appDiskChecker,
 	}
 	return job, err
+}
+
+type NewRepoPingJobParam struct {
+	Name       string
+	Interval   time.Duration
+	DataSource DataSource
+}
+
+func NewRepoPingJob(p NewRepoPingJobParam) (*HealthJob, error) {
+	if strings.TrimSpace(p.Name) == "" {
+		return nil, fmt.Errorf("invalid name")
+	}
+	if p.DataSource == nil {
+		return nil, fmt.Errorf("invalid data source")
+	}
+
+	pingChecker := NewRepoPingChecker(p.DataSource)
+
+	job := &HealthJob{
+		Name:     p.Name,
+		Interval: p.Interval,
+		Checker:  pingChecker,
+	}
+	return job, nil
 }

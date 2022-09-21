@@ -58,14 +58,16 @@ generate-mock:
 	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
 	mockgen -package=mock_datetime -source internal/datetime/clock.go -destination=internal/datetime/mock/clock_mock.go
 	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
+	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
 	mockgen -package=mock_deleting -source internal/deleting/deleter.go -destination=internal/deleting/mock/deleter_mock.go
 	mockgen -package=mock_encoding -source internal/encoding/encoder.go -destination=internal/encoding/mock/encoder_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_grpcapp -source internal/grpc-app/server.go -destination=internal/grpc-app/mock/server_mock.go
 	mockgen -package=mock_hashing -source internal/hashing/hasher.go -destination=internal/hashing/mock/hasher_mock.go
-	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
+	mockgen -package=mock_healthcheck -source internal/healthcheck/checker.go -destination=internal/healthcheck/mock/checker_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/go_health.go -destination=internal/healthcheck/mock/go_health_mock.go
+	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
 	mockgen -package=mock_io -source internal/io/io.go -destination=internal/io/mock/io_mock.go
 	mockgen -package=mock_logging -source internal/logging/log.go -destination=internal/logging/mock/log_mock.go
 	mockgen -package=mock_repository -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go

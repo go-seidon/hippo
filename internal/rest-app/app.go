@@ -8,8 +8,6 @@ import (
 
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/auth"
-	db_mongo "github.com/go-seidon/local/internal/db-mongo"
-	db_mysql "github.com/go-seidon/local/internal/db-mysql"
 	"github.com/go-seidon/local/internal/deleting"
 	"github.com/go-seidon/local/internal/encoding"
 	"github.com/go-seidon/local/internal/filesystem"
@@ -17,8 +15,6 @@ import (
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
-	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
-	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
 	"github.com/go-seidon/local/internal/retrieving"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/text"
@@ -33,10 +29,10 @@ const CorrelationIdKey = "correlationId"
 const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
 type restApp struct {
-	config *RestAppConfig
-	server Server
-	logger logging.Logger
-	repo   repository.Provider
+	config     *RestAppConfig
+	server     Server
+	logger     logging.Logger
+	repository repository.Provider
 
 	healthService healthcheck.HealthCheck
 }
@@ -49,7 +45,7 @@ func (a *restApp) Run(ctx context.Context) error {
 		return err
 	}
 
-	err = a.repo.Init(ctx)
+	err = a.repository.Init(ctx)
 	if err != nil {
 		return err
 	}
@@ -80,11 +76,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	if p.Config == nil {
-		return nil, fmt.Errorf("invalid rest app config")
-	}
-	cfgValid := p.Config.DBProvider == repository.DB_PROVIDER_MYSQL ||
-		p.Config.DBProvider == repository.DB_PROVIDER_MONGO
-	if !cfgValid {
 		return nil, fmt.Errorf("invalid config")
 	}
 
@@ -97,84 +88,19 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		}
 	}
 
-	healthService := p.HealthService
-	if healthService == nil {
-		healthService, err = app.NewDefaultHealthCheck(
-			healthcheck.WithLogger(logger),
-		)
+	repo := p.Repository
+	if repo == nil {
+		repo, err = app.NewDefaultRepository(p.Config)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	repo := p.Repository
-	if repo == nil {
-		if p.Config.DBProvider == repository.DB_PROVIDER_MYSQL {
-			dbMaster, err := db_mysql.NewClient(
-				db_mysql.WithAuth(p.Config.MySQLMasterUser, p.Config.MySQLMasterPassword),
-				db_mysql.WithConfig(db_mysql.ClientConfig{DbName: p.Config.MySQLMasterDBName}),
-				db_mysql.WithLocation(p.Config.MySQLMasterHost, p.Config.MySQLMasterPort),
-				db_mysql.ParseTime(),
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			dbReplica, err := db_mysql.NewClient(
-				db_mysql.WithAuth(p.Config.MySQLReplicaUser, p.Config.MySQLReplicaPassword),
-				db_mysql.WithConfig(db_mysql.ClientConfig{DbName: p.Config.MySQLReplicaDBName}),
-				db_mysql.WithLocation(p.Config.MySQLReplicaHost, p.Config.MySQLReplicaPort),
-				db_mysql.ParseTime(),
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			repo, err = repository_mysql.NewRepository(
-				repository_mysql.WithDbMaster(dbMaster),
-				repository_mysql.WithDbReplica(dbReplica),
-			)
-			if err != nil {
-				return nil, err
-			}
-		} else if p.Config.DBProvider == repository.DB_PROVIDER_MONGO {
-			opts := []db_mongo.ClientOption{}
-			if p.Config.MongoAuthMode == db_mongo.AUTH_BASIC {
-				opts = append(opts, db_mongo.WithBasicAuth(
-					p.Config.MongoAuthUser,
-					p.Config.MongoAuthPassword,
-					p.Config.MongoAuthSource,
-				))
-			}
-			if p.Config.MongoMode == db_mongo.MODE_STANDALONE {
-				opts = append(opts, db_mongo.UsingStandalone(
-					p.Config.MongoStandaloneHost, p.Config.MongoStandalonePort,
-				))
-			} else if p.Config.MongoMode == db_mongo.MODE_REPLICATION {
-				opts = append(opts, db_mongo.UsingReplication(
-					p.Config.MongoReplicaName,
-					p.Config.MongoReplicaHosts,
-				))
-			}
-
-			opts = append(opts, db_mongo.WithConfig(db_mongo.ClientConfig{
-				DbName: p.Config.MongoDBName,
-			}))
-
-			dbClient, err := db_mongo.NewClient(opts...)
-			if err != nil {
-				return nil, err
-			}
-
-			repo, err = repository_mongo.NewRepository(
-				repository_mongo.WithDbClient(dbClient),
-				repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-					DbName: p.Config.MongoDBName,
-				}),
-			)
-			if err != nil {
-				return nil, err
-			}
+	healthService := p.HealthService
+	if healthService == nil {
+		healthService, err = app.NewDefaultHealthCheck(logger, repo)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -296,7 +222,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		config:        raCfg,
 		logger:        logger,
 		healthService: healthService,
-		repo:          repo,
+		repository:    repo,
 	}
 	return app, nil
 }

@@ -3,6 +3,7 @@ package db_mysql
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"context"
 
@@ -10,18 +11,54 @@ import (
 )
 
 type Client interface {
+	Pingable
+	Manageable
+	Prepareable
+	Queryable
+	Executable
+	Beginable
+}
+
+type Pingable interface {
+	PingContext(ctx context.Context) error
+	Ping() error
+}
+
+type Manageable interface {
+	Close() error
+	SetMaxIdleConns(n int)
+	SetMaxOpenConns(n int)
+	SetConnMaxLifetime(d time.Duration)
+	SetConnMaxIdleTime(d time.Duration)
+}
+
+type Beginable interface {
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
-	Query
+	Begin() (*sql.Tx, error)
 }
 
 type Transaction interface {
 	Commit() error
 	Rollback() error
-	Query
+	Prepareable
+	Queryable
+	Executable
 }
 
-type Query interface {
+type Prepareable interface {
+	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
+	Prepare(query string) (*sql.Stmt, error)
+}
+
+type Queryable interface {
+	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 	QueryRow(query string, args ...interface{}) *sql.Row
+}
+
+type Executable interface {
+	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	Exec(query string, args ...interface{}) (sql.Result, error)
 }
 

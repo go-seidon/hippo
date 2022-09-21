@@ -65,7 +65,6 @@ func (s *goHealthCheck) Check() (*CheckResult, error) {
 			Name:      state.Name,
 			Status:    status,
 			Error:     state.Err,
-			Metadata:  state.Details,
 			CheckedAt: state.CheckTime.UTC(),
 		}
 	}
