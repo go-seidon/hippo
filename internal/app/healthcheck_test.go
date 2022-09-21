@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Healthcheck Package", func() {
 
-	Context("NewDefaultHealthCheck function", func() {
+	Context("NewDefaultHealthCheck function", Label("unit"), func() {
 		var (
 			logger     *mock_logging.MockLogger
 			repository *mock_repository.MockProvider
