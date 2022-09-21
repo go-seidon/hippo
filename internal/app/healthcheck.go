@@ -4,15 +4,11 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/healthcheck"
+	"github.com/go-seidon/local/internal/logging"
+	"github.com/go-seidon/local/internal/repository"
 )
 
-func NewDefaultHealthCheck(opts ...healthcheck.Option) (healthcheck.HealthCheck, error) {
-	p := healthcheck.HealthCheckParam{
-		Jobs: []*healthcheck.HealthJob{},
-	}
-	for _, opt := range opts {
-		opt(&p)
-	}
+func NewDefaultHealthCheck(logger logging.Logger, repo repository.Provider) (healthcheck.HealthCheck, error) {
 
 	inetPingJob, err := healthcheck.NewHttpPingJob(healthcheck.NewHttpPingJobParam{
 		Name:     "internet-connection",
@@ -25,17 +21,27 @@ func NewDefaultHealthCheck(opts ...healthcheck.Option) (healthcheck.HealthCheck,
 
 	appDiskJob, err := healthcheck.NewDiskUsageJob(healthcheck.NewDiskUsageJobParam{
 		Name:      "app-disk",
-		Interval:  60 * time.Second,
+		Interval:  10 * time.Minute,
 		Directory: "/",
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	repoPingJob, err := healthcheck.NewRepoPingJob(healthcheck.NewRepoPingJobParam{
+		Name:       "repository-connection",
+		Interval:   15 * time.Minute,
+		DataSource: repo,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	healthService, err := healthcheck.NewGoHealthCheck(
-		healthcheck.WithLogger(p.Logger),
+		healthcheck.WithLogger(logger),
 		healthcheck.AddJob(inetPingJob),
 		healthcheck.AddJob(appDiskJob),
+		healthcheck.AddJob(repoPingJob),
 	)
 	if err != nil {
 		return nil, err
