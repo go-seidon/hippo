@@ -76,11 +76,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	if p.Config == nil {
-		return nil, fmt.Errorf("invalid rest app config")
-	}
-	cfgValid := p.Config.DBProvider == repository.DB_PROVIDER_MYSQL ||
-		p.Config.DBProvider == repository.DB_PROVIDER_MONGO
-	if !cfgValid {
 		return nil, fmt.Errorf("invalid config")
 	}
 
