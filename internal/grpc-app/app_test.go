@@ -10,6 +10,7 @@ import (
 	mock_grpcapp "github.com/go-seidon/local/internal/grpc-app/mock"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
+	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,19 +26,22 @@ var _ = Describe("App Package", func() {
 
 	Context("NewGrpcApp function", Label("unit"), func() {
 		var (
-			cfg           app.Config
+			cfg           *app.Config
 			logger        *mock_logging.MockLogger
+			repository    *mock_repository.MockProvider
 			healthService *mock_healthcheck.MockHealthCheck
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			cfg = app.Config{
-				AppDebug: true,
-				AppEnv:   "local",
+			cfg = &app.Config{
+				AppDebug:   true,
+				AppEnv:     "local",
+				DBProvider: "mongo",
 			}
 			logger = mock_logging.NewMockLogger(ctrl)
+			repository = mock_repository.NewMockProvider(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 		})
 
@@ -46,7 +50,7 @@ var _ = Describe("App Package", func() {
 				res, err := grpc_app.NewGrpcApp()
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid grpc app config")))
+				Expect(err).To(Equal(fmt.Errorf("invalid config")))
 			})
 		})
 
@@ -55,6 +59,7 @@ var _ = Describe("App Package", func() {
 				res, err := grpc_app.NewGrpcApp(
 					grpc_app.WithConfig(cfg),
 					grpc_app.WithLogger(logger),
+					grpc_app.WithRepository(repository),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -67,6 +72,7 @@ var _ = Describe("App Package", func() {
 				res, err := grpc_app.NewGrpcApp(
 					grpc_app.WithConfig(cfg),
 					grpc_app.WithService(healthService),
+					grpc_app.WithRepository(repository),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -79,18 +85,8 @@ var _ = Describe("App Package", func() {
 				res, err := grpc_app.NewGrpcApp(
 					grpc_app.WithConfig(cfg),
 					grpc_app.WithLogger(logger),
+					grpc_app.WithRepository(repository),
 					grpc_app.WithService(healthService),
-				)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("minimal parameters are specified", func() {
-			It("should return result", func() {
-				res, err := grpc_app.NewGrpcApp(
-					grpc_app.WithConfig(cfg),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -145,12 +141,13 @@ var _ = Describe("App Package", func() {
 			logger        *mock_logging.MockLogger
 			healthService *mock_healthcheck.MockHealthCheck
 			server        *mock_grpcapp.MockServer
+			repository    *mock_repository.MockProvider
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			cfg := app.Config{
+			cfg := &app.Config{
 				AppDebug:   true,
 				AppEnv:     "local",
 				AppName:    "mock-name",
@@ -162,11 +159,13 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
+			repository = mock_repository.NewMockProvider(ctrl)
 			grpcApp, _ = grpc_app.NewGrpcApp(
 				grpc_app.WithConfig(cfg),
 				grpc_app.WithLogger(logger),
 				grpc_app.WithService(healthService),
 				grpc_app.WithServer(server),
+				grpc_app.WithRepository(repository),
 			)
 			ctx = context.Background()
 		})
@@ -190,6 +189,31 @@ var _ = Describe("App Package", func() {
 			})
 		})
 
+		When("failed init repository", func() {
+			It("should return error", func() {
+				logger.
+					EXPECT().
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Times(1)
+
+				healthService.
+					EXPECT().
+					Start().
+					Return(nil).
+					Times(1)
+
+				repository.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
+					Return(fmt.Errorf("db error")).
+					Times(1)
+
+				err := grpcApp.Run(ctx)
+
+				Expect(err).To(Equal(fmt.Errorf("db error")))
+			})
+		})
+
 		When("failed listen and serve", func() {
 			It("should return error", func() {
 				logger.
@@ -200,6 +224,12 @@ var _ = Describe("App Package", func() {
 				healthService.
 					EXPECT().
 					Start().
+					Return(nil).
+					Times(1)
+
+				repository.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -233,6 +263,12 @@ var _ = Describe("App Package", func() {
 					Return(nil).
 					Times(1)
 
+				repository.
+					EXPECT().
+					Init(gomock.Eq(ctx)).
+					Return(nil).
+					Times(1)
+
 				logger.
 					EXPECT().
 					Infof(gomock.Eq("Listening on: %s"), gomock.Eq("localhost:4949")).
@@ -263,7 +299,7 @@ var _ = Describe("App Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			cfg := app.Config{
+			cfg := &app.Config{
 				AppDebug:   true,
 				AppEnv:     "local",
 				AppName:    "mock-name",
@@ -275,11 +311,13 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
+			repository := mock_repository.NewMockProvider(ctrl)
 			grpcApp, _ = grpc_app.NewGrpcApp(
 				grpc_app.WithConfig(cfg),
 				grpc_app.WithLogger(logger),
 				grpc_app.WithService(healthService),
 				grpc_app.WithServer(server),
+				grpc_app.WithRepository(repository),
 			)
 			ctx = context.Background()
 		})
