@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/healthcheck"
+	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -96,6 +98,53 @@ var _ = Describe("Health Check Job", func() {
 		When("parameter are valid", func() {
 			It("should return result", func() {
 				res, err := healthcheck.NewDiskUsageJob(p)
+
+				Expect(res).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+	})
+
+	Context("NewRepoPingJob function", Label("unit"), func() {
+		var (
+			p healthcheck.NewRepoPingJobParam
+		)
+
+		BeforeEach(func() {
+			t := GinkgoT()
+			ctrl := gomock.NewController(t)
+			datasource := mock_healthcheck.NewMockDataSource(ctrl)
+
+			p = healthcheck.NewRepoPingJobParam{
+				Name:       "repo-ping",
+				Interval:   60 * time.Second,
+				DataSource: datasource,
+			}
+		})
+
+		When("name is invalid", func() {
+			It("should return error", func() {
+				p.Name = " "
+				res, err := healthcheck.NewRepoPingJob(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid name")))
+			})
+		})
+
+		When("datasource is invalid", func() {
+			It("should return error", func() {
+				p.DataSource = nil
+				res, err := healthcheck.NewRepoPingJob(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid data source")))
+			})
+		})
+
+		When("parameter are valid", func() {
+			It("should return result", func() {
+				res, err := healthcheck.NewRepoPingJob(p)
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
