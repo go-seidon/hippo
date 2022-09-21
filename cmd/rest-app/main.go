@@ -16,7 +16,7 @@ func main() {
 		appEnv = "local"
 	}
 
-	appConfig := app.Config{AppEnv: appEnv}
+	appConfig := &app.Config{AppEnv: appEnv}
 
 	cfgFileName := fmt.Sprintf("config/%s.toml", appConfig.AppEnv)
 	tomlConfig, err := config.NewViperConfig(
@@ -31,7 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	err = tomlConfig.ParseConfig(&appConfig)
+	err = tomlConfig.ParseConfig(appConfig)
 	if err != nil {
 		panic(err)
 	}
