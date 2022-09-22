@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package health.v1;
 
-option go_package = "./generated/proto/v1/health;health_v1";
+option go_package = "./generated/proto/api/grpc/v1/health;grpc_v1";
 
 message CheckHealthParam {}
 

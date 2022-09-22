@@ -10,19 +10,16 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/go-seidon/local/internal/deleting"
-	mock_deleting "github.com/go-seidon/local/internal/deleting/mock"
+	"github.com/go-seidon/local/internal/file"
+	mock_file "github.com/go-seidon/local/internal/file/mock"
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
 	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
-	"github.com/go-seidon/local/internal/retrieving"
-	mock_retrieving "github.com/go-seidon/local/internal/retrieving/mock"
 	"github.com/go-seidon/local/internal/serialization"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
-	"github.com/go-seidon/local/internal/uploading"
 	mock_uploading "github.com/go-seidon/local/internal/uploading/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -341,13 +338,13 @@ var _ = Describe("Handler Package", func() {
 
 	Context("NewDeleteFileHandler", Label("unit"), func() {
 		var (
-			handler       http.HandlerFunc
-			r             *http.Request
-			w             *mock_restapp.MockResponseWriter
-			log           *mock_logging.MockLogger
-			serializer    *mock_serialization.MockSerializer
-			deleteService *mock_deleting.MockDeleter
-			p             deleting.DeleteFileParam
+			handler     http.HandlerFunc
+			r           *http.Request
+			w           *mock_restapp.MockResponseWriter
+			log         *mock_logging.MockLogger
+			serializer  *mock_serialization.MockSerializer
+			fileService *mock_file.MockFile
+			p           file.DeleteFileParam
 		)
 
 		BeforeEach(func() {
@@ -359,9 +356,9 @@ var _ = Describe("Handler Package", func() {
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
-			deleteService = mock_deleting.NewMockDeleter(ctrl)
-			handler = rest_app.NewDeleteFileHandler(log, serializer, deleteService)
-			p = deleting.DeleteFileParam{
+			fileService = mock_file.NewMockFile(ctrl)
+			handler = rest_app.NewDeleteFileHandler(log, serializer, fileService)
+			p = file.DeleteFileParam{
 				FileId: "mock-file-id",
 			}
 		})
@@ -376,7 +373,7 @@ var _ = Describe("Handler Package", func() {
 					Message: err.Error(),
 				}
 
-				deleteService.
+				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
 					Return(nil, err).
@@ -405,14 +402,14 @@ var _ = Describe("Handler Package", func() {
 		When("file is not found", func() {
 			It("should write response", func() {
 
-				err := deleting.ErrorResourceNotFound
+				err := file.ErrorNotFound
 
 				b := rest_app.ResponseBody{
 					Code:    1004,
 					Message: err.Error(),
 				}
 
-				deleteService.
+				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
 					Return(nil, err).
@@ -440,7 +437,7 @@ var _ = Describe("Handler Package", func() {
 
 		When("success delete file", func() {
 			It("should write response", func() {
-				res := &deleting.DeleteFileResult{
+				res := &file.DeleteFileResult{
 					DeletedAt: time.Now(),
 				}
 				b := rest_app.ResponseBody{
@@ -453,7 +450,7 @@ var _ = Describe("Handler Package", func() {
 					},
 				}
 
-				deleteService.
+				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
 					Return(res, nil).
@@ -482,15 +479,15 @@ var _ = Describe("Handler Package", func() {
 
 	Context("NewRetrieveFileHandler", Label("unit"), func() {
 		var (
-			ctx             context.Context
-			handler         http.HandlerFunc
-			r               *http.Request
-			w               *mock_restapp.MockResponseWriter
-			log             *mock_logging.MockLogger
-			serializer      *mock_serialization.MockSerializer
-			retrieveService *mock_retrieving.MockRetriever
-			fileData        *mock_io.MockReadCloser
-			p               retrieving.RetrieveFileParam
+			ctx         context.Context
+			handler     http.HandlerFunc
+			r           *http.Request
+			w           *mock_restapp.MockResponseWriter
+			log         *mock_logging.MockLogger
+			serializer  *mock_serialization.MockSerializer
+			fileService *mock_file.MockFile
+			fileData    *mock_io.MockReadCloser
+			p           file.RetrieveFileParam
 		)
 
 		BeforeEach(func() {
@@ -503,10 +500,10 @@ var _ = Describe("Handler Package", func() {
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
-			retrieveService = mock_retrieving.NewMockRetriever(ctrl)
+			fileService = mock_file.NewMockFile(ctrl)
 			fileData = mock_io.NewMockReadCloser(ctrl)
-			handler = rest_app.NewRetrieveFileHandler(log, serializer, retrieveService)
-			p = retrieving.RetrieveFileParam{
+			handler = rest_app.NewRetrieveFileHandler(log, serializer, fileService)
+			p = file.RetrieveFileParam{
 				FileId: "mock-file-id",
 			}
 		})
@@ -521,7 +518,7 @@ var _ = Describe("Handler Package", func() {
 					Message: err.Error(),
 				}
 
-				retrieveService.
+				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
 					Return(nil, err).
@@ -550,14 +547,14 @@ var _ = Describe("Handler Package", func() {
 		When("file is not found", func() {
 			It("should write response", func() {
 
-				err := retrieving.ErrorResourceNotFound
+				err := file.ErrorNotFound
 
 				b := rest_app.ResponseBody{
 					Code:    1004,
 					Message: err.Error(),
 				}
 
-				retrieveService.
+				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
 					Return(nil, err).
@@ -597,7 +594,7 @@ var _ = Describe("Handler Package", func() {
 					Return(0, fmt.Errorf("read error")).
 					Times(1)
 
-				res := &retrieving.RetrieveFileResult{
+				res := &file.RetrieveFileResult{
 					Data: fileData,
 				}
 
@@ -606,7 +603,7 @@ var _ = Describe("Handler Package", func() {
 					Message: "read error",
 				}
 
-				retrieveService.
+				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
 					Return(res, nil).
@@ -646,7 +643,7 @@ var _ = Describe("Handler Package", func() {
 					Return(0, io.EOF).
 					Times(1)
 
-				res := &retrieving.RetrieveFileResult{
+				res := &file.RetrieveFileResult{
 					Data:      fileData,
 					UniqueId:  "mock-unique-id",
 					Name:      "mock-name",
@@ -656,7 +653,7 @@ var _ = Describe("Handler Package", func() {
 					DeletedAt: nil,
 				}
 
-				retrieveService.
+				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
 					Return(res, nil).
@@ -690,7 +687,7 @@ var _ = Describe("Handler Package", func() {
 					Return(0, io.EOF).
 					Times(1)
 
-				res := &retrieving.RetrieveFileResult{
+				res := &file.RetrieveFileResult{
 					Data:      fileData,
 					UniqueId:  "mock-unique-id",
 					Name:      "mock-name",
@@ -700,7 +697,7 @@ var _ = Describe("Handler Package", func() {
 					DeletedAt: nil,
 				}
 
-				retrieveService.
+				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
 					Return(res, nil).
@@ -732,7 +729,7 @@ var _ = Describe("Handler Package", func() {
 			handler          http.HandlerFunc
 			log              *mock_logging.MockLogger
 			serializer       serialization.Serializer
-			uploadService    *mock_uploading.MockUploader
+			uploadService    *mock_file.MockFile
 			locator          *mock_uploading.MockUploadLocation
 		)
 
@@ -755,7 +752,7 @@ var _ = Describe("Handler Package", func() {
 
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = serialization.NewJsonSerializer()
-			uploadService = mock_uploading.NewMockUploader(ctrl)
+			uploadService = mock_file.NewMockFile(ctrl)
 			locator = mock_uploading.NewMockUploadLocation(ctrl)
 			cfg := &rest_app.RestAppConfig{}
 			handler = rest_app.NewUploadFileHandler(
@@ -820,7 +817,7 @@ var _ = Describe("Handler Package", func() {
 					Return("mock/location").
 					Times(1)
 
-				uploadRes := &uploading.UploadFileResult{
+				uploadRes := &file.UploadFileResult{
 					UniqueId:   "mock-unique-id",
 					Name:       "dolpin.jpg",
 					Path:       "mock/location/mock-unique-id.jpg",

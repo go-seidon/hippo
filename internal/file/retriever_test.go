@@ -1,98 +1,33 @@
-package retrieving_test
+package file_test
 
 import (
 	"context"
 	"fmt"
 	"os"
-	"testing"
 
+	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
-	"github.com/go-seidon/local/internal/retrieving"
+	mock_text "github.com/go-seidon/local/internal/text/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func TestRetrieving(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Retrieving Package")
-}
-
-var _ = Describe("Retriever Service", func() {
-	Context("NewRetriever function", Label("unit"), func() {
-		var (
-			fileRepo    *mock_repository.MockFileRepository
-			fileManager *mock_filesystem.MockFileManager
-			logger      *mock_logging.MockLogger
-			p           retrieving.NewRetrieverParam
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
-			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			logger = mock_logging.NewMockLogger(ctrl)
-			p = retrieving.NewRetrieverParam{
-				FileRepo:    fileRepo,
-				FileManager: fileManager,
-				Logger:      logger,
-			}
-		})
-
-		When("success create service", func() {
-			It("should return result", func() {
-				res, err := retrieving.NewRetriever(p)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("file repo is not specified", func() {
-			It("should return error", func() {
-				p.FileRepo = nil
-				res, err := retrieving.NewRetriever(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file repo is not specified")))
-			})
-		})
-
-		When("file manager is not specified", func() {
-			It("should return error", func() {
-				p.FileManager = nil
-				res, err := retrieving.NewRetriever(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file manager is not specified")))
-			})
-		})
-
-		When("logger is not specified", func() {
-			It("should return error", func() {
-				p.Logger = nil
-				res, err := retrieving.NewRetriever(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("logger is not specified")))
-			})
-		})
-	})
+var _ = Describe("Retriever", func() {
 
 	Context("RetrieveFile function", Label("unit"), func() {
 		var (
 			ctx           context.Context
-			p             retrieving.RetrieveFileParam
-			r             *retrieving.RetrieveFileResult
+			p             file.RetrieveFileParam
+			r             *file.RetrieveFileResult
 			fileRepo      *mock_repository.MockFileRepository
 			fileManager   *mock_filesystem.MockFileManager
 			log           *mock_logging.MockLogger
-			s             retrieving.Retriever
+			s             file.File
 			retrieveParam repository.RetrieveFileParam
 			retrieveRes   *repository.RetrieveFileResult
 			openParam     filesystem.OpenFileParam
@@ -101,17 +36,21 @@ var _ = Describe("Retriever Service", func() {
 
 		BeforeEach(func() {
 			ctx = context.Background()
-			p = retrieving.RetrieveFileParam{
+			p = file.RetrieveFileParam{
 				FileId: "mock-file-id",
 			}
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
+			identifier := mock_text.NewMockIdentifier(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
-			s, _ = retrieving.NewRetriever(retrieving.NewRetrieverParam{
+			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
+				DirManager:  dirManager,
+				Identifier:  identifier,
 				Logger:      log,
 			})
 			retrieveParam = repository.RetrieveFileParam{
@@ -127,12 +66,12 @@ var _ = Describe("Retriever Service", func() {
 			openParam = filesystem.OpenFileParam{
 				Path: retrieveRes.Path,
 			}
-			file := &os.File{}
+			osFile := &os.File{}
 			openRes = &filesystem.OpenFileResult{
-				File: file,
+				File: osFile,
 			}
-			r = &retrieving.RetrieveFileResult{
-				Data:      file,
+			r = &file.RetrieveFileResult{
+				Data:      osFile,
 				UniqueId:  retrieveRes.UniqueId,
 				Name:      retrieveRes.Name,
 				Path:      retrieveRes.Path,
@@ -169,7 +108,7 @@ var _ = Describe("Retriever Service", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(retrieving.ErrorResourceNotFound))
+				Expect(err).To(Equal(file.ErrorNotFound))
 			})
 		})
 
@@ -205,7 +144,7 @@ var _ = Describe("Retriever Service", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(retrieving.ErrorResourceNotFound))
+				Expect(err).To(Equal(file.ErrorNotFound))
 			})
 		})
 

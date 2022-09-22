@@ -8,14 +8,13 @@ import (
 
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/auth"
-	"github.com/go-seidon/local/internal/deleting"
 	"github.com/go-seidon/local/internal/encoding"
+	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
 	"github.com/go-seidon/local/internal/hashing"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
-	"github.com/go-seidon/local/internal/retrieving"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/text"
 	"github.com/go-seidon/local/internal/uploading"
@@ -108,25 +107,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
 
-	deleteService, err := deleting.NewDeleter(deleting.NewDeleterParam{
-		FileRepo:    repo.GetFileRepo(),
-		Logger:      logger,
-		FileManager: fileManager,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	retrieveService, err := retrieving.NewRetriever(retrieving.NewRetrieverParam{
-		FileRepo:    repo.GetFileRepo(),
-		Logger:      logger,
-		FileManager: fileManager,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	uploadService, err := uploading.NewUploader(uploading.NewUploaderParam{
+	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
 		FileManager: fileManager,
 		Logger:      logger,
@@ -182,15 +163,15 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	).Methods(http.MethodGet)
 	fileRouter.HandleFunc(
 		"/file/{id}",
-		NewDeleteFileHandler(logger, serializer, deleteService),
+		NewDeleteFileHandler(logger, serializer, fileService),
 	).Methods(http.MethodDelete)
 	fileRouter.HandleFunc(
 		"/file/{id}",
-		NewRetrieveFileHandler(logger, serializer, retrieveService),
+		NewRetrieveFileHandler(logger, serializer, fileService),
 	).Methods(http.MethodGet)
 	fileRouter.HandleFunc(
 		"/file",
-		NewUploadFileHandler(logger, serializer, uploadService, locator, raCfg),
+		NewUploadFileHandler(logger, serializer, fileService, locator, raCfg),
 	).Methods(http.MethodPost)
 
 	router.NotFoundHandler = NewNotFoundHandler(logger, serializer)

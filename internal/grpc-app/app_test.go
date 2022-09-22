@@ -42,6 +42,8 @@ var _ = Describe("App Package", func() {
 			}
 			logger = mock_logging.NewMockLogger(ctrl)
 			repository = mock_repository.NewMockProvider(ctrl)
+			fileRepo := mock_repository.NewMockFileRepository(ctrl)
+			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 		})
 
@@ -160,6 +162,9 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
 			repository = mock_repository.NewMockProvider(ctrl)
+			fileRepo := mock_repository.NewMockFileRepository(ctrl)
+			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
+
 			grpcApp, _ = grpc_app.NewGrpcApp(
 				grpc_app.WithConfig(cfg),
 				grpc_app.WithLogger(logger),
@@ -312,6 +317,9 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
 			repository := mock_repository.NewMockProvider(ctrl)
+			fileRepo := mock_repository.NewMockFileRepository(ctrl)
+			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
+
 			grpcApp, _ = grpc_app.NewGrpcApp(
 				grpc_app.WithConfig(cfg),
 				grpc_app.WithLogger(logger),

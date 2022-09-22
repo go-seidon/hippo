@@ -1,6 +1,7 @@
 package uploading_test
 
 import (
+	"testing"
 	"time"
 
 	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
@@ -9,6 +10,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
+
+func TestUploading(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Uploading Package")
+}
 
 var _ = Describe("Daily Rotate Service", func() {
 	Context("NewDailyRotate function", Label("unit"), func() {

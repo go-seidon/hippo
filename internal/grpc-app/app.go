@@ -6,9 +6,12 @@ import (
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
 	"github.com/go-seidon/local/internal/app"
+	"github.com/go-seidon/local/internal/file"
+	"github.com/go-seidon/local/internal/filesystem"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/local/internal/text"
 	"google.golang.org/grpc"
 )
 
@@ -88,9 +91,26 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		}
 	}
 
+	fileManager := filesystem.NewFileManager()
+	dirManager := filesystem.NewDirectoryManager()
+	identifier := text.NewKsuid()
+
+	fileService, err := file.NewFile(file.NewFileParam{
+		FileRepo:    repo.GetFileRepo(),
+		FileManager: fileManager,
+		Logger:      logger,
+		Identifier:  identifier,
+		DirManager:  dirManager,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	grpcServer := grpc.NewServer()
 	healthCheckHandler := NewHealthHandler(healthService)
+	fileHandler := NewFileHandler(fileService)
 	grpc_v1.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
+	grpc_v1.RegisterFileServiceServer(grpcServer, fileHandler)
 
 	config := &GrpcAppConfig{
 		AppName:    p.Config.AppName,

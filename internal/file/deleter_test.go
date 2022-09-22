@@ -1,122 +1,61 @@
-package deleting_test
+package file_test
 
 import (
 	"context"
 	"fmt"
-	"testing"
 	"time"
 
-	"github.com/go-seidon/local/internal/deleting"
+	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
+	mock_text "github.com/go-seidon/local/internal/text/mock"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func TestDeleting(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Deleting Package")
-}
-
-var _ = Describe("Deleter Service", func() {
-	Context("NewDeleter function", Label("unit"), func() {
-		var (
-			fileRepo    *mock_repository.MockFileRepository
-			fileManager *mock_filesystem.MockFileManager
-			logger      *mock_logging.MockLogger
-			p           deleting.NewDeleterParam
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
-			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			logger = mock_logging.NewMockLogger(ctrl)
-			p = deleting.NewDeleterParam{
-				FileRepo:    fileRepo,
-				FileManager: fileManager,
-				Logger:      logger,
-			}
-		})
-
-		When("success create service", func() {
-			It("should return result", func() {
-				res, err := deleting.NewDeleter(p)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("file repo is not specified", func() {
-			It("should return error", func() {
-				p.FileRepo = nil
-				res, err := deleting.NewDeleter(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file repo is not specified")))
-			})
-		})
-
-		When("file manager is not specified", func() {
-			It("should return error", func() {
-				p.FileManager = nil
-				res, err := deleting.NewDeleter(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file manager is not specified")))
-			})
-		})
-
-		When("logger is not specified", func() {
-			It("should return error", func() {
-				p.Logger = nil
-				res, err := deleting.NewDeleter(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("logger is not specified")))
-			})
-		})
-	})
+var _ = Describe("Deleter", func() {
 
 	Context("DeleteFile function", Label("unit"), func() {
 		var (
 			ctx         context.Context
-			p           deleting.DeleteFileParam
+			p           file.DeleteFileParam
 			fileRepo    *mock_repository.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
 			log         *mock_logging.MockLogger
-			s           deleting.Deleter
+			s           file.File
 			deleteRes   *repository.DeleteFileResult
-			finalRes    *deleting.DeleteFileResult
+			finalRes    *file.DeleteFileResult
 		)
 
 		BeforeEach(func() {
 			currentTimestamp := time.Now()
 			ctx = context.Background()
-			p = deleting.DeleteFileParam{
+			p = file.DeleteFileParam{
 				FileId: "mock-file-id",
 			}
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileRepo = mock_repository.NewMockFileRepository(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
+			identifier := mock_text.NewMockIdentifier(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
-			s, _ = deleting.NewDeleter(deleting.NewDeleterParam{
+			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
+				DirManager:  dirManager,
 				Logger:      log,
+				Identifier:  identifier,
 			})
 			deleteRes = &repository.DeleteFileResult{
 				DeletedAt: currentTimestamp,
 			}
-			finalRes = &deleting.DeleteFileResult{
+			finalRes = &file.DeleteFileResult{
 				DeletedAt: currentTimestamp,
 			}
 
@@ -164,7 +103,7 @@ var _ = Describe("Deleter Service", func() {
 				res, err := s.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(deleting.ErrorResourceNotFound))
+				Expect(err).To(Equal(file.ErrorNotFound))
 			})
 		})
 
@@ -201,7 +140,7 @@ var _ = Describe("Deleter Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			fn = deleting.NewDeleteFn(fileManager)
+			fn = file.NewDeleteFn(fileManager)
 			deleteFnParam = repository.DeleteFnParam{
 				FilePath: "mock/path",
 			}
@@ -240,7 +179,7 @@ var _ = Describe("Deleter Service", func() {
 
 				err := fn(ctx, deleteFnParam)
 
-				Expect(err).To(Equal(deleting.ErrorResourceNotFound))
+				Expect(err).To(Equal(file.ErrorNotFound))
 			})
 		})
 

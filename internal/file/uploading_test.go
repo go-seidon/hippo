@@ -1,12 +1,12 @@
-package uploading_test
+package file_test
 
 import (
 	"context"
 	"fmt"
 	"io"
-	"testing"
 	"time"
 
+	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
@@ -14,205 +14,12 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
-	"github.com/go-seidon/local/internal/uploading"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func TestUploading(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Uploading Package")
-}
-
-var _ = Describe("Uploader Service", func() {
-	Context("NewUploader function", Label("unit"), func() {
-		var (
-			fileRepo    *mock_repository.MockFileRepository
-			fileManager *mock_filesystem.MockFileManager
-			dirManager  *mock_filesystem.MockDirectoryManager
-			logger      *mock_logging.MockLogger
-			identifier  *mock_text.MockIdentifier
-			p           uploading.NewUploaderParam
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
-			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
-			logger = mock_logging.NewMockLogger(ctrl)
-			identifier = mock_text.NewMockIdentifier(ctrl)
-			p = uploading.NewUploaderParam{
-				FileRepo:    fileRepo,
-				FileManager: fileManager,
-				DirManager:  dirManager,
-				Logger:      logger,
-				Identifier:  identifier,
-			}
-		})
-
-		When("success create service", func() {
-			It("should return result", func() {
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("file repo is not specified", func() {
-			It("should return error", func() {
-				p.FileRepo = nil
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file repo is not specified")))
-			})
-		})
-
-		When("file manager is not specified", func() {
-			It("should return error", func() {
-				p.FileManager = nil
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file manager is not specified")))
-			})
-		})
-
-		When("directory manager is not specified", func() {
-			It("should return error", func() {
-				p.DirManager = nil
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("directory manager is not specified")))
-			})
-		})
-
-		When("logger is not specified", func() {
-			It("should return error", func() {
-				p.Logger = nil
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("logger is not specified")))
-			})
-		})
-
-		When("identifier is not specified", func() {
-			It("should return error", func() {
-				p.Identifier = nil
-				res, err := uploading.NewUploader(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("identifier is not specified")))
-			})
-		})
-	})
-
-	Context("NewCreateFn function", Label("unit"), func() {
-		var (
-			ctx           context.Context
-			data          []byte
-			fileManager   *mock_filesystem.MockFileManager
-			fn            repository.CreateFn
-			createFnParam repository.CreateFnParam
-			existsParam   filesystem.IsFileExistsParam
-			saveParam     filesystem.SaveFileParam
-		)
-
-		BeforeEach(func() {
-			ctx = context.Background()
-			t := GinkgoT()
-			ctrl := gomock.NewController(t)
-			data = []byte{}
-			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			fn = uploading.NewCreateFn(data, fileManager)
-			createFnParam = repository.CreateFnParam{
-				FilePath: "mock/path/name.jpg",
-			}
-			existsParam = filesystem.IsFileExistsParam{
-				Path: createFnParam.FilePath,
-			}
-			saveParam = filesystem.SaveFileParam{
-				Name:       createFnParam.FilePath,
-				Data:       data,
-				Permission: 0644,
-			}
-		})
-
-		When("failed check file existance", func() {
-			It("should return error", func() {
-				fileManager.
-					EXPECT().
-					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
-					Return(false, fmt.Errorf("disk error")).
-					Times(1)
-
-				err := fn(ctx, createFnParam)
-
-				Expect(err).To(Equal(fmt.Errorf("disk error")))
-			})
-		})
-
-		When("file already exists", func() {
-			It("should return error", func() {
-				fileManager.
-					EXPECT().
-					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
-					Return(true, nil).
-					Times(1)
-
-				err := fn(ctx, createFnParam)
-
-				Expect(err).To(Equal(uploading.ErrorResourceExists))
-			})
-		})
-
-		When("failed save file", func() {
-			It("should return error", func() {
-				fileManager.
-					EXPECT().
-					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
-					Return(false, nil).
-					Times(1)
-
-				fileManager.
-					EXPECT().
-					SaveFile(gomock.Eq(ctx), gomock.Eq(saveParam)).
-					Return(nil, fmt.Errorf("disk error")).
-					Times(1)
-
-				err := fn(ctx, createFnParam)
-
-				Expect(err).To(Equal(fmt.Errorf("disk error")))
-			})
-		})
-
-		When("success save file", func() {
-			It("should return nil", func() {
-				fileManager.
-					EXPECT().
-					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
-					Return(false, nil).
-					Times(1)
-
-				saveRes := filesystem.SaveFileResult{}
-				fileManager.
-					EXPECT().
-					SaveFile(gomock.Eq(ctx), gomock.Eq(saveParam)).
-					Return(&saveRes, nil).
-					Times(1)
-
-				err := fn(ctx, createFnParam)
-
-				Expect(err).To(BeNil())
-			})
-		})
-	})
+var _ = Describe("Uploader", func() {
 
 	Context("UploadFile function", Label("unit"), func() {
 		var (
@@ -224,11 +31,11 @@ var _ = Describe("Uploader Service", func() {
 			logger           *mock_logging.MockLogger
 			reader           *mock_io.MockReader
 			identifier       *mock_text.MockIdentifier
-			s                uploading.Uploader
+			s                file.File
 			dirExistsParam   filesystem.IsDirectoryExistsParam
 			createDirParam   filesystem.CreateDirParam
 			createFileRes    *repository.CreateFileResult
-			opts             []uploading.UploadFileOption
+			opts             []file.UploadFileOption
 		)
 
 		BeforeEach(func() {
@@ -242,7 +49,7 @@ var _ = Describe("Uploader Service", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
-			s, _ = uploading.NewUploader(uploading.NewUploaderParam{
+			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
 				DirManager:  dirManager,
@@ -265,9 +72,9 @@ var _ = Describe("Uploader Service", func() {
 				Size:      200,
 				CreatedAt: currentTimestamp,
 			}
-			dataOpt := uploading.WithData([]byte{})
-			dirOpt := uploading.WithDirectory("temp")
-			infoOpt := uploading.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
+			dataOpt := file.WithData([]byte{})
+			dirOpt := file.WithDirectory("temp")
+			infoOpt := file.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
 			opts = append(opts, dataOpt)
 			opts = append(opts, dirOpt)
 			opts = append(opts, infoOpt)
@@ -293,7 +100,7 @@ var _ = Describe("Uploader Service", func() {
 
 		When("upload directory is not specified", func() {
 			It("should return error", func() {
-				res, err := s.UploadFile(ctx, uploading.WithData([]byte{}))
+				res, err := s.UploadFile(ctx, file.WithData([]byte{}))
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("invalid upload directory is not specified")))
@@ -352,7 +159,7 @@ var _ = Describe("Uploader Service", func() {
 					Return(0, fmt.Errorf("disk error")).
 					Times(1)
 
-				fwOpt := uploading.WithReader(reader)
+				fwOpt := file.WithReader(reader)
 				copts := opts
 				copts = append(copts, fwOpt)
 
@@ -385,7 +192,7 @@ var _ = Describe("Uploader Service", func() {
 					Return("", fmt.Errorf("generate error")).
 					Times(1)
 
-				fwOpt := uploading.WithReader(reader)
+				fwOpt := file.WithReader(reader)
 				copts := opts
 				copts = append(copts, fwOpt)
 
@@ -449,7 +256,7 @@ var _ = Describe("Uploader Service", func() {
 
 				res, err := s.UploadFile(ctx, opts...)
 
-				expectedRes := &uploading.UploadFileResult{
+				expectedRes := &file.UploadFileResult{
 					UniqueId:   "mock-unique-id",
 					Name:       "mock-name",
 					Path:       "mock-path",
@@ -464,4 +271,106 @@ var _ = Describe("Uploader Service", func() {
 		})
 
 	})
+
+	Context("NewCreateFn function", Label("unit"), func() {
+		var (
+			ctx           context.Context
+			data          []byte
+			fileManager   *mock_filesystem.MockFileManager
+			fn            repository.CreateFn
+			createFnParam repository.CreateFnParam
+			existsParam   filesystem.IsFileExistsParam
+			saveParam     filesystem.SaveFileParam
+		)
+
+		BeforeEach(func() {
+			ctx = context.Background()
+			t := GinkgoT()
+			ctrl := gomock.NewController(t)
+			data = []byte{}
+			fileManager = mock_filesystem.NewMockFileManager(ctrl)
+			fn = file.NewCreateFn(data, fileManager)
+			createFnParam = repository.CreateFnParam{
+				FilePath: "mock/path/name.jpg",
+			}
+			existsParam = filesystem.IsFileExistsParam{
+				Path: createFnParam.FilePath,
+			}
+			saveParam = filesystem.SaveFileParam{
+				Name:       createFnParam.FilePath,
+				Data:       data,
+				Permission: 0644,
+			}
+		})
+
+		When("failed check file existance", func() {
+			It("should return error", func() {
+				fileManager.
+					EXPECT().
+					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
+					Return(false, fmt.Errorf("disk error")).
+					Times(1)
+
+				err := fn(ctx, createFnParam)
+
+				Expect(err).To(Equal(fmt.Errorf("disk error")))
+			})
+		})
+
+		When("file already exists", func() {
+			It("should return error", func() {
+				fileManager.
+					EXPECT().
+					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
+					Return(true, nil).
+					Times(1)
+
+				err := fn(ctx, createFnParam)
+
+				Expect(err).To(Equal(file.ErrorExists))
+			})
+		})
+
+		When("failed save file", func() {
+			It("should return error", func() {
+				fileManager.
+					EXPECT().
+					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
+					Return(false, nil).
+					Times(1)
+
+				fileManager.
+					EXPECT().
+					SaveFile(gomock.Eq(ctx), gomock.Eq(saveParam)).
+					Return(nil, fmt.Errorf("disk error")).
+					Times(1)
+
+				err := fn(ctx, createFnParam)
+
+				Expect(err).To(Equal(fmt.Errorf("disk error")))
+			})
+		})
+
+		When("success save file", func() {
+			It("should return nil", func() {
+				fileManager.
+					EXPECT().
+					IsFileExists(gomock.Eq(ctx), gomock.Eq(existsParam)).
+					Return(false, nil).
+					Times(1)
+
+				saveRes := filesystem.SaveFileResult{}
+				fileManager.
+					EXPECT().
+					SaveFile(gomock.Eq(ctx), gomock.Eq(saveParam)).
+					Return(&saveRes, nil).
+					Times(1)
+
+				err := fn(ctx, createFnParam)
+
+				Expect(err).To(BeNil())
+			})
+		})
+	})
+
 })
