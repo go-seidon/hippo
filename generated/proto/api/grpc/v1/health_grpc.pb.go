@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: api/grpc/v1/health.proto
 
-package health_v1
+package grpc_v1
 
 import (
 	context "context"

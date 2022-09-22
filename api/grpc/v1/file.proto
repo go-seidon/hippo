@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package file.v1;
+
+option go_package = "./generated/proto/api/grpc/v1/file;grpc_v1";
+
+message DeleteFileParam {
+  string file_id = 1;
+}
+
+message DeleteFileResult {
+  int32 code = 1;
+  string message = 2;
+  DeleteFileData data = 3;
+}
+
+message DeleteFileData {
+  int64 deleted_at = 1;
+}
+
+service FileService {
+  rpc DeleteFile(DeleteFileParam) returns (DeleteFileResult);
+}
