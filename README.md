@@ -7,14 +7,12 @@
 No doc right now
 
 ## Todo
-1. Add delete file `grpc-app` implementation
-2. Add retrieve file `grpc-app` implementation
-3. Add upload file `grpc-app` implementation
-4. Add `grpc-app` basic authentication
-5. Add `REST API versioning`
-6. Add OpenAPI specification & code generation
-7. Stream instead of load the entire files to the memory
-8. Deploy dev, stg, prod (deployment script)
+1. Add retrieve file `grpc-app` implementation
+2. Add upload file `grpc-app` implementation (move location selection to file service)
+3. Add basic auth `grpc-app` implementation
+4. Add OpenAPI specification & code generation (with API versioning)
+5. Stream instead of load the entire files to the memory
+6. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy
@@ -35,7 +33,7 @@ No doc right now
 ## Technical Stack
 1. Transport layer
 - rest
-- grpc (TBA)
+- grpc
 2. Database
 - mysql
 - mongo
