@@ -18,6 +18,17 @@ message DeleteFileData {
   int64 deleted_at = 1;
 }
 
+message RetrieveFileParam {
+  string file_id = 1;
+}
+
+message RetrieveFileResult {
+  int32 code = 1;
+  string message = 2;
+  bytes chunks = 3;
+}
+
 service FileService {
   rpc DeleteFile(DeleteFileParam) returns (DeleteFileResult);
+  rpc RetrieveFile(RetrieveFileParam) returns (stream RetrieveFileResult);
 }

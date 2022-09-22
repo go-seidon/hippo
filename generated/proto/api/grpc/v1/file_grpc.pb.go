@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileServiceClient interface {
 	DeleteFile(ctx context.Context, in *DeleteFileParam, opts ...grpc.CallOption) (*DeleteFileResult, error)
+	RetrieveFile(ctx context.Context, in *RetrieveFileParam, opts ...grpc.CallOption) (FileService_RetrieveFileClient, error)
 }
 
 type fileServiceClient struct {
@@ -42,11 +43,44 @@ func (c *fileServiceClient) DeleteFile(ctx context.Context, in *DeleteFileParam,
 	return out, nil
 }
 
+func (c *fileServiceClient) RetrieveFile(ctx context.Context, in *RetrieveFileParam, opts ...grpc.CallOption) (FileService_RetrieveFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[0], "/file.v1.FileService/RetrieveFile", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fileServiceRetrieveFileClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type FileService_RetrieveFileClient interface {
+	Recv() (*RetrieveFileResult, error)
+	grpc.ClientStream
+}
+
+type fileServiceRetrieveFileClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileServiceRetrieveFileClient) Recv() (*RetrieveFileResult, error) {
+	m := new(RetrieveFileResult)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FileServiceServer is the server API for FileService service.
 // All implementations should embed UnimplementedFileServiceServer
 // for forward compatibility
 type FileServiceServer interface {
 	DeleteFile(context.Context, *DeleteFileParam) (*DeleteFileResult, error)
+	RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error
 }
 
 // UnimplementedFileServiceServer should be embedded to have forward compatible implementations.
@@ -55,6 +89,9 @@ type UnimplementedFileServiceServer struct {
 
 func (UnimplementedFileServiceServer) DeleteFile(context.Context, *DeleteFileParam) (*DeleteFileResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
+}
+func (UnimplementedFileServiceServer) RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method RetrieveFile not implemented")
 }
 
 // UnsafeFileServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -86,6 +123,27 @@ func _FileService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileService_RetrieveFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RetrieveFileParam)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FileServiceServer).RetrieveFile(m, &fileServiceRetrieveFileServer{stream})
+}
+
+type FileService_RetrieveFileServer interface {
+	Send(*RetrieveFileResult) error
+	grpc.ServerStream
+}
+
+type fileServiceRetrieveFileServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileServiceRetrieveFileServer) Send(m *RetrieveFileResult) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // FileService_ServiceDesc is the grpc.ServiceDesc for FileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +156,12 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FileService_DeleteFile_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RetrieveFile",
+			Handler:       _FileService_RetrieveFile_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "api/grpc/v1/file.proto",
 }
