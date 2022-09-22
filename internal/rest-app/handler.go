@@ -7,10 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/go-seidon/local/internal/deleting"
+	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/retrieving"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/status"
 	"github.com/go-seidon/local/internal/uploading"
@@ -113,13 +112,13 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 	}
 }
 
-func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, deleter deleting.Deleter) http.HandlerFunc {
+func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, deleter file.File) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
 		vars := mux.Vars(req)
 
 		ctx := context.Background()
-		r, err := deleter.DeleteFile(ctx, deleting.DeleteFileParam{
+		r, err := deleter.DeleteFile(ctx, file.DeleteFileParam{
 			FileId: vars["id"],
 		})
 		if err == nil {
@@ -138,7 +137,7 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 			return
 		}
 
-		if errors.Is(err, deleting.ErrorResourceNotFound) {
+		if errors.Is(err, file.ErrorNotFound) {
 			Response(
 				WithWriterSerializer(w, s),
 				WithHttpCode(http.StatusNotFound),
@@ -157,13 +156,13 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 	}
 }
 
-func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retriever retrieving.Retriever) http.HandlerFunc {
+func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retriever file.File) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
 		vars := mux.Vars(req)
 
 		ctx := context.Background()
-		r, err := retriever.RetrieveFile(ctx, retrieving.RetrieveFileParam{
+		r, err := retriever.RetrieveFile(ctx, file.RetrieveFileParam{
 			FileId: vars["id"],
 		})
 		if err == nil {
@@ -190,7 +189,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			return
 		}
 
-		if errors.Is(err, retrieving.ErrorResourceNotFound) {
+		if errors.Is(err, file.ErrorNotFound) {
 			Response(
 				WithWriterSerializer(w, s),
 				WithHttpCode(http.StatusNotFound),
@@ -209,13 +208,13 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 	}
 }
 
-func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, uploader uploading.Uploader, locator uploading.UploadLocation, config *RestAppConfig) http.HandlerFunc {
+func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, uploader file.File, locator uploading.UploadLocation, config *RestAppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
 		// set form max size + add 1KB (non file size estimation if any)
 		req.Body = http.MaxBytesReader(w, req.Body, config.UploadFormSize+1024)
 
-		file, fileHeader, err := req.FormFile("file")
+		fileReader, fileHeader, err := req.FormFile("file")
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
@@ -225,9 +224,9 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 			)
 			return
 		}
-		defer file.Close()
+		defer fileReader.Close()
 
-		fileInfo, err := ParseMultipartFile(file, fileHeader)
+		fileInfo, err := ParseMultipartFile(fileReader, fileHeader)
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
@@ -242,9 +241,9 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 
 		ctx := context.Background()
 		uploadRes, err := uploader.UploadFile(ctx,
-			uploading.WithReader(file),
-			uploading.WithDirectory(uploadDir),
-			uploading.WithFileInfo(
+			file.WithReader(fileReader),
+			file.WithDirectory(uploadDir),
+			file.WithFileInfo(
 				fileInfo.Name,
 				fileInfo.Mimetype,
 				fileInfo.Extension,
