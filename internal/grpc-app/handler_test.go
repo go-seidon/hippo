@@ -6,6 +6,8 @@ import (
 	"time"
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
+	"github.com/go-seidon/local/internal/file"
+	mock_file "github.com/go-seidon/local/internal/file/mock"
 	grpc_app "github.com/go-seidon/local/internal/grpc-app"
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
@@ -144,4 +146,93 @@ var _ = Describe("Handler Package", func() {
 		})
 	})
 
+	Context("DeleteFile function", Label("unit"), func() {
+		var (
+			handler     grpc_v1.FileServiceServer
+			fileService *mock_file.MockFile
+			ctx         context.Context
+			currentTs   time.Time
+			p           *grpc_v1.DeleteFileParam
+			delParam    file.DeleteFileParam
+			delRes      *file.DeleteFileResult
+		)
+
+		BeforeEach(func() {
+			t := GinkgoT()
+			ctrl := gomock.NewController(t)
+			fileService = mock_file.NewMockFile(ctrl)
+			handler = grpc_app.NewFileHandler(fileService)
+			ctx = context.Background()
+			currentTs = time.Now()
+			p = &grpc_v1.DeleteFileParam{
+				FileId: "file-id",
+			}
+			delParam = file.DeleteFileParam{
+				FileId: "file-id",
+			}
+			delRes = &file.DeleteFileResult{
+				DeletedAt: currentTs,
+			}
+		})
+
+		When("success delete file", func() {
+			It("should return result", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(delRes, nil).
+					Times(1)
+
+				res, err := handler.DeleteFile(ctx, p)
+
+				expectRes := &grpc_v1.DeleteFileResult{
+					Code:    1000,
+					Message: "success delete file",
+					Data: &grpc_v1.DeleteFileData{
+						DeletedAt: currentTs.UnixMilli(),
+					},
+				}
+				Expect(res).To(Equal(expectRes))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("file is not found", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, file.ErrorNotFound).
+					Times(1)
+
+				res, err := handler.DeleteFile(ctx, p)
+
+				expectRes := &grpc_v1.DeleteFileResult{
+					Code:    1004,
+					Message: "not found",
+				}
+				Expect(res).To(Equal(expectRes))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed delete file", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, fmt.Errorf("db error")).
+					Times(1)
+
+				res, err := handler.DeleteFile(ctx, p)
+
+				expectRes := &grpc_v1.DeleteFileResult{
+					Code:    1001,
+					Message: "db error",
+				}
+				Expect(res).To(Equal(expectRes))
+				Expect(err).To(BeNil())
+			})
+		})
+	})
 })
