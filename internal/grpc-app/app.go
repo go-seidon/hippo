@@ -94,6 +94,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
+	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
@@ -101,6 +102,10 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		Logger:      logger,
 		Identifier:  identifier,
 		DirManager:  dirManager,
+		Locator:     locator,
+		Config: &file.FileConfig{
+			UploadDir: p.Config.UploadDirectory,
+		},
 	})
 	if err != nil {
 		return nil, err

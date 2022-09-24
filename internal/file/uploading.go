@@ -19,14 +19,13 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 	}
 
 	if p.fileData == nil && p.fileReader == nil {
-		return nil, fmt.Errorf("invalid file is not specified")
-	}
-	if p.fileDir == "" {
-		return nil, fmt.Errorf("invalid upload directory is not specified")
+		return nil, fmt.Errorf("file is not specified")
 	}
 
+	uploadDir := fmt.Sprintf("%s/%s", s.config.UploadDir, s.locator.GetLocation())
+
 	exists, err := s.dirManager.IsDirectoryExists(ctx, filesystem.IsDirectoryExistsParam{
-		Path: p.fileDir,
+		Path: uploadDir,
 	})
 	if err != nil {
 		return nil, err
@@ -34,7 +33,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 
 	if !exists {
 		_, err := s.dirManager.CreateDir(ctx, filesystem.CreateDirParam{
-			Path:       p.fileDir,
+			Path:       uploadDir,
 			Permission: 0644,
 		})
 		if err != nil {
@@ -56,7 +55,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		return nil, err
 	}
 
-	path := fmt.Sprintf("%s/%s", p.fileDir, uniqueId)
+	path := fmt.Sprintf("%s/%s", uploadDir, uniqueId)
 	if p.fileExtension != "" {
 		path = fmt.Sprintf("%s.%s", path, p.fileExtension)
 	}
@@ -84,37 +83,6 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		UploadedAt: cRes.CreatedAt,
 	}
 	return res, nil
-}
-
-type UploadFileOption = func(*UploadFileParam)
-
-func WithData(d []byte) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileData = d
-		ufp.fileReader = nil
-	}
-}
-
-func WithReader(w io.Reader) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileReader = w
-		ufp.fileData = nil
-	}
-}
-
-func WithDirectory(path string) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileDir = path
-	}
-}
-
-func WithFileInfo(name, mimetype, extension string, size int64) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileName = name
-		ufp.fileMimetype = mimetype
-		ufp.fileExtension = extension
-		ufp.fileSize = size
-	}
 }
 
 func NewCreateFn(data []byte, fileManager filesystem.FileManager) repository.CreateFn {

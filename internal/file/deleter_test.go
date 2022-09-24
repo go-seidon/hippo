@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/file"
+	mock_file "github.com/go-seidon/local/internal/file/mock"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
@@ -44,6 +45,7 @@ var _ = Describe("Deleter", func() {
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
 			identifier := mock_text.NewMockIdentifier(ctrl)
+			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
@@ -51,6 +53,10 @@ var _ = Describe("Deleter", func() {
 				DirManager:  dirManager,
 				Logger:      log,
 				Identifier:  identifier,
+				Locator:     locator,
+				Config: &file.FileConfig{
+					UploadDir: "temp",
+				},
 			})
 			deleteRes = &repository.DeleteFileResult{
 				DeletedAt: currentTimestamp,

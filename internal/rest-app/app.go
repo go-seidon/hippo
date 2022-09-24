@@ -105,6 +105,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
+	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
@@ -112,6 +113,10 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		Logger:      logger,
 		Identifier:  identifier,
 		DirManager:  dirManager,
+		Locator:     locator,
+		Config: &file.FileConfig{
+			UploadDir: p.Config.UploadDirectory,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -125,7 +130,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		UploadFormSize: p.Config.UploadFormSize,
 		UploadDir:      p.Config.UploadDirectory,
 	}
-	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 	serializer := serialization.NewJsonSerializer()
 	encoder := encoding.NewBase64Encoder()
 	hasher := hashing.NewBcryptHasher()
@@ -170,7 +174,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	).Methods(http.MethodGet)
 	fileRouter.HandleFunc(
 		"/file",
-		NewUploadFileHandler(logger, serializer, fileService, locator, raCfg),
+		NewUploadFileHandler(logger, serializer, fileService, raCfg),
 	).Methods(http.MethodPost)
 
 	router.NotFoundHandler = NewNotFoundHandler(logger, serializer)

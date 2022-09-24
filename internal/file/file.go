@@ -18,12 +18,34 @@ type File interface {
 	DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, error)
 }
 
+type UploadFileOption = func(*UploadFileParam)
+
+func WithData(d []byte) UploadFileOption {
+	return func(ufp *UploadFileParam) {
+		ufp.fileData = d
+		ufp.fileReader = nil
+	}
+}
+
+func WithReader(w io.Reader) UploadFileOption {
+	return func(ufp *UploadFileParam) {
+		ufp.fileReader = w
+		ufp.fileData = nil
+	}
+}
+
+func WithFileInfo(name, mimetype, extension string, size int64) UploadFileOption {
+	return func(ufp *UploadFileParam) {
+		ufp.fileName = name
+		ufp.fileMimetype = mimetype
+		ufp.fileExtension = extension
+		ufp.fileSize = size
+	}
+}
+
 type UploadFileParam struct {
-	fileData   []byte
-	fileReader io.Reader
-
-	fileDir string
-
+	fileData      []byte
+	fileReader    io.Reader
 	fileName      string
 	fileMimetype  string
 	fileExtension string
@@ -68,6 +90,12 @@ type file struct {
 	dirManager  filesystem.DirectoryManager
 	identifier  text.Identifier
 	log         logging.Logger
+	locator     UploadLocation
+	config      *FileConfig
+}
+
+type FileConfig struct {
+	UploadDir string
 }
 
 type NewFileParam struct {
@@ -76,6 +104,8 @@ type NewFileParam struct {
 	DirManager  filesystem.DirectoryManager
 	Logger      logging.Logger
 	Identifier  text.Identifier
+	Locator     UploadLocation
+	Config      *FileConfig
 }
 
 func NewFile(p NewFileParam) (*file, error) {
@@ -94,6 +124,12 @@ func NewFile(p NewFileParam) (*file, error) {
 	if p.Identifier == nil {
 		return nil, fmt.Errorf("identifier is not specified")
 	}
+	if p.Config == nil {
+		return nil, fmt.Errorf("config is not specified")
+	}
+	if p.Locator == nil {
+		return nil, fmt.Errorf("locator is not specified")
+	}
 
 	s := &file{
 		fileRepo:    p.FileRepo,
@@ -101,6 +137,8 @@ func NewFile(p NewFileParam) (*file, error) {
 		dirManager:  p.DirManager,
 		identifier:  p.Identifier,
 		log:         p.Logger,
+		locator:     p.Locator,
+		config:      p.Config,
 	}
 	return s, nil
 }
