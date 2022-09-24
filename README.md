@@ -7,12 +7,16 @@
 No doc right now
 
 ## Todo
-1. Add retrieve file `grpc-app` implementation
-2. Add upload file `grpc-app` implementation (move location selection to file service)
-3. Add basic auth `grpc-app` implementation
-4. Add OpenAPI specification & code generation (with API versioning)
-5. Stream instead of load the entire files to the memory
-6. Deploy dev, stg, prod (deployment script)
+1. Add upload file `grpc-app` implementation
+- move location package to file package
+- move location selection to file service
+- stream instead of load the entire files to the memory
+2. Add basic auth `grpc-app` implementation
+3. Add request logging `grpc-app` implementation
+4. Add validation package & validation error handling
+5. Stream instead of reading entier files to the memory (io.Copy) on `rest-app`
+6. Change REST using OpenAPI specification & code generation (with API versioning)
+7. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy
