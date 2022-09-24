@@ -112,9 +112,9 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 
 		defer retrieval.Data.Close()
 
-		const CHUNK_SIZE = 102400 //100KB
+		const chunkSize = 102400 //100KB
 		for {
-			chunks := make([]byte, CHUNK_SIZE)
+			chunks := make([]byte, chunkSize)
 			_, err := retrieval.Data.Read(chunks)
 			if err == nil {
 				err = stream.Send(&grpc_v1.RetrieveFileResult{
