@@ -17,7 +17,6 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/text"
-	"github.com/go-seidon/local/internal/uploading"
 
 	"github.com/gorilla/mux"
 )
@@ -126,7 +125,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		UploadFormSize: p.Config.UploadFormSize,
 		UploadDir:      p.Config.UploadDirectory,
 	}
-	locator := uploading.NewDailyRotate(uploading.NewDailyRotateParam{})
+	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 	serializer := serialization.NewJsonSerializer()
 	encoder := encoding.NewBase64Encoder()
 	hasher := hashing.NewBcryptHasher()

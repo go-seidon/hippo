@@ -20,7 +20,6 @@ import (
 	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	"github.com/go-seidon/local/internal/serialization"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
-	mock_uploading "github.com/go-seidon/local/internal/uploading/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -730,7 +729,7 @@ var _ = Describe("Handler Package", func() {
 			log              *mock_logging.MockLogger
 			serializer       serialization.Serializer
 			uploadService    *mock_file.MockFile
-			locator          *mock_uploading.MockUploadLocation
+			locator          *mock_file.MockUploadLocation
 		)
 
 		BeforeEach(func() {
@@ -753,7 +752,7 @@ var _ = Describe("Handler Package", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = serialization.NewJsonSerializer()
 			uploadService = mock_file.NewMockFile(ctrl)
-			locator = mock_uploading.NewMockUploadLocation(ctrl)
+			locator = mock_file.NewMockUploadLocation(ctrl)
 			cfg := &rest_app.RestAppConfig{}
 			handler = rest_app.NewUploadFileHandler(
 				log, serializer, uploadService,

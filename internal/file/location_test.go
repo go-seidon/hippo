@@ -1,25 +1,19 @@
-package uploading_test
+package file_test
 
 import (
-	"testing"
 	"time"
 
 	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
-	"github.com/go-seidon/local/internal/uploading"
+	"github.com/go-seidon/local/internal/file"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func TestUploading(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Uploading Package")
-}
-
 var _ = Describe("Daily Rotate Service", func() {
 	Context("NewDailyRotate function", Label("unit"), func() {
 		var (
-			p     uploading.NewDailyRotateParam
+			p     file.NewDailyRotateParam
 			clock *mock_datetime.MockClock
 		)
 
@@ -27,12 +21,12 @@ var _ = Describe("Daily Rotate Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			clock = mock_datetime.NewMockClock(ctrl)
-			p = uploading.NewDailyRotateParam{}
+			p = file.NewDailyRotateParam{}
 		})
 
 		When("success create rotator", func() {
 			It("should return result", func() {
-				res := uploading.NewDailyRotate(p)
+				res := file.NewDailyRotate(p)
 
 				Expect(res).ToNot(BeNil())
 			})
@@ -41,7 +35,7 @@ var _ = Describe("Daily Rotate Service", func() {
 		When("clock is specified", func() {
 			It("should return result", func() {
 				p.Clock = clock
-				res := uploading.NewDailyRotate(p)
+				res := file.NewDailyRotate(p)
 
 				Expect(res).ToNot(BeNil())
 			})
@@ -50,7 +44,7 @@ var _ = Describe("Daily Rotate Service", func() {
 
 	Context("GetLocation function", Label("unit"), func() {
 		var (
-			s     uploading.UploadLocation
+			s     file.UploadLocation
 			clock *mock_datetime.MockClock
 		)
 
@@ -59,7 +53,7 @@ var _ = Describe("Daily Rotate Service", func() {
 			ctrl := gomock.NewController(t)
 			clock = mock_datetime.NewMockClock(ctrl)
 
-			s = uploading.NewDailyRotate(uploading.NewDailyRotateParam{
+			s = file.NewDailyRotate(file.NewDailyRotateParam{
 				Clock: clock,
 			})
 		})

@@ -170,6 +170,55 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 	return nil
 }
 
+func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) error {
+	p, err := stream.Recv()
+	if err != nil {
+		err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// @todo: continue implementation
+
+	res, err := h.fileService.UploadFile(
+		stream.Context(),
+		file.WithFileInfo(p.Name, p.Mimetype, p.Extension, p.Size),
+	)
+	if err != nil {
+		err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+		Code:    status.ACTION_SUCCESS,
+		Message: "success upload file",
+		Data: &grpc_v1.UploadFileData{
+			UniqueId:   res.UniqueId,
+			Name:       res.Name,
+			Path:       res.Path,
+			Mimetype:   res.Mimetype,
+			Extension:  res.Extension,
+			Size:       res.Size,
+			UploadedAt: res.UploadedAt.UnixMilli(),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewFileHandler(fileService file.File) *fileHandler {
 	return &fileHandler{fileService: fileService}
 }
