@@ -54,6 +54,7 @@ test-watch-integration:
 
 .PHONY: generate-mock
 generate-mock:
+	mockgen -package=mock_grpcv1 -source generated/proto/api/grpc/v1/file_grpc.pb.go -destination=generated/proto/api/grpc/v1/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
 	mockgen -package=mock_datetime -source internal/datetime/clock.go -destination=internal/datetime/mock/clock_mock.go
