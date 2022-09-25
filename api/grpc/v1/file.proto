@@ -28,7 +28,37 @@ message RetrieveFileResult {
   bytes chunks = 3;
 }
 
+message UploadFileParam {
+  oneof data {
+    bytes chunks = 1;
+    UploadFileInfo info = 2;
+  }
+}
+
+message UploadFileInfo {
+  string name = 1;
+  string mimetype = 2;
+  string extension = 3;
+}
+
+message UploadFileResult {
+  int32 code = 1;
+  string message = 2;
+  UploadFileData data = 3;
+}
+
+message UploadFileData {
+  string id = 1;
+  string name = 2;
+  string path = 3;
+  string mimetype = 4;
+  string extension = 5;
+  int64 size = 6;
+  int64 uploaded_at = 7;
+}
+
 service FileService {
   rpc DeleteFile(DeleteFileParam) returns (DeleteFileResult);
   rpc RetrieveFile(RetrieveFileParam) returns (stream RetrieveFileResult);
+  rpc UploadFile(stream UploadFileParam) returns (UploadFileResult);
 }
