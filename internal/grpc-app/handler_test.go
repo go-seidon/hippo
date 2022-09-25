@@ -14,6 +14,7 @@ import (
 	"github.com/go-seidon/local/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
+	"github.com/go-seidon/local/internal/status"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 
@@ -166,7 +167,8 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileService = mock_file.NewMockFile(ctrl)
-			handler = grpc_app.NewFileHandler(fileService)
+			config := &grpc_app.GrpcAppConfig{}
+			handler = grpc_app.NewFileHandler(fileService, config)
 			ctx = context.Background()
 			currentTs = time.Now()
 			p = &grpc_v1.DeleteFileParam{
@@ -260,7 +262,8 @@ var _ = Describe("Handler Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileService = mock_file.NewMockFile(ctrl)
-			handler = grpc_app.NewFileHandler(fileService)
+			config := &grpc_app.GrpcAppConfig{}
+			handler = grpc_app.NewFileHandler(fileService, config)
 			ctx = context.Background()
 			p = &grpc_v1.RetrieveFileParam{
 				FileId: "file-id",
@@ -719,5 +722,429 @@ var _ = Describe("Handler Package", func() {
 				Expect(err).To(BeNil())
 			})
 		})
+	})
+
+	Context("UploadFile function", Label("unit"), func() {
+		var (
+			handler     grpc_v1.FileServiceServer
+			fileService *mock_file.MockFile
+			ctx         context.Context
+			currentTs   time.Time
+			stream      *mock_grpcv1.MockFileService_UploadFileServer
+		)
+
+		BeforeEach(func() {
+			t := GinkgoT()
+			ctrl := gomock.NewController(t)
+			fileService = mock_file.NewMockFile(ctrl)
+			config := &grpc_app.GrpcAppConfig{
+				UploadFormSize: 1073741824, //1GB
+			}
+			handler = grpc_app.NewFileHandler(fileService, config)
+			ctx = context.Background()
+			currentTs = time.Now()
+			stream = mock_grpcv1.NewMockFileService_UploadFileServer(ctrl)
+		})
+
+		When("failed send stream during failed receive stream", func() {
+			It("should return error", func() {
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, fmt.Errorf("client cancelled")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "client cancelled",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("failed receive stream", func() {
+			It("should return error", func() {
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, fmt.Errorf("client cancelled")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "client cancelled",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed send stream during max file size reached", func() {
+			It("should return error", func() {
+				config := &grpc_app.GrpcAppConfig{
+					UploadFormSize: 1,
+				}
+				handler := grpc_app.NewFileHandler(fileService, config)
+
+				param := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(param, nil).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "file is too large",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("max file size reached", func() {
+			It("should return error", func() {
+				config := &grpc_app.GrpcAppConfig{
+					UploadFormSize: 1,
+				}
+				handler := grpc_app.NewFileHandler(fileService, config)
+
+				param := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(param, nil).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "file is too large",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed send stream during failed upload file", func() {
+			It("should return error", func() {
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, fmt.Errorf("db error")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "db error",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("failed upload file", func() {
+			It("should return error", func() {
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, fmt.Errorf("db error")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: "db error",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed send stream during success upload file", func() {
+			It("should return error", func() {
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				uploadRes := &file.UploadFileResult{
+					UniqueId:   "file-id",
+					Name:       "file-name",
+					Path:       "file/path",
+					Mimetype:   "file-mime-type",
+					Extension:  "jpeg",
+					Size:       100,
+					UploadedAt: currentTs,
+				}
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(uploadRes, nil).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_SUCCESS,
+					Message: "success upload file",
+					Data: &grpc_v1.UploadFileData{
+						Id:         uploadRes.UniqueId,
+						Name:       uploadRes.Name,
+						Path:       uploadRes.Path,
+						Mimetype:   uploadRes.Mimetype,
+						Extension:  uploadRes.Extension,
+						Size:       uploadRes.Size,
+						UploadedAt: uploadRes.UploadedAt.UnixMilli(),
+					},
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("success upload file", func() {
+			It("should return result", func() {
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				uploadRes := &file.UploadFileResult{
+					UniqueId:   "file-id",
+					Name:       "file-name",
+					Path:       "file/path",
+					Mimetype:   "file-mime-type",
+					Extension:  "jpeg",
+					Size:       100,
+					UploadedAt: currentTs,
+				}
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(uploadRes, nil).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_SUCCESS,
+					Message: "success upload file",
+					Data: &grpc_v1.UploadFileData{
+						Id:         uploadRes.UniqueId,
+						Name:       uploadRes.Name,
+						Path:       uploadRes.Path,
+						Mimetype:   uploadRes.Mimetype,
+						Extension:  uploadRes.Extension,
+						Size:       uploadRes.Size,
+						UploadedAt: uploadRes.UploadedAt.UnixMilli(),
+					},
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
 	})
 })

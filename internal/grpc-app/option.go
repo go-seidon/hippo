@@ -10,10 +10,11 @@ import (
 )
 
 type GrpcAppConfig struct {
-	AppName    string
-	AppVersion string
-	AppHost    string
-	AppPort    int
+	AppName        string
+	AppVersion     string
+	AppHost        string
+	AppPort        int
+	UploadFormSize int64
 }
 
 func (c *GrpcAppConfig) GetAppName() string {

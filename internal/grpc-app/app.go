@@ -111,18 +111,19 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		return nil, err
 	}
 
+	config := &GrpcAppConfig{
+		AppName:        p.Config.AppName,
+		AppVersion:     p.Config.AppVersion,
+		AppHost:        p.Config.RPCAppHost,
+		AppPort:        p.Config.RPCAppPort,
+		UploadFormSize: p.Config.UploadFormSize,
+	}
+
 	grpcServer := grpc.NewServer()
 	healthCheckHandler := NewHealthHandler(healthService)
-	fileHandler := NewFileHandler(fileService)
+	fileHandler := NewFileHandler(fileService, config)
 	grpc_v1.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
 	grpc_v1.RegisterFileServiceServer(grpcServer, fileHandler)
-
-	config := &GrpcAppConfig{
-		AppName:    p.Config.AppName,
-		AppVersion: p.Config.AppVersion,
-		AppHost:    p.Config.RPCAppHost,
-		AppPort:    p.Config.RPCAppPort,
-	}
 
 	svr := p.Server
 	if svr == nil {

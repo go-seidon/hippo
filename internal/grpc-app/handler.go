@@ -1,6 +1,7 @@
 package grpc_app
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"io"
@@ -55,6 +56,7 @@ func NewHealthHandler(healthService healthcheck.HealthCheck) *healthHandler {
 type fileHandler struct {
 	grpc_v1.UnimplementedFileServiceServer
 	fileService file.File
+	config      *GrpcAppConfig
 }
 
 func (h *fileHandler) DeleteFile(ctx context.Context, p *grpc_v1.DeleteFileParam) (*grpc_v1.DeleteFileResult, error) {
@@ -171,8 +173,46 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 }
 
 func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) error {
-	p, err := stream.Recv()
-	if err != nil {
+	fileSize := int64(0)
+	fileInfo := grpc_v1.UploadFileInfo{}
+	fileReader := &bytes.Buffer{}
+
+	for {
+		param, err := stream.Recv()
+		if err == nil {
+			info := param.GetInfo()
+			if info != nil {
+				fileInfo = grpc_v1.UploadFileInfo{
+					Name:      info.GetName(),
+					Mimetype:  info.GetMimetype(),
+					Extension: info.GetExtension(),
+				}
+			}
+
+			chunks := param.GetChunks()
+			if chunks != nil {
+				fileSize += int64(len(chunks))
+
+				if fileSize > h.config.UploadFormSize {
+					err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+						Code:    status.ACTION_FAILED,
+						Message: "file is too large",
+					})
+					if err != nil {
+						return err
+					}
+					return nil
+				}
+
+				fileReader.Write(chunks)
+			}
+			continue
+		}
+
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
 		err = stream.SendAndClose(&grpc_v1.UploadFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
@@ -183,11 +223,15 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 		return nil
 	}
 
-	// @todo: continue implementation
-
 	res, err := h.fileService.UploadFile(
 		stream.Context(),
-		file.WithFileInfo(p.Name, p.Mimetype, p.Extension, p.Size),
+		file.WithFileInfo(
+			fileInfo.Name,
+			fileInfo.Mimetype,
+			fileInfo.Extension,
+			fileSize,
+		),
+		file.WithReader(fileReader),
 	)
 	if err != nil {
 		err = stream.SendAndClose(&grpc_v1.UploadFileResult{
@@ -204,7 +248,7 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 		Code:    status.ACTION_SUCCESS,
 		Message: "success upload file",
 		Data: &grpc_v1.UploadFileData{
-			UniqueId:   res.UniqueId,
+			Id:         res.UniqueId,
 			Name:       res.Name,
 			Path:       res.Path,
 			Mimetype:   res.Mimetype,
@@ -219,6 +263,9 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 	return nil
 }
 
-func NewFileHandler(fileService file.File) *fileHandler {
-	return &fileHandler{fileService: fileService}
+func NewFileHandler(fileService file.File, config *GrpcAppConfig) *fileHandler {
+	return &fileHandler{
+		fileService: fileService,
+		config:      config,
+	}
 }
