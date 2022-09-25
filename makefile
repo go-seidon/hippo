@@ -62,6 +62,7 @@ generate-mock:
 	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
 	mockgen -package=mock_encoding -source internal/encoding/encoder.go -destination=internal/encoding/mock/encoder_mock.go
 	mockgen -package=mock_file -source internal/file/file.go -destination=internal/file/mock/file_mock.go
+	mockgen -package=mock_file -source internal/file/location.go -destination=internal/file/mock/location_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_grpcapp -source internal/grpc-app/server.go -destination=internal/grpc-app/mock/server_mock.go
@@ -78,8 +79,6 @@ generate-mock:
 	mockgen -package=mock_retrieving -source internal/retrieving/retriever.go -destination=internal/retrieving/mock/retriever_mock.go
 	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
 	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
-	mockgen -package=mock_uploading -source internal/uploading/uploader.go -destination=internal/uploading/mock/uploader_mock.go
-	mockgen -package=mock_uploading -source internal/uploading/location.go -destination=internal/uploading/mock/location_mock.go
 
 .PHONY: run-grpc-app
 run-grpc-app:

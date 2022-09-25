@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type FileServiceClient interface {
 	DeleteFile(ctx context.Context, in *DeleteFileParam, opts ...grpc.CallOption) (*DeleteFileResult, error)
 	RetrieveFile(ctx context.Context, in *RetrieveFileParam, opts ...grpc.CallOption) (FileService_RetrieveFileClient, error)
+	UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadFileClient, error)
 }
 
 type fileServiceClient struct {
@@ -75,12 +76,47 @@ func (x *fileServiceRetrieveFileClient) Recv() (*RetrieveFileResult, error) {
 	return m, nil
 }
 
+func (c *fileServiceClient) UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[1], "/file.v1.FileService/UploadFile", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fileServiceUploadFileClient{stream}
+	return x, nil
+}
+
+type FileService_UploadFileClient interface {
+	Send(*UploadFileParam) error
+	CloseAndRecv() (*UploadFileResult, error)
+	grpc.ClientStream
+}
+
+type fileServiceUploadFileClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileServiceUploadFileClient) Send(m *UploadFileParam) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *fileServiceUploadFileClient) CloseAndRecv() (*UploadFileResult, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploadFileResult)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FileServiceServer is the server API for FileService service.
 // All implementations should embed UnimplementedFileServiceServer
 // for forward compatibility
 type FileServiceServer interface {
 	DeleteFile(context.Context, *DeleteFileParam) (*DeleteFileResult, error)
 	RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error
+	UploadFile(FileService_UploadFileServer) error
 }
 
 // UnimplementedFileServiceServer should be embedded to have forward compatible implementations.
@@ -92,6 +128,9 @@ func (UnimplementedFileServiceServer) DeleteFile(context.Context, *DeleteFilePar
 }
 func (UnimplementedFileServiceServer) RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method RetrieveFile not implemented")
+}
+func (UnimplementedFileServiceServer) UploadFile(FileService_UploadFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
 
 // UnsafeFileServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -144,6 +183,32 @@ func (x *fileServiceRetrieveFileServer) Send(m *RetrieveFileResult) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _FileService_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FileServiceServer).UploadFile(&fileServiceUploadFileServer{stream})
+}
+
+type FileService_UploadFileServer interface {
+	SendAndClose(*UploadFileResult) error
+	Recv() (*UploadFileParam, error)
+	grpc.ServerStream
+}
+
+type fileServiceUploadFileServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileServiceUploadFileServer) SendAndClose(m *UploadFileResult) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *fileServiceUploadFileServer) Recv() (*UploadFileParam, error) {
+	m := new(UploadFileParam)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FileService_ServiceDesc is the grpc.ServiceDesc for FileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +226,11 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "RetrieveFile",
 			Handler:       _FileService_RetrieveFile_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "UploadFile",
+			Handler:       _FileService_UploadFile_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "api/grpc/v1/file.proto",

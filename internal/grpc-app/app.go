@@ -94,6 +94,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
+	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
@@ -101,23 +102,28 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		Logger:      logger,
 		Identifier:  identifier,
 		DirManager:  dirManager,
+		Locator:     locator,
+		Config: &file.FileConfig{
+			UploadDir: p.Config.UploadDirectory,
+		},
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	config := &GrpcAppConfig{
+		AppName:        p.Config.AppName,
+		AppVersion:     p.Config.AppVersion,
+		AppHost:        p.Config.RPCAppHost,
+		AppPort:        p.Config.RPCAppPort,
+		UploadFormSize: p.Config.UploadFormSize,
+	}
+
 	grpcServer := grpc.NewServer()
 	healthCheckHandler := NewHealthHandler(healthService)
-	fileHandler := NewFileHandler(fileService)
+	fileHandler := NewFileHandler(fileService, config)
 	grpc_v1.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
 	grpc_v1.RegisterFileServiceServer(grpcServer, fileHandler)
-
-	config := &GrpcAppConfig{
-		AppName:    p.Config.AppName,
-		AppVersion: p.Config.AppVersion,
-		AppHost:    p.Config.RPCAppHost,
-		AppPort:    p.Config.RPCAppPort,
-	}
 
 	svr := p.Server
 	if svr == nil {

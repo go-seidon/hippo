@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/go-seidon/local/internal/file"
+	mock_file "github.com/go-seidon/local/internal/file/mock"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
@@ -28,6 +29,8 @@ var _ = Describe("File", func() {
 			dirManager  *mock_filesystem.MockDirectoryManager
 			logger      *mock_logging.MockLogger
 			identifier  *mock_text.MockIdentifier
+			locator     file.UploadLocation
+			config      *file.FileConfig
 			p           file.NewFileParam
 		)
 
@@ -39,12 +42,18 @@ var _ = Describe("File", func() {
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
+			locator = mock_file.NewMockUploadLocation(ctrl)
+			config = &file.FileConfig{
+				UploadDir: "/storage/",
+			}
 			p = file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
 				DirManager:  dirManager,
 				Logger:      logger,
 				Identifier:  identifier,
+				Locator:     locator,
+				Config:      config,
 			}
 		})
 
@@ -104,6 +113,26 @@ var _ = Describe("File", func() {
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("identifier is not specified")))
+			})
+		})
+
+		When("locator is not specified", func() {
+			It("should return error", func() {
+				p.Locator = nil
+				res, err := file.NewFile(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("locator is not specified")))
+			})
+		})
+
+		When("config is not specified", func() {
+			It("should return error", func() {
+				p.Config = nil
+				res, err := file.NewFile(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("config is not specified")))
 			})
 		})
 	})

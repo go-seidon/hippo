@@ -7,14 +7,15 @@
 No doc right now
 
 ## Todo
-1. Add upload file `grpc-app` implementation
-- move location package to file package
-- move location selection to file service
-- stream instead of load the entire files to the memory
-2. Add basic auth `grpc-app` implementation
-3. Add request logging `grpc-app` implementation
-4. Add validation package & validation error handling
-5. Stream instead of reading entier files to the memory (io.Copy) on `rest-app`
+0. Check upload & retrieve file ctx error
+1. Add basic auth `grpc-app` implementation
+2. Add request logging `grpc-app` implementation
+3. Add validation package & validation error handling
+4. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
+- remove upload WithData support or change the implementation
+5. Return file size on retrieving file
+- rest-app (http header)
+- grpc-app (stream header)
 6. Change REST using OpenAPI specification & code generation (with API versioning)
 7. Deploy dev, stg, prod (deployment script)
 

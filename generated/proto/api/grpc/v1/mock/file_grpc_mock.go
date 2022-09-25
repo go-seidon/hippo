@@ -77,6 +77,26 @@ func (mr *MockFileServiceClientMockRecorder) RetrieveFile(ctx, in interface{}, o
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveFile", reflect.TypeOf((*MockFileServiceClient)(nil).RetrieveFile), varargs...)
 }
 
+// UploadFile mocks base method.
+func (m *MockFileServiceClient) UploadFile(ctx context.Context, opts ...grpc.CallOption) (grpc_v1.FileService_UploadFileClient, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UploadFile", varargs...)
+	ret0, _ := ret[0].(grpc_v1.FileService_UploadFileClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UploadFile indicates an expected call of UploadFile.
+func (mr *MockFileServiceClientMockRecorder) UploadFile(ctx interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockFileServiceClient)(nil).UploadFile), varargs...)
+}
+
 // MockFileService_RetrieveFileClient is a mock of FileService_RetrieveFileClient interface.
 type MockFileService_RetrieveFileClient struct {
 	ctrl     *gomock.Controller
@@ -200,6 +220,143 @@ func (mr *MockFileService_RetrieveFileClientMockRecorder) Trailer() *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Trailer", reflect.TypeOf((*MockFileService_RetrieveFileClient)(nil).Trailer))
 }
 
+// MockFileService_UploadFileClient is a mock of FileService_UploadFileClient interface.
+type MockFileService_UploadFileClient struct {
+	ctrl     *gomock.Controller
+	recorder *MockFileService_UploadFileClientMockRecorder
+}
+
+// MockFileService_UploadFileClientMockRecorder is the mock recorder for MockFileService_UploadFileClient.
+type MockFileService_UploadFileClientMockRecorder struct {
+	mock *MockFileService_UploadFileClient
+}
+
+// NewMockFileService_UploadFileClient creates a new mock instance.
+func NewMockFileService_UploadFileClient(ctrl *gomock.Controller) *MockFileService_UploadFileClient {
+	mock := &MockFileService_UploadFileClient{ctrl: ctrl}
+	mock.recorder = &MockFileService_UploadFileClientMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockFileService_UploadFileClient) EXPECT() *MockFileService_UploadFileClientMockRecorder {
+	return m.recorder
+}
+
+// CloseAndRecv mocks base method.
+func (m *MockFileService_UploadFileClient) CloseAndRecv() (*grpc_v1.UploadFileResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CloseAndRecv")
+	ret0, _ := ret[0].(*grpc_v1.UploadFileResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CloseAndRecv indicates an expected call of CloseAndRecv.
+func (mr *MockFileService_UploadFileClientMockRecorder) CloseAndRecv() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseAndRecv", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).CloseAndRecv))
+}
+
+// CloseSend mocks base method.
+func (m *MockFileService_UploadFileClient) CloseSend() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CloseSend")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CloseSend indicates an expected call of CloseSend.
+func (mr *MockFileService_UploadFileClientMockRecorder) CloseSend() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseSend", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).CloseSend))
+}
+
+// Context mocks base method.
+func (m *MockFileService_UploadFileClient) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context.
+func (mr *MockFileService_UploadFileClientMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).Context))
+}
+
+// Header mocks base method.
+func (m *MockFileService_UploadFileClient) Header() (metadata.MD, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Header")
+	ret0, _ := ret[0].(metadata.MD)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Header indicates an expected call of Header.
+func (mr *MockFileService_UploadFileClientMockRecorder) Header() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).Header))
+}
+
+// RecvMsg mocks base method.
+func (m_2 *MockFileService_UploadFileClient) RecvMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "RecvMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg.
+func (mr *MockFileService_UploadFileClientMockRecorder) RecvMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).RecvMsg), m)
+}
+
+// Send mocks base method.
+func (m *MockFileService_UploadFileClient) Send(arg0 *grpc_v1.UploadFileParam) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Send", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Send indicates an expected call of Send.
+func (mr *MockFileService_UploadFileClientMockRecorder) Send(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).Send), arg0)
+}
+
+// SendMsg mocks base method.
+func (m_2 *MockFileService_UploadFileClient) SendMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "SendMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg.
+func (mr *MockFileService_UploadFileClientMockRecorder) SendMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).SendMsg), m)
+}
+
+// Trailer mocks base method.
+func (m *MockFileService_UploadFileClient) Trailer() metadata.MD {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Trailer")
+	ret0, _ := ret[0].(metadata.MD)
+	return ret0
+}
+
+// Trailer indicates an expected call of Trailer.
+func (mr *MockFileService_UploadFileClientMockRecorder) Trailer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Trailer", reflect.TypeOf((*MockFileService_UploadFileClient)(nil).Trailer))
+}
+
 // MockFileServiceServer is a mock of FileServiceServer interface.
 type MockFileServiceServer struct {
 	ctrl     *gomock.Controller
@@ -250,6 +407,20 @@ func (m *MockFileServiceServer) RetrieveFile(arg0 *grpc_v1.RetrieveFileParam, ar
 func (mr *MockFileServiceServerMockRecorder) RetrieveFile(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveFile", reflect.TypeOf((*MockFileServiceServer)(nil).RetrieveFile), arg0, arg1)
+}
+
+// UploadFile mocks base method.
+func (m *MockFileServiceServer) UploadFile(arg0 grpc_v1.FileService_UploadFileServer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UploadFile", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UploadFile indicates an expected call of UploadFile.
+func (mr *MockFileServiceServerMockRecorder) UploadFile(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockFileServiceServer)(nil).UploadFile), arg0)
 }
 
 // MockUnsafeFileServiceServer is a mock of UnsafeFileServiceServer interface.
@@ -404,4 +575,138 @@ func (m *MockFileService_RetrieveFileServer) SetTrailer(arg0 metadata.MD) {
 func (mr *MockFileService_RetrieveFileServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockFileService_RetrieveFileServer)(nil).SetTrailer), arg0)
+}
+
+// MockFileService_UploadFileServer is a mock of FileService_UploadFileServer interface.
+type MockFileService_UploadFileServer struct {
+	ctrl     *gomock.Controller
+	recorder *MockFileService_UploadFileServerMockRecorder
+}
+
+// MockFileService_UploadFileServerMockRecorder is the mock recorder for MockFileService_UploadFileServer.
+type MockFileService_UploadFileServerMockRecorder struct {
+	mock *MockFileService_UploadFileServer
+}
+
+// NewMockFileService_UploadFileServer creates a new mock instance.
+func NewMockFileService_UploadFileServer(ctrl *gomock.Controller) *MockFileService_UploadFileServer {
+	mock := &MockFileService_UploadFileServer{ctrl: ctrl}
+	mock.recorder = &MockFileService_UploadFileServerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockFileService_UploadFileServer) EXPECT() *MockFileService_UploadFileServerMockRecorder {
+	return m.recorder
+}
+
+// Context mocks base method.
+func (m *MockFileService_UploadFileServer) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context.
+func (mr *MockFileService_UploadFileServerMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).Context))
+}
+
+// Recv mocks base method.
+func (m *MockFileService_UploadFileServer) Recv() (*grpc_v1.UploadFileParam, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Recv")
+	ret0, _ := ret[0].(*grpc_v1.UploadFileParam)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Recv indicates an expected call of Recv.
+func (mr *MockFileService_UploadFileServerMockRecorder) Recv() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).Recv))
+}
+
+// RecvMsg mocks base method.
+func (m_2 *MockFileService_UploadFileServer) RecvMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "RecvMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg.
+func (mr *MockFileService_UploadFileServerMockRecorder) RecvMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).RecvMsg), m)
+}
+
+// SendAndClose mocks base method.
+func (m *MockFileService_UploadFileServer) SendAndClose(arg0 *grpc_v1.UploadFileResult) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendAndClose", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendAndClose indicates an expected call of SendAndClose.
+func (mr *MockFileService_UploadFileServerMockRecorder) SendAndClose(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendAndClose", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).SendAndClose), arg0)
+}
+
+// SendHeader mocks base method.
+func (m *MockFileService_UploadFileServer) SendHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendHeader indicates an expected call of SendHeader.
+func (mr *MockFileService_UploadFileServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).SendHeader), arg0)
+}
+
+// SendMsg mocks base method.
+func (m_2 *MockFileService_UploadFileServer) SendMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "SendMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg.
+func (mr *MockFileService_UploadFileServerMockRecorder) SendMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).SendMsg), m)
+}
+
+// SetHeader mocks base method.
+func (m *MockFileService_UploadFileServer) SetHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetHeader indicates an expected call of SetHeader.
+func (mr *MockFileService_UploadFileServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).SetHeader), arg0)
+}
+
+// SetTrailer mocks base method.
+func (m *MockFileService_UploadFileServer) SetTrailer(arg0 metadata.MD) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetTrailer", arg0)
+}
+
+// SetTrailer indicates an expected call of SetTrailer.
+func (mr *MockFileService_UploadFileServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockFileService_UploadFileServer)(nil).SetTrailer), arg0)
 }

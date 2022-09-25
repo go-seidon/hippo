@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/file"
+	mock_file "github.com/go-seidon/local/internal/file/mock"
 	"github.com/go-seidon/local/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/local/internal/filesystem/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
@@ -31,6 +32,7 @@ var _ = Describe("Uploader", func() {
 			logger           *mock_logging.MockLogger
 			reader           *mock_io.MockReader
 			identifier       *mock_text.MockIdentifier
+			locator          *mock_file.MockUploadLocation
 			s                file.File
 			dirExistsParam   filesystem.IsDirectoryExistsParam
 			createDirParam   filesystem.CreateDirParam
@@ -48,6 +50,7 @@ var _ = Describe("Uploader", func() {
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
+			locator = mock_file.NewMockUploadLocation(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
@@ -55,12 +58,16 @@ var _ = Describe("Uploader", func() {
 				DirManager:  dirManager,
 				Logger:      logger,
 				Identifier:  identifier,
+				Locator:     locator,
+				Config: &file.FileConfig{
+					UploadDir: "temp",
+				},
 			})
 			dirExistsParam = filesystem.IsDirectoryExistsParam{
-				Path: "temp",
+				Path: "temp/2022/08/22",
 			}
 			createDirParam = filesystem.CreateDirParam{
-				Path:       "temp",
+				Path:       "temp/2022/08/22",
 				Permission: 0644,
 			}
 			createFileRes = &repository.CreateFileResult{
@@ -73,10 +80,8 @@ var _ = Describe("Uploader", func() {
 				CreatedAt: currentTimestamp,
 			}
 			dataOpt := file.WithData([]byte{})
-			dirOpt := file.WithDirectory("temp")
 			infoOpt := file.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
 			opts = append(opts, dataOpt)
-			opts = append(opts, dirOpt)
 			opts = append(opts, infoOpt)
 
 			logger.
@@ -94,21 +99,18 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid file is not specified")))
-			})
-		})
-
-		When("upload directory is not specified", func() {
-			It("should return error", func() {
-				res, err := s.UploadFile(ctx, file.WithData([]byte{}))
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid upload directory is not specified")))
+				Expect(err).To(Equal(fmt.Errorf("file is not specified")))
 			})
 		})
 
 		When("failed check directory existance", func() {
 			It("should return error", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
@@ -124,6 +126,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed create upload directory", func() {
 			It("should return error", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
@@ -144,6 +152,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed read from file reader", func() {
 			It("should return error", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
@@ -172,6 +186,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed generate file id", func() {
 			It("should return error", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
@@ -205,6 +225,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed create file", func() {
 			It("should return error", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
@@ -234,6 +260,12 @@ var _ = Describe("Uploader", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
+				locator.
+					EXPECT().
+					GetLocation().
+					Return("2022/08/22").
+					Times(1)
+
 				dirManager.
 					EXPECT().
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).

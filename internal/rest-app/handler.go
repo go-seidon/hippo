@@ -3,7 +3,6 @@ package rest_app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/status"
-	"github.com/go-seidon/local/internal/uploading"
 	"github.com/gorilla/mux"
 )
 
@@ -208,7 +206,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 	}
 }
 
-func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, uploader file.File, locator uploading.UploadLocation, config *RestAppConfig) http.HandlerFunc {
+func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, uploader file.File, config *RestAppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
 		// set form max size + add 1KB (non file size estimation if any)
@@ -237,12 +235,9 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 			return
 		}
 
-		uploadDir := fmt.Sprintf("%s/%s", config.UploadDir, locator.GetLocation())
-
 		ctx := context.Background()
 		uploadRes, err := uploader.UploadFile(ctx,
 			file.WithReader(fileReader),
-			file.WithDirectory(uploadDir),
 			file.WithFileInfo(
 				fileInfo.Name,
 				fileInfo.Mimetype,

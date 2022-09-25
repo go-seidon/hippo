@@ -20,7 +20,6 @@ import (
 	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	"github.com/go-seidon/local/internal/serialization"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
-	mock_uploading "github.com/go-seidon/local/internal/uploading/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -730,7 +729,6 @@ var _ = Describe("Handler Package", func() {
 			log              *mock_logging.MockLogger
 			serializer       serialization.Serializer
 			uploadService    *mock_file.MockFile
-			locator          *mock_uploading.MockUploadLocation
 		)
 
 		BeforeEach(func() {
@@ -753,11 +751,10 @@ var _ = Describe("Handler Package", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = serialization.NewJsonSerializer()
 			uploadService = mock_file.NewMockFile(ctrl)
-			locator = mock_uploading.NewMockUploadLocation(ctrl)
 			cfg := &rest_app.RestAppConfig{}
 			handler = rest_app.NewUploadFileHandler(
-				log, serializer, uploadService,
-				locator, cfg,
+				log, serializer,
+				uploadService, cfg,
 			)
 		})
 
@@ -781,13 +778,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed upload file", func() {
 			It("should return error", func() {
-
-				locator.
-					EXPECT().
-					GetLocation().
-					Return("mock/location").
-					Times(1)
-
 				uploadService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
@@ -810,13 +800,6 @@ var _ = Describe("Handler Package", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
-
-				locator.
-					EXPECT().
-					GetLocation().
-					Return("mock/location").
-					Times(1)
-
 				uploadRes := &file.UploadFileResult{
 					UniqueId:   "mock-unique-id",
 					Name:       "dolpin.jpg",
