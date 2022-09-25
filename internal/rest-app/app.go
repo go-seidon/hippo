@@ -128,7 +128,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		AppHost:        p.Config.RESTAppHost,
 		AppPort:        p.Config.RESTAppPort,
 		UploadFormSize: p.Config.UploadFormSize,
-		UploadDir:      p.Config.UploadDirectory,
 	}
 	serializer := serialization.NewJsonSerializer()
 	encoder := encoding.NewBase64Encoder()

@@ -14,7 +14,6 @@ type RestAppConfig struct {
 	AppVersion     string
 	AppHost        string
 	AppPort        int
-	UploadDir      string
 	UploadFormSize int64
 }
 
