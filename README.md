@@ -7,6 +7,7 @@
 No doc right now
 
 ## Todo
+0. Check upload & retrieve file ctx error
 1. Add basic auth `grpc-app` implementation
 2. Add request logging `grpc-app` implementation
 3. Add validation package & validation error handling
