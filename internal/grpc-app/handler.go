@@ -189,6 +189,18 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 	fileReader := &bytes.Buffer{}
 
 	for {
+		err := stream.Context().Err()
+		if err != nil {
+			err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+				Code:    status.ACTION_FAILED,
+				Message: err.Error(),
+			})
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
 		param, err := stream.Recv()
 		if err == nil {
 			info := param.GetInfo()

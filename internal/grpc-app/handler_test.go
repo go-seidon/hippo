@@ -902,7 +902,7 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler     grpc_v1.FileServiceServer
 			fileService *mock_file.MockFile
-			ctx         context.Context
+			ctx         *mock_context.MockContext
 			currentTs   time.Time
 			stream      *mock_grpcv1.MockFileService_UploadFileServer
 		)
@@ -915,13 +915,25 @@ var _ = Describe("Handler Package", func() {
 				UploadFormSize: 1073741824, //1GB
 			}
 			handler = grpc_app.NewFileHandler(fileService, config)
-			ctx = context.Background()
+			ctx = mock_context.NewMockContext(ctrl)
 			currentTs = time.Now()
 			stream = mock_grpcv1.NewMockFileService_UploadFileServer(ctrl)
 		})
 
 		When("failed send stream during failed receive stream", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
 				stream.
 					EXPECT().
 					Recv().
@@ -946,6 +958,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed receive stream", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
 				stream.
 					EXPECT().
 					Recv().
@@ -970,6 +994,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed send stream during max file size reached", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
 				config := &grpc_app.GrpcAppConfig{
 					UploadFormSize: 1,
 				}
@@ -1004,6 +1040,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("max file size reached", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
 				config := &grpc_app.GrpcAppConfig{
 					UploadFormSize: 1,
 				}
@@ -1038,6 +1086,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed send stream during failed upload file", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
 				infoParam := &grpc_v1.UploadFileParam{
 					Data: &grpc_v1.UploadFileParam_Info{
 						Info: &grpc_v1.UploadFileInfo{
@@ -1100,6 +1160,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed upload file", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
 				infoParam := &grpc_v1.UploadFileParam{
 					Data: &grpc_v1.UploadFileParam_Info{
 						Info: &grpc_v1.UploadFileInfo{
@@ -1162,6 +1234,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("failed send stream during success upload file", func() {
 			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
 				infoParam := &grpc_v1.UploadFileParam{
 					Data: &grpc_v1.UploadFileParam_Info{
 						Info: &grpc_v1.UploadFileInfo{
@@ -1242,6 +1326,18 @@ var _ = Describe("Handler Package", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
 				infoParam := &grpc_v1.UploadFileParam{
 					Data: &grpc_v1.UploadFileParam_Info{
 						Info: &grpc_v1.UploadFileInfo{
@@ -1319,6 +1415,5 @@ var _ = Describe("Handler Package", func() {
 				Expect(err).To(BeNil())
 			})
 		})
-
 	})
 })
