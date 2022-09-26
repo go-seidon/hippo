@@ -94,7 +94,6 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 		FileId: p.FileId,
 	})
 	if err == nil {
-
 		err = stream.SendHeader(metadata.New(map[string]string{
 			"file_name":      retrieval.Name,
 			"file_mimetype":  retrieval.MimeType,
@@ -116,6 +115,18 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 
 		const chunkSize = 102400 //100KB
 		for {
+			err = stream.Context().Err()
+			if err != nil {
+				err = stream.Send(&grpc_v1.RetrieveFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: err.Error(),
+				})
+				if err != nil {
+					return err
+				}
+				break
+			}
+
 			chunks := make([]byte, chunkSize)
 			_, err := retrieval.Data.Read(chunks)
 			if err == nil {
@@ -178,6 +189,18 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 	fileReader := &bytes.Buffer{}
 
 	for {
+		err := stream.Context().Err()
+		if err != nil {
+			err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+				Code:    status.ACTION_FAILED,
+				Message: err.Error(),
+			})
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
 		param, err := stream.Recv()
 		if err == nil {
 			info := param.GetInfo()
