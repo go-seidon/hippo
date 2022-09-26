@@ -8,6 +8,7 @@ import (
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
 	mock_grpcv1 "github.com/go-seidon/local/generated/proto/api/grpc/v1/mock"
+	mock_context "github.com/go-seidon/local/internal/context/mock"
 	"github.com/go-seidon/local/internal/file"
 	mock_file "github.com/go-seidon/local/internal/file/mock"
 	grpc_app "github.com/go-seidon/local/internal/grpc-app"
@@ -247,9 +248,10 @@ var _ = Describe("Handler Package", func() {
 		var (
 			handler     grpc_v1.FileServiceServer
 			fileService *mock_file.MockFile
-			ctx         context.Context
+			ctx         *mock_context.MockContext
 			p           *grpc_v1.RetrieveFileParam
 			pendingRes  *grpc_v1.RetrieveFileResult
+			canceledRes *grpc_v1.RetrieveFileResult
 			failedRes   *grpc_v1.RetrieveFileResult
 			successRes  *grpc_v1.RetrieveFileResult
 			stream      *mock_grpcv1.MockFileService_RetrieveFileServer
@@ -264,13 +266,17 @@ var _ = Describe("Handler Package", func() {
 			fileService = mock_file.NewMockFile(ctrl)
 			config := &grpc_app.GrpcAppConfig{}
 			handler = grpc_app.NewFileHandler(fileService, config)
-			ctx = context.Background()
+			ctx = mock_context.NewMockContext(ctrl)
 			p = &grpc_v1.RetrieveFileParam{
 				FileId: "file-id",
 			}
 			pendingRes = &grpc_v1.RetrieveFileResult{
 				Code:    1005,
 				Message: "retrieving file",
+			}
+			canceledRes = &grpc_v1.RetrieveFileResult{
+				Code:    1001,
+				Message: context.Canceled.Error(),
 			}
 			failedRes = &grpc_v1.RetrieveFileResult{
 				Code:    1001,
@@ -451,6 +457,114 @@ var _ = Describe("Handler Package", func() {
 			})
 		})
 
+		When("failed send stream during action is cancelled by client", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
+					Return(retRes, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Send(gomock.Eq(pendingRes)).
+					Return(nil).
+					Times(1)
+
+				md := metadata.New(map[string]string{
+					"file_name":      retRes.Name,
+					"file_mimetype":  retRes.MimeType,
+					"file_extension": retRes.Extension,
+				})
+				stream.
+					EXPECT().
+					SendHeader(gomock.Eq(md)).
+					Return(nil).
+					Times(1)
+
+				rc.
+					EXPECT().
+					Close().
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(context.Canceled).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Send(gomock.Eq(canceledRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.RetrieveFile(p, stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("action is cancelled by client", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
+					Return(retRes, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Send(gomock.Eq(pendingRes)).
+					Return(nil).
+					Times(1)
+
+				md := metadata.New(map[string]string{
+					"file_name":      retRes.Name,
+					"file_mimetype":  retRes.MimeType,
+					"file_extension": retRes.Extension,
+				})
+				stream.
+					EXPECT().
+					SendHeader(gomock.Eq(md)).
+					Return(nil).
+					Times(1)
+
+				rc.
+					EXPECT().
+					Close().
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(context.Canceled).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Send(gomock.Eq(canceledRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.RetrieveFile(p, stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
 		When("failed send action fail during read data", func() {
 			It("should return error", func() {
 				fileService.
@@ -479,6 +593,18 @@ var _ = Describe("Handler Package", func() {
 				rc.
 					EXPECT().
 					Close().
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
 					Times(1)
 
 				rc.
@@ -529,6 +655,18 @@ var _ = Describe("Handler Package", func() {
 					Close().
 					Times(1)
 
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
 				rc.
 					EXPECT().
 					Read(gomock.Any()).
@@ -575,6 +713,18 @@ var _ = Describe("Handler Package", func() {
 				rc.
 					EXPECT().
 					Close().
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
 					Times(1)
 
 				rc.
@@ -624,6 +774,18 @@ var _ = Describe("Handler Package", func() {
 					EXPECT().
 					Close().
 					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(2)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(2)
 
 				firstRead := rc.
 					EXPECT().
@@ -688,6 +850,18 @@ var _ = Describe("Handler Package", func() {
 					EXPECT().
 					Close().
 					Times(1)
+
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(2)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(2)
 
 				firstRead := rc.
 					EXPECT().
