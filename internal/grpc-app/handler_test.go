@@ -920,6 +920,66 @@ var _ = Describe("Handler Package", func() {
 			stream = mock_grpcv1.NewMockFileService_UploadFileServer(ctrl)
 		})
 
+		When("failed send stream during action cancelled by client", func() {
+			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(context.Canceled).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: context.Canceled.Error(),
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("action cancelled by client", func() {
+			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(context.Canceled).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.ACTION_FAILED,
+					Message: context.Canceled.Error(),
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
 		When("failed send stream during failed receive stream", func() {
 			It("should return error", func() {
 				ctx.
