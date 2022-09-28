@@ -120,9 +120,24 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 	if p.Logger == nil {
 		return nil, fmt.Errorf("logger is not specified")
 	}
+	logger := p.Logger
+
+	clock := p.Clock
+	if p.Clock == nil {
+		clock = datetime.NewClock()
+	}
+
 	ignoreUri := map[string]bool{}
 	if p.IgnoreURI != nil {
 		ignoreUri = p.IgnoreURI
+	}
+
+	header := map[string]string{}
+	header["User-Agent"] = "userAgent"
+	header["Referer"] = "referer"
+	header["X-Forwarded-For"] = "forwardedFor"
+	if p.Header != nil {
+		header = p.Header
 	}
 
 	return func(h http.Handler) http.Handler {
@@ -132,10 +147,6 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 				return
 			}
 
-			clock := p.Clock
-			if p.Clock == nil {
-				clock = datetime.NewClock()
-			}
 			startTime := clock.Now()
 			mw := &metricWriter{ResponseWriter: w}
 
@@ -156,17 +167,11 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 				"duration":      duration,
 			}
 
-			if p.Header == nil {
-				p.Header = map[string]string{}
-			}
-			p.Header["User-Agent"] = "userAgent"
-			p.Header["Referer"] = "referer"
-			p.Header["X-Forwarded-For"] = "forwardedFor"
-			for key, val := range p.Header {
+			for key, val := range header {
 				httpRequest[val] = r.Header.Get(key)
 			}
 
-			logger := p.Logger.WithFields(map[string]interface{}{
+			logger = logger.WithFields(map[string]interface{}{
 				"httpRequest": httpRequest,
 			})
 
