@@ -259,7 +259,7 @@ var _ = Describe("Middleware Package", func() {
 				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
-					IngoreURI: map[string]bool{
+					IgnoreURI: map[string]bool{
 						"uri": true,
 					},
 				})

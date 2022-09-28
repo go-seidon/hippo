@@ -109,7 +109,7 @@ type RequestLogMiddlewareParam struct {
 
 	// key = uri
 	// value = set `true` to ignore the uri being logged
-	IngoreURI map[string]bool
+	IgnoreURI map[string]bool
 
 	// key = header key
 	// value = log key
@@ -120,14 +120,14 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 	if p.Logger == nil {
 		return nil, fmt.Errorf("logger is not specified")
 	}
+	ignoreUri := map[string]bool{}
+	if p.IgnoreURI != nil {
+		ignoreUri = p.IgnoreURI
+	}
 
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if p.IngoreURI == nil {
-				p.IngoreURI = map[string]bool{}
-			}
-
-			if p.IngoreURI[r.RequestURI] {
+			if ignoreUri[r.RequestURI] {
 				h.ServeHTTP(w, r)
 				return
 			}
