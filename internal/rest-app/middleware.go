@@ -151,7 +151,7 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 				"status":        status,
 				"serverIp":      r.Host,
 				"remoteAddr":    r.RemoteAddr,
-				"proto":         r.Proto,
+				"protocol":      r.Proto,
 				"receivedAt":    startTime.UTC().Format(time.RFC3339),
 				"duration":      duration,
 			}
