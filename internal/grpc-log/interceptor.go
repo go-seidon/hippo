@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-seidon/local/internal/logging"
 	"google.golang.org/grpc"
 )
 
@@ -12,7 +11,12 @@ func UnaryServerInterceptor(opts ...LogInterceptorOption) grpc.UnaryServerInterc
 	cfg := buildConfig(opts...)
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		startTime := cfg.Clock.Now()
+
+		var deadlineAt *time.Time
 		dlTime, dlOccured := ctx.Deadline()
+		if dlOccured {
+			deadlineAt = &dlTime
+		}
 
 		res, err := handler(ctx, req)
 
@@ -32,29 +36,12 @@ func UnaryServerInterceptor(opts ...LogInterceptorOption) grpc.UnaryServerInterc
 			Metadata:  cfg.Metadata,
 		})
 
-		grpcRequest := map[string]interface{}{
-			"requestService": logInfo.Service,
-			"requestMethod":  logInfo.Method,
-			"status":         logInfo.Status,
-			"receivedAt":     logInfo.ReceivedAt.UTC().Format(time.RFC3339),
-			"duration":       logInfo.Duration,
-			"remoteAddr":     logInfo.RemoteAddress,
-			"protocol":       logInfo.Protocol,
-		}
-		if dlOccured {
-			grpcRequest["deadlineAt"] = dlTime.UTC().Format(time.RFC3339)
-		}
-
-		logger := cfg.Logger
-		if err != nil {
-			logger = logger.WithFields(map[string]interface{}{
-				logging.FIELD_ERROR: err,
-			})
-		}
-		logger = logger.WithFields(map[string]interface{}{
-			"grpcRequest": grpcRequest,
+		cfg.SendLog(ctx, SendLogParam{
+			Logger:     cfg.Logger,
+			LogInfo:    *logInfo,
+			Error:      err,
+			DeadlineAt: deadlineAt,
 		})
-		logger.Logf(logInfo.Level, "request: %s@%s", logInfo.Service, logInfo.Method)
 
 		return res, err
 	}
@@ -66,7 +53,11 @@ func StreamServerInterceptor(opts ...LogInterceptorOption) grpc.StreamServerInte
 		startTime := cfg.Clock.Now()
 
 		ctx := ss.Context()
+		var deadlineAt *time.Time
 		dlTime, dlOccured := ctx.Deadline()
+		if dlOccured {
+			deadlineAt = &dlTime
+		}
 
 		err := handler(srv, ss)
 
@@ -86,29 +77,12 @@ func StreamServerInterceptor(opts ...LogInterceptorOption) grpc.StreamServerInte
 			Metadata:  cfg.Metadata,
 		})
 
-		grpcRequest := map[string]interface{}{
-			"requestService": logInfo.Service,
-			"requestMethod":  logInfo.Method,
-			"status":         logInfo.Status,
-			"receivedAt":     logInfo.ReceivedAt.UTC().Format(time.RFC3339),
-			"duration":       logInfo.Duration,
-			"remoteAddr":     logInfo.RemoteAddress,
-			"protocol":       logInfo.Protocol,
-		}
-		if dlOccured {
-			grpcRequest["deadlineAt"] = dlTime.UTC().Format(time.RFC3339)
-		}
-
-		logger := cfg.Logger
-		if err != nil {
-			logger = logger.WithFields(map[string]interface{}{
-				logging.FIELD_ERROR: err,
-			})
-		}
-		logger = logger.WithFields(map[string]interface{}{
-			"grpcRequest": grpcRequest,
+		cfg.SendLog(ctx, SendLogParam{
+			Logger:     cfg.Logger,
+			LogInfo:    *logInfo,
+			Error:      err,
+			DeadlineAt: deadlineAt,
 		})
-		logger.Logf(logInfo.Level, "request: %s@%s", logInfo.Service, logInfo.Method)
 
 		return err
 	}
@@ -121,6 +95,7 @@ func buildConfig(opts ...LogInterceptorOption) *LogInterceptorConfig {
 		Metadata:     map[string]string{},
 		ShouldLog:    DefaultShouldLog,
 		CreateLog:    DefaultCreateLog,
+		SendLog:      DefaultSendLog,
 	}
 	for _, opt := range opts {
 		opt(cfg)

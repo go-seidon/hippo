@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/local/internal/datetime"
+	"github.com/go-seidon/local/internal/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
@@ -105,4 +106,42 @@ var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
 		Metadata:      meta,
 		Level:         level,
 	}
+}
+
+type SendLog = func(ctx context.Context, p SendLogParam) error
+
+type SendLogParam struct {
+	Logger     logging.Logger
+	LogInfo    LogInfo
+	Error      error
+	DeadlineAt *time.Time
+}
+
+var DefaultSendLog = func(ctx context.Context, p SendLogParam) error {
+
+	grpcRequest := map[string]interface{}{
+		"requestService": p.LogInfo.Service,
+		"requestMethod":  p.LogInfo.Method,
+		"status":         p.LogInfo.Status,
+		"receivedAt":     p.LogInfo.ReceivedAt.UTC().Format(time.RFC3339),
+		"duration":       p.LogInfo.Duration,
+		"remoteAddr":     p.LogInfo.RemoteAddress,
+		"protocol":       p.LogInfo.Protocol,
+	}
+	if p.DeadlineAt != nil {
+		grpcRequest["deadlineAt"] = p.DeadlineAt.UTC().Format(time.RFC3339)
+	}
+
+	logger := p.Logger
+	if p.Error != nil {
+		logger = logger.WithFields(map[string]interface{}{
+			logging.FIELD_ERROR: p.Error,
+		})
+	}
+	logger = logger.WithFields(map[string]interface{}{
+		"grpcRequest": grpcRequest,
+	})
+	logger.Logf(p.LogInfo.Level, "request: %s@%s", p.LogInfo.Service, p.LogInfo.Method)
+
+	return nil
 }

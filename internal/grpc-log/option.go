@@ -25,6 +25,9 @@ type LogInterceptorConfig struct {
 
 	// return log info based on request information
 	CreateLog CreateLog
+
+	// send log using the specified logger
+	SendLog SendLog
 }
 
 type LogInterceptorOption = func(*LogInterceptorConfig)
