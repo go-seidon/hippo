@@ -8,31 +8,33 @@ No doc right now
 
 ## Todo
 1. Add basic auth `grpc-app` implementation
-2. Add request logging `grpc-app` implementation
-3. Add validation package & validation error handling
-4. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
+- unary server
+- streaming server
+2. Add validation package & validation error handling
+3. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
 - remove upload WithData support or change the implementation
-5. Return file size on retrieving file
+4. Return file size on retrieving file
 - rest-app (http header)
 - grpc-app (stream header)
+5. Simplify factory function interface not returning error
 6. Change REST using OpenAPI specification & code generation (with API versioning)
-7. Deploy dev, stg, prod (deployment script)
+7. Move reusable package to provider package
+- config, context, datetime, encoding, filesystem, hashing
+- healthcheck, io, logging, serialization, text, validation
+8. Add gracefull shutdown
+9. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Upload location strategy
 2. Add repo: `repository-postgre`
 3. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
-4. Inject logger to mysql instance (if possible)
-5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
-6. Seperate unit test and integration test workflow (cqc.yml)
+4. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
+5. Separate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
-1. Separate findFile query in DeleteFile and RetrieveFile
+1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
 2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
 3. Change NewDailyRotate using optional param
-
-## Note
-1. Router: CORS setting
 
 ## Technical Stack
 1. Transport layer
@@ -183,7 +185,7 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 - Linux
-etc\hosts
+\etc\hosts
 ```md
   127.0.0.1 mongo-db-1
   127.0.0.1 mongo-db-2
