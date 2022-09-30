@@ -120,7 +120,6 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 	if p.Logger == nil {
 		return nil, fmt.Errorf("logger is not specified")
 	}
-	logger := p.Logger
 
 	clock := p.Clock
 	if p.Clock == nil {
@@ -171,7 +170,7 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 				httpRequest[val] = r.Header.Get(key)
 			}
 
-			logger = logger.WithFields(map[string]interface{}{
+			logger := p.Logger.WithFields(map[string]interface{}{
 				"httpRequest": httpRequest,
 			})
 
