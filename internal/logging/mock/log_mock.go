@@ -183,6 +183,57 @@ func (mr *MockLoggerMockRecorder) Infoln(msg ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Infoln", reflect.TypeOf((*MockLogger)(nil).Infoln), msg...)
 }
 
+// Log mocks base method.
+func (m *MockLogger) Log(level string, args ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Log", varargs...)
+}
+
+// Log indicates an expected call of Log.
+func (mr *MockLoggerMockRecorder) Log(level interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Log", reflect.TypeOf((*MockLogger)(nil).Log), varargs...)
+}
+
+// Logf mocks base method.
+func (m *MockLogger) Logf(level, format string, args ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level, format}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Logf", varargs...)
+}
+
+// Logf indicates an expected call of Logf.
+func (mr *MockLoggerMockRecorder) Logf(level, format interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level, format}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logf", reflect.TypeOf((*MockLogger)(nil).Logf), varargs...)
+}
+
+// Logln mocks base method.
+func (m *MockLogger) Logln(level string, msg ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level}
+	for _, a := range msg {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Logln", varargs...)
+}
+
+// Logln indicates an expected call of Logln.
+func (mr *MockLoggerMockRecorder) Logln(level interface{}, msg ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level}, msg...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logln", reflect.TypeOf((*MockLogger)(nil).Logln), varargs...)
+}
+
 // Warn mocks base method.
 func (m *MockLogger) Warn(args ...interface{}) {
 	m.ctrl.T.Helper()
@@ -359,6 +410,23 @@ func (mr *MockSimpleLogMockRecorder) Info(args ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockSimpleLog)(nil).Info), args...)
 }
 
+// Log mocks base method.
+func (m *MockSimpleLog) Log(level string, args ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Log", varargs...)
+}
+
+// Log indicates an expected call of Log.
+func (mr *MockSimpleLogMockRecorder) Log(level interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Log", reflect.TypeOf((*MockSimpleLog)(nil).Log), varargs...)
+}
+
 // Warn mocks base method.
 func (m *MockSimpleLog) Warn(args ...interface{}) {
 	m.ctrl.T.Helper()
@@ -449,6 +517,23 @@ func (mr *MockFormatedLogMockRecorder) Infof(format interface{}, args ...interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Infof", reflect.TypeOf((*MockFormatedLog)(nil).Infof), varargs...)
 }
 
+// Logf mocks base method.
+func (m *MockFormatedLog) Logf(level, format string, args ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level, format}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Logf", varargs...)
+}
+
+// Logf indicates an expected call of Logf.
+func (mr *MockFormatedLogMockRecorder) Logf(level, format interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level, format}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logf", reflect.TypeOf((*MockFormatedLog)(nil).Logf), varargs...)
+}
+
 // Warnf mocks base method.
 func (m *MockFormatedLog) Warnf(format string, args ...interface{}) {
 	m.ctrl.T.Helper()
@@ -535,6 +620,23 @@ func (m *MockLineLog) Infoln(msg ...interface{}) {
 func (mr *MockLineLogMockRecorder) Infoln(msg ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Infoln", reflect.TypeOf((*MockLineLog)(nil).Infoln), msg...)
+}
+
+// Logln mocks base method.
+func (m *MockLineLog) Logln(level string, msg ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{level}
+	for _, a := range msg {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Logln", varargs...)
+}
+
+// Logln indicates an expected call of Logln.
+func (mr *MockLineLogMockRecorder) Logln(level interface{}, msg ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{level}, msg...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logln", reflect.TypeOf((*MockLineLog)(nil).Logln), varargs...)
 }
 
 // Warnln mocks base method.
