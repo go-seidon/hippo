@@ -1,7 +1,6 @@
 package rest_app
 
 import (
-	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -115,8 +114,7 @@ func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, delete
 
 		vars := mux.Vars(req)
 
-		ctx := context.Background()
-		r, err := deleter.DeleteFile(ctx, file.DeleteFileParam{
+		r, err := deleter.DeleteFile(req.Context(), file.DeleteFileParam{
 			FileId: vars["id"],
 		})
 		if err == nil {
@@ -159,8 +157,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 
 		vars := mux.Vars(req)
 
-		ctx := context.Background()
-		r, err := retriever.RetrieveFile(ctx, file.RetrieveFileParam{
+		r, err := retriever.RetrieveFile(req.Context(), file.RetrieveFileParam{
 			FileId: vars["id"],
 		})
 		if err == nil {
@@ -235,8 +232,7 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 			return
 		}
 
-		ctx := context.Background()
-		uploadRes, err := uploader.UploadFile(ctx,
+		uploadRes, err := uploader.UploadFile(req.Context(),
 			file.WithReader(fileReader),
 			file.WithFileInfo(
 				fileInfo.Name,
