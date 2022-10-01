@@ -44,7 +44,7 @@ func WithClock(clock datetime.Clock) LogInterceptorOption {
 	}
 }
 
-func WithIgnoredMethod(ims []string) LogInterceptorOption {
+func IgnoredMethod(ims []string) LogInterceptorOption {
 	return func(cfg *LogInterceptorConfig) {
 		if len(ims) > 0 {
 			im := map[string]bool{}
@@ -56,7 +56,7 @@ func WithIgnoredMethod(ims []string) LogInterceptorOption {
 	}
 }
 
-func WithAllowedMetadata(mds []string) LogInterceptorOption {
+func AllowedMetadata(mds []string) LogInterceptorOption {
 	return func(cfg *LogInterceptorConfig) {
 		if len(mds) > 0 {
 			md := map[string]string{}

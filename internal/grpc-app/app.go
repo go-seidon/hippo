@@ -122,10 +122,10 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 
 	grpcLogOpt := []grpc_log.LogInterceptorOption{
 		grpc_log.WithLogger(logger),
-		grpc_log.WithIgnoredMethod([]string{
+		grpc_log.IgnoredMethod([]string{
 			"/health.v1.HealthService/CheckHealth",
 		}),
-		grpc_log.WithAllowedMetadata([]string{
+		grpc_log.AllowedMetadata([]string{
 			"X-Correlation-Id",
 		}),
 	}
