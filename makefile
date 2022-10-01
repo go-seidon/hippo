@@ -67,6 +67,7 @@ generate-mock:
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_grpcapp -source internal/grpc-app/server.go -destination=internal/grpc-app/mock/server_mock.go
+	mockgen -package=mock_grpclog -source internal/grpc-log/stream.go -destination=internal/grpc-log/mock/stream_mock.go
 	mockgen -package=mock_hashing -source internal/hashing/hasher.go -destination=internal/hashing/mock/hasher_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/checker.go -destination=internal/healthcheck/mock/checker_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/go_health.go -destination=internal/healthcheck/mock/go_health_mock.go

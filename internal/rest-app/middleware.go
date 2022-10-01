@@ -109,7 +109,7 @@ type RequestLogMiddlewareParam struct {
 
 	// key = uri
 	// value = set `true` to ignore the uri being logged
-	IngoreURI map[string]bool
+	IgnoreURI map[string]bool
 
 	// key = header key
 	// value = log key
@@ -121,21 +121,31 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 		return nil, fmt.Errorf("logger is not specified")
 	}
 
+	clock := p.Clock
+	if p.Clock == nil {
+		clock = datetime.NewClock()
+	}
+
+	ignoreUri := map[string]bool{}
+	if p.IgnoreURI != nil {
+		ignoreUri = p.IgnoreURI
+	}
+
+	header := map[string]string{}
+	header["User-Agent"] = "userAgent"
+	header["Referer"] = "referer"
+	header["X-Forwarded-For"] = "forwardedFor"
+	if p.Header != nil {
+		header = p.Header
+	}
+
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if p.IngoreURI == nil {
-				p.IngoreURI = map[string]bool{}
-			}
-
-			if p.IngoreURI[r.RequestURI] {
+			if ignoreUri[r.RequestURI] {
 				h.ServeHTTP(w, r)
 				return
 			}
 
-			clock := p.Clock
-			if p.Clock == nil {
-				clock = datetime.NewClock()
-			}
 			startTime := clock.Now()
 			mw := &metricWriter{ResponseWriter: w}
 
@@ -151,18 +161,12 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 				"status":        status,
 				"serverIp":      r.Host,
 				"remoteAddr":    r.RemoteAddr,
-				"proto":         r.Proto,
+				"protocol":      r.Proto,
 				"receivedAt":    startTime.UTC().Format(time.RFC3339),
 				"duration":      duration,
 			}
 
-			if p.Header == nil {
-				p.Header = map[string]string{}
-			}
-			p.Header["User-Agent"] = "userAgent"
-			p.Header["Referer"] = "referer"
-			p.Header["X-Forwarded-For"] = "forwardedFor"
-			for key, val := range p.Header {
+			for key, val := range header {
 				httpRequest[val] = r.Header.Get(key)
 			}
 

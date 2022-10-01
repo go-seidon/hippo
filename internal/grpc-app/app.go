@@ -8,6 +8,7 @@ import (
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
+	grpc_log "github.com/go-seidon/local/internal/grpc-log"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
@@ -119,7 +120,23 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		UploadFormSize: p.Config.UploadFormSize,
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcLogOpt := []grpc_log.LogInterceptorOption{
+		grpc_log.WithLogger(logger),
+		grpc_log.IgnoredMethod([]string{
+			"/health.v1.HealthService/CheckHealth",
+		}),
+		grpc_log.AllowedMetadata([]string{
+			"X-Correlation-Id",
+		}),
+	}
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grpc_log.UnaryServerInterceptor(grpcLogOpt...),
+		),
+		grpc.ChainStreamInterceptor(
+			grpc_log.StreamServerInterceptor(grpcLogOpt...),
+		),
+	)
 	healthCheckHandler := NewHealthHandler(healthService)
 	fileHandler := NewFileHandler(fileService, config)
 	grpc_v1.RegisterHealthServiceServer(grpcServer, healthCheckHandler)

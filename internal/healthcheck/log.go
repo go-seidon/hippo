@@ -60,8 +60,10 @@ func (l *GoHealthLog) Warnln(args ...interface{}) {
 }
 
 func (l *GoHealthLog) WithFields(fs gLog.Fields) gLog.Logger {
-	l.client = l.client.WithFields(fs)
-	return l
+	client := l.client.WithFields(fs)
+	return &GoHealthLog{
+		client: client,
+	}
 }
 
 func NewGoHealthLog(logger logging.Logger) (*GoHealthLog, error) {

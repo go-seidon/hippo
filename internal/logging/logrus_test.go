@@ -40,6 +40,23 @@ var _ = Describe("Logrus Package", func() {
 		})
 	})
 
+	Context("Log function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("success send log", func() {
+			It("should return nil", func() {
+				logger.Log("info", "mock-log")
+
+			})
+		})
+	})
+
 	Context("Info function", Label("unit"), func() {
 		var (
 			logger logging.Logger
@@ -108,6 +125,23 @@ var _ = Describe("Logrus Package", func() {
 		})
 	})
 
+	Context("Logf function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("success send log", func() {
+			It("should return nil", func() {
+				logger.Logf("info", "%s", "mock-log")
+
+			})
+		})
+	})
+
 	Context("Infof function", Label("unit"), func() {
 		var (
 			logger logging.Logger
@@ -171,6 +205,23 @@ var _ = Describe("Logrus Package", func() {
 		When("success send log", func() {
 			It("should return nil", func() {
 				logger.Warnf("%s", "mock-log")
+
+			})
+		})
+	})
+
+	Context("Logln function", Label("unit"), func() {
+		var (
+			logger logging.Logger
+		)
+
+		BeforeEach(func() {
+			logger = logging.NewLogrusLog()
+		})
+
+		When("success send log", func() {
+			It("should return nil", func() {
+				logger.Logln("info", "mock-log")
 
 			})
 		})

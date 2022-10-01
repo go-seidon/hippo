@@ -12,6 +12,15 @@ type logrusLog struct {
 	client *logrus.Entry
 }
 
+func (l *logrusLog) Log(level string, args ...interface{}) {
+	lv, err := logrus.ParseLevel(level)
+	if err != nil {
+		lv = logrus.InfoLevel
+	}
+
+	l.client.Log(lv, args...)
+}
+
 func (l *logrusLog) Info(args ...interface{}) {
 	l.client.Info(args...)
 }
@@ -26,6 +35,15 @@ func (l *logrusLog) Error(args ...interface{}) {
 
 func (l *logrusLog) Warn(args ...interface{}) {
 	l.client.Warn(args...)
+}
+
+func (l *logrusLog) Logf(level string, format string, args ...interface{}) {
+	lv, err := logrus.ParseLevel(level)
+	if err != nil {
+		lv = logrus.InfoLevel
+	}
+
+	l.client.Logf(lv, format, args...)
 }
 
 func (l *logrusLog) Infof(format string, args ...interface{}) {
@@ -44,20 +62,29 @@ func (l *logrusLog) Warnf(format string, args ...interface{}) {
 	l.client.Warnf(format, args...)
 }
 
-func (l *logrusLog) Infoln(args ...interface{}) {
-	l.client.Infoln(args...)
+func (l *logrusLog) Logln(level string, msg ...interface{}) {
+	lv, err := logrus.ParseLevel(level)
+	if err != nil {
+		lv = logrus.InfoLevel
+	}
+
+	l.client.Logln(lv, msg...)
 }
 
-func (l *logrusLog) Debugln(args ...interface{}) {
-	l.client.Debugln(args...)
+func (l *logrusLog) Infoln(msg ...interface{}) {
+	l.client.Infoln(msg...)
 }
 
-func (l *logrusLog) Errorln(args ...interface{}) {
-	l.client.Errorln(args...)
+func (l *logrusLog) Debugln(msg ...interface{}) {
+	l.client.Debugln(msg...)
 }
 
-func (l *logrusLog) Warnln(args ...interface{}) {
-	l.client.Warnln(args...)
+func (l *logrusLog) Errorln(msg ...interface{}) {
+	l.client.Errorln(msg...)
+}
+
+func (l *logrusLog) Warnln(msg ...interface{}) {
+	l.client.Warnln(msg...)
 }
 
 func (l *logrusLog) WithFields(fs map[string]interface{}) Logger {

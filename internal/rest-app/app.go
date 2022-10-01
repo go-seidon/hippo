@@ -139,7 +139,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 
 	RequestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
 		Logger: logger,
-		IngoreURI: map[string]bool{
+		IgnoreURI: map[string]bool{
 			"/health": true,
 		},
 		Header: map[string]string{
