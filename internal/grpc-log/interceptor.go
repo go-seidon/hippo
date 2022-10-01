@@ -34,6 +34,8 @@ func UnaryServerInterceptor(opts ...LogInterceptorOption) grpc.UnaryServerInterc
 			Error:     err,
 			StartTime: startTime,
 			Metadata:  cfg.Metadata,
+			Request:   req,
+			Response:  res,
 		})
 
 		cfg.SendLog(ctx, SendLogParam{
@@ -59,7 +61,8 @@ func StreamServerInterceptor(opts ...LogInterceptorOption) grpc.StreamServerInte
 			deadlineAt = &dlTime
 		}
 
-		err := handler(srv, ss)
+		lss := NewLogServerStream(ss, cfg.Logger)
+		err := handler(srv, lss)
 
 		shouldLog := cfg.ShouldLog(ctx, ShouldLogParam{
 			Method:       info.FullMethod,

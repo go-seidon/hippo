@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 var DefaultClock = datetime.NewClock()
@@ -34,6 +35,8 @@ type CreateLogParam struct {
 	Error     error
 	StartTime time.Time
 	Metadata  map[string]string
+	Request   interface{}
+	Response  interface{}
 }
 
 type LogInfo struct {
@@ -46,6 +49,8 @@ type LogInfo struct {
 	RemoteAddress string
 	Protocol      string
 	Metadata      map[string]interface{}
+	Request       Message
+	Response      Message
 }
 
 var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
@@ -78,6 +83,22 @@ var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
 		}
 	}
 
+	var request *messageMarshaller
+	if p.Request != nil {
+		reqMsg, ok := p.Request.(proto.Message)
+		if ok {
+			request = NewMessage(reqMsg)
+		}
+	}
+
+	var response *messageMarshaller
+	if p.Response != nil {
+		resMsg, ok := p.Response.(proto.Message)
+		if ok {
+			response = NewMessage(resMsg)
+		}
+	}
+
 	level := "error"
 	switch code {
 	case
@@ -105,6 +126,8 @@ var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
 		Protocol:      protocol,
 		Metadata:      meta,
 		Level:         level,
+		Request:       request,
+		Response:      response,
 	}
 }
 
@@ -130,6 +153,12 @@ var DefaultSendLog = func(ctx context.Context, p SendLogParam) error {
 	}
 	if p.DeadlineAt != nil {
 		grpcRequest["deadlineAt"] = p.DeadlineAt.UTC().Format(time.RFC3339)
+	}
+	if p.LogInfo.Request != nil {
+		grpcRequest["request"] = p.LogInfo.Request
+	}
+	if p.LogInfo.Response != nil {
+		grpcRequest["response"] = p.LogInfo.Response
 	}
 
 	logger := p.Logger

@@ -9,6 +9,7 @@ import (
 	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	grpc_log "github.com/go-seidon/local/internal/grpc-log"
 	mock_grpclog "github.com/go-seidon/local/internal/grpc-log/mock"
+	grpc_test "github.com/go-seidon/local/internal/grpc-test"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -21,7 +22,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ = Describe("Handler Package", func() {
+var _ = Describe("Interceptor Package", func() {
 
 	Context("UnaryServerInterceptor function", Label("unit"), func() {
 		var (
@@ -68,7 +69,7 @@ var _ = Describe("Handler Package", func() {
 				interceptor = grpc_log.UnaryServerInterceptor(
 					grpc_log.WithLogger(logger),
 					grpc_log.WithClock(clock),
-					grpc_log.WithIgnoredMethod([]string{
+					grpc_log.IgnoredMethod([]string{
 						info.FullMethod,
 					}),
 				)
@@ -366,13 +367,118 @@ var _ = Describe("Handler Package", func() {
 				interceptor = grpc_log.UnaryServerInterceptor(
 					grpc_log.WithLogger(logger),
 					grpc_log.WithClock(clock),
-					grpc_log.WithAllowedMetadata([]string{
+					grpc_log.AllowedMetadata([]string{
 						"X-Correlation-Id",
 					}),
 				)
 				res, err := interceptor(mctx, req, info, handler)
 
 				Expect(res).To(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("request is available", func() {
+			It("should return result", func() {
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Deadline().
+					Return(currentTs, false).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Value(gomock.Any()).
+					Return(nil).
+					Times(2)
+
+				logger.
+					EXPECT().
+					Logf(
+						gomock.Eq("info"),
+						gomock.Eq("request: %s@%s"),
+						gomock.Eq("pkg.Service"),
+						gomock.Eq("MethodName"),
+					).
+					Times(1)
+
+				interceptor = grpc_log.UnaryServerInterceptor(
+					grpc_log.WithLogger(logger),
+					grpc_log.WithClock(clock),
+				)
+				req := &grpc_test.TestData{
+					Key:   "key",
+					Value: grpc_test.Bool(true),
+				}
+				res, err := interceptor(ctx, req, info, handler)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("response is available", func() {
+			It("should return result", func() {
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Deadline().
+					Return(currentTs, false).
+					Times(1)
+
+				logger.
+					EXPECT().
+					WithFields(gomock.Any()).
+					Return(logger).
+					Times(1)
+
+				ctx.
+					EXPECT().
+					Value(gomock.Any()).
+					Return(nil).
+					Times(2)
+
+				logger.
+					EXPECT().
+					Logf(
+						gomock.Eq("info"),
+						gomock.Eq("request: %s@%s"),
+						gomock.Eq("pkg.Service"),
+						gomock.Eq("MethodName"),
+					).
+					Times(1)
+
+				interceptor = grpc_log.UnaryServerInterceptor(
+					grpc_log.WithLogger(logger),
+					grpc_log.WithClock(clock),
+				)
+
+				res, err := interceptor(ctx, req, info, func(ctx context.Context, req interface{}) (interface{}, error) {
+					res := &grpc_test.TestData{
+						Key:   "key",
+						Value: grpc_test.Bool(true),
+					}
+					return res, nil
+				})
+
+				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
 			})
 		})
@@ -431,7 +537,7 @@ var _ = Describe("Handler Package", func() {
 				interceptor = grpc_log.StreamServerInterceptor(
 					grpc_log.WithLogger(logger),
 					grpc_log.WithClock(clock),
-					grpc_log.WithIgnoredMethod([]string{
+					grpc_log.IgnoredMethod([]string{
 						info.FullMethod,
 					}),
 				)
@@ -759,7 +865,7 @@ var _ = Describe("Handler Package", func() {
 				interceptor = grpc_log.StreamServerInterceptor(
 					grpc_log.WithLogger(logger),
 					grpc_log.WithClock(clock),
-					grpc_log.WithAllowedMetadata([]string{
+					grpc_log.AllowedMetadata([]string{
 						"X-Correlation-Id",
 					}),
 				)
