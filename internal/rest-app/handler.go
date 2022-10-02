@@ -1,6 +1,7 @@
 package rest_app
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"net/http"
@@ -189,9 +190,10 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			)
 			return
 		}
-
 		defer r.Data.Close()
-		data, err := io.ReadAll(r.Data)
+
+		data := bytes.NewBuffer([]byte{})
+		_, err = io.Copy(data, r.Data)
 		if err != nil {
 			Response(
 				WithWriterSerializer(w, s),
@@ -208,7 +210,7 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			w.Header().Del("Content-Type")
 		}
 
-		w.Write(data)
+		w.Write(data.Bytes())
 	}
 }
 

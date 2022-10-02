@@ -21,31 +21,22 @@ type File interface {
 
 type UploadFileOption = func(*UploadFileParam)
 
-func WithData(d []byte) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileData = d
-		ufp.fileReader = nil
-	}
-}
-
 func WithReader(w io.Reader) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileReader = w
-		ufp.fileData = nil
+	return func(p *UploadFileParam) {
+		p.fileReader = w
 	}
 }
 
 func WithFileInfo(name, mimetype, extension string, size int64) UploadFileOption {
-	return func(ufp *UploadFileParam) {
-		ufp.fileName = name
-		ufp.fileMimetype = mimetype
-		ufp.fileExtension = extension
-		ufp.fileSize = size
+	return func(p *UploadFileParam) {
+		p.fileName = name
+		p.fileMimetype = mimetype
+		p.fileExtension = extension
+		p.fileSize = size
 	}
 }
 
 type UploadFileParam struct {
-	fileData      []byte
 	fileReader    io.Reader
 	fileName      string `validate:"max=4096" label:"name"`
 	fileMimetype  string `validate:"max=256" label:"mimetype"`

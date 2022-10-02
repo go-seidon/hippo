@@ -159,6 +159,28 @@ var _ = Describe("Go Health Check", func() {
 				Expect(err).To(BeNil())
 			})
 		})
+
+		When("app is already started", func() {
+			It("should return result", func() {
+				client.
+					EXPECT().
+					AddChecks(gomock.Any()).
+					Return(nil).
+					Times(1)
+
+				client.
+					EXPECT().
+					Start().
+					Return(nil).
+					Times(1)
+
+				err1 := s.Start()
+				err2 := s.Start()
+
+				Expect(err1).To(BeNil())
+				Expect(err2).To(BeNil())
+			})
+		})
 	})
 
 	Context("Stop function", Label("unit"), func() {
