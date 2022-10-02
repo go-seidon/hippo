@@ -9,7 +9,7 @@ import (
 
 func UnaryServerInterceptor(opts ...LogInterceptorOption) grpc.UnaryServerInterceptor {
 	cfg := buildConfig(opts...)
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		startTime := cfg.Clock.Now()
 
 		var deadlineAt *time.Time
