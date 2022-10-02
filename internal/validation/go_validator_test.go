@@ -78,6 +78,23 @@ var _ = Describe("Go Validator", func() {
 				Expect(err.Error()).To(Equal(expectErr.Error()))
 			})
 		})
+
+		When("there are invalid data on stripped parameter", func() {
+			It("should return error", func() {
+				i := struct {
+					Key string `validate:"required,min=3" label:"-"`
+				}{
+					Key: "",
+				}
+
+				err := validator.Validate(i)
+
+				expectErr := validation.Error(
+					"is a required field",
+				)
+				Expect(err.Error()).To(Equal(expectErr.Error()))
+			})
+		})
 	})
 
 })

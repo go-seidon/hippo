@@ -139,6 +139,16 @@ var _ = Describe("File", func() {
 				Expect(err).To(Equal(fmt.Errorf("config is not specified")))
 			})
 		})
+
+		When("validator is not specified", func() {
+			It("should return error", func() {
+				p.Validator = nil
+				res, err := file.NewFile(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("validator is not specified")))
+			})
+		})
 	})
 
 })

@@ -168,17 +168,17 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			httpCode := http.StatusBadRequest
 			message := err.Error()
 
-			if errors.Is(err, file.ErrorNotFound) {
-				code = status.RESOURCE_NOTFOUND
-				httpCode = http.StatusNotFound
-				message = err.Error()
-			}
-
 			switch e := err.(type) {
 			case *validation.ValidationError:
 				code = status.INVALID_PARAM
 				httpCode = http.StatusBadRequest
 				message = e.Error()
+			}
+
+			if errors.Is(err, file.ErrorNotFound) {
+				code = status.RESOURCE_NOTFOUND
+				httpCode = http.StatusNotFound
+				message = err.Error()
 			}
 
 			Response(
