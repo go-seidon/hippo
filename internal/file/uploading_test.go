@@ -84,7 +84,7 @@ var _ = Describe("Uploader", func() {
 				Size:      200,
 				CreatedAt: currentTimestamp,
 			}
-			dataOpt := file.WithData([]byte{})
+			dataOpt := file.WithReader(reader)
 			infoOpt := file.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
 			opts = append(opts, dataOpt)
 			opts = append(opts, infoOpt)
@@ -207,10 +207,12 @@ var _ = Describe("Uploader", func() {
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
 					Return(true, nil).
 					Times(1)
+
 				dirManager.
 					EXPECT().
 					CreateDir(gomock.Eq(ctx), gomock.Eq(createDirParam)).
 					Times(0)
+
 				reader.
 					EXPECT().
 					Read(gomock.Any()).
@@ -292,15 +294,24 @@ var _ = Describe("Uploader", func() {
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
 					Return(true, nil).
 					Times(1)
+
 				dirManager.
 					EXPECT().
 					CreateDir(gomock.Eq(ctx), gomock.Eq(createDirParam)).
 					Times(0)
+
+				reader.
+					EXPECT().
+					Read(gomock.Any()).
+					Return(0, io.EOF).
+					Times(1)
+
 				identifier.
 					EXPECT().
 					GenerateId().
 					Return("mock-unique-id", nil).
 					Times(1)
+
 				fileRepo.
 					EXPECT().
 					CreateFile(gomock.Eq(ctx), gomock.Any()).
@@ -333,15 +344,24 @@ var _ = Describe("Uploader", func() {
 					IsDirectoryExists(gomock.Eq(ctx), gomock.Eq(dirExistsParam)).
 					Return(true, nil).
 					Times(1)
+
 				dirManager.
 					EXPECT().
 					CreateDir(gomock.Eq(ctx), gomock.Eq(createDirParam)).
 					Times(0)
+
+				reader.
+					EXPECT().
+					Read(gomock.Any()).
+					Return(0, io.EOF).
+					Times(1)
+
 				identifier.
 					EXPECT().
 					GenerateId().
 					Return("mock-unique-id", nil).
 					Times(1)
+
 				fileRepo.
 					EXPECT().
 					CreateFile(gomock.Eq(ctx), gomock.Any()).

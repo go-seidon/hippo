@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -24,7 +25,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		return nil, err
 	}
 
-	if p.fileData == nil && p.fileReader == nil {
+	if p.fileReader == nil {
 		return nil, validation.Error("file is not specified")
 	}
 
@@ -47,13 +48,10 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		}
 	}
 
-	data := p.fileData
-	if p.fileReader != nil {
-		byte, err := io.ReadAll(p.fileReader)
-		if err != nil {
-			return nil, err
-		}
-		data = byte
+	data := bytes.NewBuffer([]byte{})
+	_, err = io.Copy(data, p.fileReader)
+	if err != nil {
+		return nil, err
 	}
 
 	uniqueId, err := s.identifier.GenerateId()
@@ -73,7 +71,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		Mimetype:  p.fileMimetype,
 		Extension: p.fileExtension,
 		Size:      p.fileSize,
-		CreateFn:  NewCreateFn(data, s.fileManager),
+		CreateFn:  NewCreateFn(data.Bytes(), s.fileManager),
 	})
 	if err != nil {
 		return nil, err
