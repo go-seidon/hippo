@@ -15,6 +15,7 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
+	mock_validation "github.com/go-seidon/local/internal/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,6 +34,7 @@ var _ = Describe("Uploader", func() {
 			reader           *mock_io.MockReader
 			identifier       *mock_text.MockIdentifier
 			locator          *mock_file.MockUploadLocation
+			validator        *mock_validation.MockValidator
 			s                file.File
 			dirExistsParam   filesystem.IsDirectoryExistsParam
 			createDirParam   filesystem.CreateDirParam
@@ -51,6 +53,7 @@ var _ = Describe("Uploader", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
+			validator = mock_validation.NewMockValidator(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
@@ -59,6 +62,7 @@ var _ = Describe("Uploader", func() {
 				Logger:      logger,
 				Identifier:  identifier,
 				Locator:     locator,
+				Validator:   validator,
 				Config: &file.FileConfig{
 					UploadDir: "temp",
 				},

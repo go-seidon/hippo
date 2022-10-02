@@ -10,6 +10,7 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/text"
+	"github.com/go-seidon/local/internal/validation"
 )
 
 type File interface {
@@ -91,6 +92,7 @@ type file struct {
 	identifier  text.Identifier
 	log         logging.Logger
 	locator     UploadLocation
+	validator   validation.Validator
 	config      *FileConfig
 }
 
@@ -105,6 +107,7 @@ type NewFileParam struct {
 	Logger      logging.Logger
 	Identifier  text.Identifier
 	Locator     UploadLocation
+	Validator   validation.Validator
 	Config      *FileConfig
 }
 
@@ -130,6 +133,9 @@ func NewFile(p NewFileParam) (*file, error) {
 	if p.Locator == nil {
 		return nil, fmt.Errorf("locator is not specified")
 	}
+	if p.Validator == nil {
+		return nil, fmt.Errorf("validator is not specified")
+	}
 
 	s := &file{
 		fileRepo:    p.FileRepo,
@@ -139,6 +145,7 @@ func NewFile(p NewFileParam) (*file, error) {
 		log:         p.Logger,
 		locator:     p.Locator,
 		config:      p.Config,
+		validator:   p.Validator,
 	}
 	return s, nil
 }

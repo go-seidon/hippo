@@ -7,7 +7,7 @@
 No doc right now
 
 ## Todo
-1. Add validation package & validation error handling
+1. Add validation error handling
 2. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
 - remove upload WithData support or change the implementation
 3. Return file size on retrieving file

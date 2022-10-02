@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
+	mock_validation "github.com/go-seidon/local/internal/validation/mock"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -28,6 +29,7 @@ var _ = Describe("Deleter", func() {
 			fileRepo    *mock_repository.MockFileRepository
 			fileManager *mock_filesystem.MockFileManager
 			log         *mock_logging.MockLogger
+			validator   *mock_validation.MockValidator
 			s           file.File
 			deleteRes   *repository.DeleteFileResult
 			finalRes    *file.DeleteFileResult
@@ -47,6 +49,7 @@ var _ = Describe("Deleter", func() {
 			identifier := mock_text.NewMockIdentifier(ctrl)
 			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
+			validator = mock_validation.NewMockValidator(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
@@ -54,6 +57,7 @@ var _ = Describe("Deleter", func() {
 				Logger:      log,
 				Identifier:  identifier,
 				Locator:     locator,
+				Validator:   validator,
 				Config: &file.FileConfig{
 					UploadDir: "temp",
 				},
