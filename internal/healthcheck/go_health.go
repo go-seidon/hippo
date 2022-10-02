@@ -14,11 +14,16 @@ type HealthClient interface {
 }
 
 type goHealthCheck struct {
-	client HealthClient
-	jobs   []*HealthJob
+	client    HealthClient
+	jobs      []*HealthJob
+	runStatus bool
 }
 
 func (s *goHealthCheck) Start() error {
+	if s.runStatus {
+		return nil
+	}
+
 	cfgs := []*health.Config{}
 	for _, job := range s.jobs {
 		cfgs = append(cfgs, &health.Config{
@@ -27,11 +32,19 @@ func (s *goHealthCheck) Start() error {
 			Interval: job.Interval,
 		})
 	}
+
 	err := s.client.AddChecks(cfgs)
 	if err != nil {
 		return err
 	}
-	return s.client.Start()
+
+	err = s.client.Start()
+	if err != nil {
+		return err
+	}
+
+	s.runStatus = true
+	return nil
 }
 
 func (s *goHealthCheck) Stop() error {
