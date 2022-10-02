@@ -729,10 +729,11 @@ var _ = Describe("Handler Package", func() {
 					Return(res, nil).
 					Times(1)
 
-				w.EXPECT().
+				w.
+					EXPECT().
 					Header().
 					Return(http.Header{}).
-					Times(1)
+					Times(5)
 
 				w.
 					EXPECT().
@@ -773,10 +774,11 @@ var _ = Describe("Handler Package", func() {
 					Return(res, nil).
 					Times(1)
 
-				w.EXPECT().
+				w.
+					EXPECT().
 					Header().
 					Return(http.Header{}).
-					Times(1)
+					Times(5)
 
 				w.
 					EXPECT().
