@@ -20,6 +20,7 @@ import (
 	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
 	"github.com/go-seidon/local/internal/serialization"
 	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
+	"github.com/go-seidon/local/internal/validation"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -434,6 +435,42 @@ var _ = Describe("Handler Package", func() {
 			})
 		})
 
+		When("there are invalid data", func() {
+			It("should write response", func() {
+
+				err := validation.Error("invalid data")
+
+				b := rest_app.ResponseBody{
+					Code:    1002,
+					Message: err.Error(),
+				}
+
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Any(), gomock.Eq(p)).
+					Return(nil, err).
+					Times(1)
+
+				serializer.
+					EXPECT().
+					Marshal(b).
+					Return([]byte{}, nil).
+					Times(1)
+
+				w.
+					EXPECT().
+					WriteHeader(gomock.Eq(400)).
+					Times(1)
+
+				w.
+					EXPECT().
+					Write([]byte{}).
+					Times(1)
+
+				handler.ServeHTTP(w, r)
+			})
+		})
+
 		When("success delete file", func() {
 			It("should write response", func() {
 				res := &file.DeleteFileResult{
@@ -566,6 +603,42 @@ var _ = Describe("Handler Package", func() {
 				w.
 					EXPECT().
 					WriteHeader(gomock.Eq(404)).
+					Times(1)
+
+				w.
+					EXPECT().
+					Write([]byte{}).
+					Times(1)
+
+				handler.ServeHTTP(w, r)
+			})
+		})
+
+		When("there are invalid data", func() {
+			It("should write response", func() {
+
+				err := validation.Error("invalid data")
+
+				b := rest_app.ResponseBody{
+					Code:    1002,
+					Message: err.Error(),
+				}
+
+				fileService.
+					EXPECT().
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
+					Return(nil, err).
+					Times(1)
+
+				serializer.
+					EXPECT().
+					Marshal(b).
+					Return([]byte{}, nil).
+					Times(1)
+
+				w.
+					EXPECT().
+					WriteHeader(gomock.Eq(400)).
 					Times(1)
 
 				w.
@@ -792,6 +865,28 @@ var _ = Describe("Handler Package", func() {
 				Expect(w.Code).To(Equal(400))
 				Expect(resBody.Code).To(Equal(int32(1001)))
 				Expect(resBody.Message).To(Equal("disk error"))
+				Expect(resBody.Data).To(BeNil())
+			})
+		})
+
+		When("there are invalid data", func() {
+			It("should return error", func() {
+				uploadService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				w := httptest.NewRecorder()
+
+				handler.ServeHTTP(w, r)
+
+				resBody := rest_app.ResponseBody{}
+				serializer.Unmarshal(w.Body.Bytes(), &resBody)
+
+				Expect(w.Code).To(Equal(400))
+				Expect(resBody.Code).To(Equal(int32(1002)))
+				Expect(resBody.Message).To(Equal("invalid data"))
 				Expect(resBody.Data).To(BeNil())
 			})
 		})

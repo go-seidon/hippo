@@ -3,7 +3,6 @@ package file
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/go-seidon/local/internal/filesystem"
 	"github.com/go-seidon/local/internal/repository"
@@ -13,8 +12,9 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 	s.log.Debug("In function: RetrieveFile")
 	defer s.log.Debug("Returning function: RetrieveFile")
 
-	if p.FileId == "" {
-		return nil, fmt.Errorf("invalid file id parameter")
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, err
 	}
 
 	file, err := s.fileRepo.RetrieveFile(ctx, repository.RetrieveFileParam{
@@ -45,6 +45,5 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 		MimeType:  file.MimeType,
 		Extension: file.Extension,
 	}
-
 	return res, nil
 }

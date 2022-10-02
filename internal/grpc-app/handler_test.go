@@ -16,6 +16,7 @@ import (
 	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
 	"github.com/go-seidon/local/internal/status"
+	"github.com/go-seidon/local/internal/validation"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 
@@ -224,6 +225,25 @@ var _ = Describe("Handler Package", func() {
 			})
 		})
 
+		When("there are invalid param", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				res, err := handler.DeleteFile(ctx, p)
+
+				expectRes := &grpc_v1.DeleteFileResult{
+					Code:    1002,
+					Message: "invalid data",
+				}
+				Expect(res).To(Equal(expectRes))
+				Expect(err).To(BeNil())
+			})
+		})
+
 		When("failed delete file", func() {
 			It("should return error", func() {
 				fileService.
@@ -340,6 +360,54 @@ var _ = Describe("Handler Package", func() {
 				res := &grpc_v1.RetrieveFileResult{
 					Code:    1004,
 					Message: file.ErrorNotFound.Error(),
+				}
+				stream.
+					EXPECT().
+					Send(gomock.Eq(res)).
+					Return(nil).
+					Times(1)
+
+				err := handler.RetrieveFile(p, stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed send stream during invalid data", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				res := &grpc_v1.RetrieveFileResult{
+					Code:    1002,
+					Message: "invalid data",
+				}
+				stream.
+					EXPECT().
+					Send(gomock.Eq(res)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.RetrieveFile(p, stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("there are invalid data", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				res := &grpc_v1.RetrieveFileResult{
+					Code:    1002,
+					Message: "invalid data",
 				}
 				stream.
 					EXPECT().
@@ -1279,6 +1347,154 @@ var _ = Describe("Handler Package", func() {
 				failedRes := &grpc_v1.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "db error",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(nil).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed send stream during invalid data", func() {
+			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.INVALID_PARAM,
+					Message: "invalid data",
+				}
+				stream.
+					EXPECT().
+					SendAndClose(gomock.Eq(failedRes)).
+					Return(fmt.Errorf("network error")).
+					Times(1)
+
+				err := handler.UploadFile(stream)
+
+				Expect(err).To(Equal(fmt.Errorf("network error")))
+			})
+		})
+
+		When("there are invalid data", func() {
+			It("should return error", func() {
+				ctx.
+					EXPECT().
+					Err().
+					Return(nil).
+					Times(3)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(3)
+
+				infoParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Info{
+						Info: &grpc_v1.UploadFileInfo{
+							Name:      "file-name",
+							Mimetype:  "file-mimetype",
+							Extension: "file-extension",
+						},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(infoParam, nil).
+					Times(1)
+
+				chunkParam := &grpc_v1.UploadFileParam{
+					Data: &grpc_v1.UploadFileParam_Chunks{
+						Chunks: []byte{1, 2, 3},
+					},
+				}
+				stream.
+					EXPECT().
+					Recv().
+					Return(chunkParam, nil).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Recv().
+					Return(nil, io.EOF).
+					Times(1)
+
+				stream.
+					EXPECT().
+					Context().
+					Return(ctx).
+					Times(1)
+
+				fileService.
+					EXPECT().
+					UploadFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, validation.Error("invalid data")).
+					Times(1)
+
+				failedRes := &grpc_v1.UploadFileResult{
+					Code:    status.INVALID_PARAM,
+					Message: "invalid data",
 				}
 				stream.
 					EXPECT().

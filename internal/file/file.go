@@ -47,10 +47,10 @@ func WithFileInfo(name, mimetype, extension string, size int64) UploadFileOption
 type UploadFileParam struct {
 	fileData      []byte
 	fileReader    io.Reader
-	fileName      string
-	fileMimetype  string
-	fileExtension string
-	fileSize      int64
+	fileName      string `validate:"max=4096"`
+	fileMimetype  string `validate:"max=256"`
+	fileExtension string `validate:"max=128"`
+	fileSize      int64  `validate:"min=0"`
 }
 
 type UploadFileResult struct {
@@ -64,7 +64,7 @@ type UploadFileResult struct {
 }
 
 type RetrieveFileParam struct {
-	FileId string
+	FileId string `validate:"required,min=5,max=64"`
 }
 
 type RetrieveFileResult struct {
@@ -78,7 +78,7 @@ type RetrieveFileResult struct {
 }
 
 type DeleteFileParam struct {
-	FileId string
+	FileId string `validate:"required,min=5,max=64"`
 }
 
 type DeleteFileResult struct {

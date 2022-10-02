@@ -97,18 +97,31 @@ var _ = Describe("Retriever", func() {
 				Times(1)
 		})
 
-		When("file id is not specified", func() {
+		When("parameter are not valid", func() {
 			It("should return error", func() {
 				p.FileId = ""
+
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(fmt.Errorf("invalid data")).
+					Times(1)
+
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid file id parameter")))
+				Expect(err).To(Equal(fmt.Errorf("invalid data")))
 			})
 		})
 
 		When("file record is not found", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -124,6 +137,12 @@ var _ = Describe("Retriever", func() {
 
 		When("failed find file record", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -139,6 +158,12 @@ var _ = Describe("Retriever", func() {
 
 		When("file is not available in disk", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -160,6 +185,12 @@ var _ = Describe("Retriever", func() {
 
 		When("failed open file in disk", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -181,6 +212,12 @@ var _ = Describe("Retriever", func() {
 
 		When("success retrieve file", func() {
 			It("should return result", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).

@@ -10,6 +10,7 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/status"
+	"github.com/go-seidon/local/internal/validation"
 	"github.com/gorilla/mux"
 )
 
@@ -41,7 +42,6 @@ func NewMethodNotAllowedHandler(log logging.Logger, s serialization.Serializer) 
 
 func NewRootHandler(log logging.Logger, s serialization.Serializer, config *RestAppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-
 		d := struct {
 			AppName    string `json:"app_name"`
 			AppVersion string `json:"app_version"`
@@ -55,7 +55,6 @@ func NewRootHandler(log logging.Logger, s serialization.Serializer, config *Rest
 
 func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healthService healthcheck.HealthCheck) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-
 		r, err := healthService.Check()
 		if err != nil {
 
@@ -111,95 +110,105 @@ func NewHealthCheckHandler(log logging.Logger, s serialization.Serializer, healt
 
 func NewDeleteFileHandler(log logging.Logger, s serialization.Serializer, deleter file.File) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-
 		vars := mux.Vars(req)
 
 		r, err := deleter.DeleteFile(req.Context(), file.DeleteFileParam{
 			FileId: vars["id"],
 		})
-		if err == nil {
+		if err != nil {
+			code := status.ACTION_FAILED
+			httpCode := http.StatusBadRequest
+			message := err.Error()
 
-			d := struct {
-				DeletedAt int64 `json:"deleted_at"`
-			}{
-				DeletedAt: r.DeletedAt.UnixMilli(),
+			if errors.Is(err, file.ErrorNotFound) {
+				code = status.RESOURCE_NOTFOUND
+				httpCode = http.StatusNotFound
+				message = err.Error()
+			}
+
+			switch e := err.(type) {
+			case *validation.ValidationError:
+				code = status.INVALID_PARAM
+				httpCode = http.StatusBadRequest
+				message = e.Error()
 			}
 
 			Response(
 				WithWriterSerializer(w, s),
-				WithData(d),
-				WithMessage("success delete file"),
+				WithCode(code),
+				WithMessage(message),
+				WithHttpCode(httpCode),
 			)
 			return
 		}
 
-		if errors.Is(err, file.ErrorNotFound) {
-			Response(
-				WithWriterSerializer(w, s),
-				WithHttpCode(http.StatusNotFound),
-				WithCode(status.RESOURCE_NOTFOUND),
-				WithMessage(err.Error()),
-			)
-			return
+		d := struct {
+			DeletedAt int64 `json:"deleted_at"`
+		}{
+			DeletedAt: r.DeletedAt.UnixMilli(),
 		}
 
 		Response(
 			WithWriterSerializer(w, s),
-			WithCode(status.ACTION_FAILED),
-			WithMessage(err.Error()),
-			WithHttpCode(http.StatusBadRequest),
+			WithData(d),
+			WithMessage("success delete file"),
 		)
 	}
 }
 
 func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retriever file.File) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-
 		vars := mux.Vars(req)
 
 		r, err := retriever.RetrieveFile(req.Context(), file.RetrieveFileParam{
 			FileId: vars["id"],
 		})
-		if err == nil {
+		if err != nil {
+			code := status.ACTION_FAILED
+			httpCode := http.StatusBadRequest
+			message := err.Error()
 
-			defer r.Data.Close()
-			data, err := io.ReadAll(r.Data)
-			if err != nil {
-				Response(
-					WithWriterSerializer(w, s),
-					WithCode(status.ACTION_FAILED),
-					WithMessage(err.Error()),
-					WithHttpCode(http.StatusBadRequest),
-				)
-				return
+			if errors.Is(err, file.ErrorNotFound) {
+				code = status.RESOURCE_NOTFOUND
+				httpCode = http.StatusNotFound
+				message = err.Error()
 			}
 
-			if r.MimeType != "" {
-				w.Header().Set("Content-Type", r.MimeType)
-			} else {
-				w.Header().Del("Content-Type")
+			switch e := err.(type) {
+			case *validation.ValidationError:
+				code = status.INVALID_PARAM
+				httpCode = http.StatusBadRequest
+				message = e.Error()
 			}
 
-			w.Write(data)
-			return
-		}
-
-		if errors.Is(err, file.ErrorNotFound) {
 			Response(
 				WithWriterSerializer(w, s),
-				WithHttpCode(http.StatusNotFound),
-				WithCode(status.RESOURCE_NOTFOUND),
-				WithMessage(err.Error()),
+				WithCode(code),
+				WithMessage(message),
+				WithHttpCode(httpCode),
 			)
 			return
 		}
 
-		Response(
-			WithWriterSerializer(w, s),
-			WithCode(status.ACTION_FAILED),
-			WithMessage(err.Error()),
-			WithHttpCode(http.StatusBadRequest),
-		)
+		defer r.Data.Close()
+		data, err := io.ReadAll(r.Data)
+		if err != nil {
+			Response(
+				WithWriterSerializer(w, s),
+				WithCode(status.ACTION_FAILED),
+				WithMessage(err.Error()),
+				WithHttpCode(http.StatusBadRequest),
+			)
+			return
+		}
+
+		if r.MimeType != "" {
+			w.Header().Set("Content-Type", r.MimeType)
+		} else {
+			w.Header().Del("Content-Type")
+		}
+
+		w.Write(data)
 	}
 }
 
@@ -242,11 +251,22 @@ func NewUploadFileHandler(log logging.Logger, s serialization.Serializer, upload
 			),
 		)
 		if err != nil {
+			code := status.ACTION_FAILED
+			httpCode := http.StatusBadRequest
+			message := err.Error()
+
+			switch e := err.(type) {
+			case *validation.ValidationError:
+				code = status.INVALID_PARAM
+				httpCode = http.StatusBadRequest
+				message = e.Error()
+			}
+
 			Response(
 				WithWriterSerializer(w, s),
-				WithCode(status.ACTION_FAILED),
-				WithMessage(err.Error()),
-				WithHttpCode(http.StatusBadRequest),
+				WithCode(code),
+				WithMessage(message),
+				WithHttpCode(httpCode),
 			)
 			return
 		}
