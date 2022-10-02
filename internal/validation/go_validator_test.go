@@ -45,7 +45,7 @@ var _ = Describe("Go Validator", func() {
 			})
 		})
 
-		When("there are invalid data", func() {
+		When("there are invalid data on unlabeled parameter", func() {
 			It("should return error", func() {
 				i := struct {
 					Key string `validate:"required,min=3"`
@@ -56,12 +56,28 @@ var _ = Describe("Go Validator", func() {
 				err := validator.Validate(i)
 
 				expectErr := validation.Error(
-					"Key: 'Key' Error:Field validation for 'Key' failed on the 'required' tag",
+					"Key is a required field",
 				)
 				Expect(err.Error()).To(Equal(expectErr.Error()))
 			})
 		})
 
+		When("there are invalid data on labeled parameter", func() {
+			It("should return error", func() {
+				i := struct {
+					Key string `validate:"required,min=3" label:"custom_key"`
+				}{
+					Key: "",
+				}
+
+				err := validator.Validate(i)
+
+				expectErr := validation.Error(
+					"custom_key is a required field",
+				)
+				Expect(err.Error()).To(Equal(expectErr.Error()))
+			})
+		})
 	})
 
 })
