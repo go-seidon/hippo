@@ -1,6 +1,9 @@
 package grpc_log
 
 import (
+	"context"
+	"time"
+
 	"github.com/go-seidon/local/internal/datetime"
 	"github.com/go-seidon/local/internal/logging"
 )
@@ -28,6 +31,48 @@ type LogInterceptorConfig struct {
 
 	// send log using the specified logger
 	SendLog SendLog
+}
+
+type ShouldLog = func(ctx context.Context, p ShouldLogParam) bool
+
+type ShouldLogParam struct {
+	Method       string
+	Error        error
+	IgnoreMethod map[string]bool
+}
+
+type CreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo
+
+type CreateLogParam struct {
+	Method    string
+	Error     error
+	StartTime time.Time
+	Metadata  map[string]string
+	Request   interface{}
+	Response  interface{}
+}
+
+type LogInfo struct {
+	Service       string
+	Method        string
+	Status        string
+	Level         string
+	ReceivedAt    time.Time
+	Duration      int64
+	RemoteAddress string
+	Protocol      string
+	Metadata      map[string]interface{}
+	Request       Message
+	Response      Message
+}
+
+type SendLog = func(ctx context.Context, p SendLogParam) error
+
+type SendLogParam struct {
+	Logger     logging.Logger
+	LogInfo    LogInfo
+	Error      error
+	DeadlineAt *time.Time
 }
 
 type LogInterceptorOption = func(*LogInterceptorConfig)

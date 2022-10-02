@@ -478,7 +478,6 @@ var _ = Describe("Handler Package", func() {
 
 	Context("NewRetrieveFileHandler", Label("unit"), func() {
 		var (
-			ctx         context.Context
 			handler     http.HandlerFunc
 			r           *http.Request
 			w           *mock_restapp.MockResponseWriter
@@ -491,7 +490,6 @@ var _ = Describe("Handler Package", func() {
 
 		BeforeEach(func() {
 			t := GinkgoT()
-			ctx = context.Background()
 			r = mux.SetURLVars(&http.Request{}, map[string]string{
 				"id": "mock-file-id",
 			})
@@ -519,7 +517,7 @@ var _ = Describe("Handler Package", func() {
 
 				fileService.
 					EXPECT().
-					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(nil, err).
 					Times(1)
 
@@ -555,7 +553,7 @@ var _ = Describe("Handler Package", func() {
 
 				fileService.
 					EXPECT().
-					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(nil, err).
 					Times(1)
 
@@ -604,7 +602,7 @@ var _ = Describe("Handler Package", func() {
 
 				fileService.
 					EXPECT().
-					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(res, nil).
 					Times(1)
 
@@ -654,7 +652,7 @@ var _ = Describe("Handler Package", func() {
 
 				fileService.
 					EXPECT().
-					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(res, nil).
 					Times(1)
 
@@ -698,7 +696,7 @@ var _ = Describe("Handler Package", func() {
 
 				fileService.
 					EXPECT().
-					RetrieveFile(gomock.Eq(ctx), gomock.Eq(p)).
+					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(res, nil).
 					Times(1)
 

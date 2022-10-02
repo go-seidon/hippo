@@ -6,9 +6,13 @@ import (
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
 	"github.com/go-seidon/local/internal/app"
+	"github.com/go-seidon/local/internal/auth"
+	"github.com/go-seidon/local/internal/encoding"
 	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/filesystem"
+	grpc_auth "github.com/go-seidon/local/internal/grpc-auth"
 	grpc_log "github.com/go-seidon/local/internal/grpc-log"
+	"github.com/go-seidon/local/internal/hashing"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
@@ -112,6 +116,18 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		return nil, err
 	}
 
+	encoder := encoding.NewBase64Encoder()
+	hasher := hashing.NewBcryptHasher()
+
+	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
+		AuthRepo: repo.GetAuthRepo(),
+		Encoder:  encoder,
+		Hasher:   hasher,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	config := &GrpcAppConfig{
 		AppName:        p.Config.AppName,
 		AppVersion:     p.Config.AppVersion,
@@ -129,12 +145,15 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			"X-Correlation-Id",
 		}),
 	}
+	grpcBasicAuth := grpc_auth.WithAuth(BasicAuth(basicAuth))
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			grpc_log.UnaryServerInterceptor(grpcLogOpt...),
+			grpc_auth.UnaryServerInterceptor(grpcBasicAuth),
 		),
 		grpc.ChainStreamInterceptor(
 			grpc_log.StreamServerInterceptor(grpcLogOpt...),
+			grpc_auth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)
 	healthCheckHandler := NewHealthHandler(healthService)

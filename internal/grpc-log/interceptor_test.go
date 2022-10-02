@@ -8,8 +8,8 @@ import (
 	mock_context "github.com/go-seidon/local/internal/context/mock"
 	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
 	grpc_log "github.com/go-seidon/local/internal/grpc-log"
-	mock_grpclog "github.com/go-seidon/local/internal/grpc-log/mock"
 	grpc_test "github.com/go-seidon/local/internal/grpc-test"
+	mock_grpc "github.com/go-seidon/local/internal/grpc/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -489,7 +489,7 @@ var _ = Describe("Interceptor Package", func() {
 			currentTs   time.Time
 			ctx         *mock_context.MockContext
 			srv         interface{}
-			ss          *mock_grpclog.MockServerStream
+			ss          *mock_grpc.MockServerStream
 			info        *grpc.StreamServerInfo
 			logger      *mock_logging.MockLogger
 			interceptor grpc.StreamServerInterceptor
@@ -505,7 +505,7 @@ var _ = Describe("Interceptor Package", func() {
 				FullMethod: "/pkg.Service/MethodName",
 			}
 			ctrl := gomock.NewController(t)
-			ss = mock_grpclog.NewMockServerStream(ctrl)
+			ss = mock_grpc.NewMockServerStream(ctrl)
 			ctx = mock_context.NewMockContext(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)

@@ -16,41 +16,8 @@ import (
 
 var DefaultClock = datetime.NewClock()
 
-type ShouldLog = func(ctx context.Context, p ShouldLogParam) bool
-
-type ShouldLogParam struct {
-	Method       string
-	Error        error
-	IgnoreMethod map[string]bool
-}
-
 var DefaultShouldLog = func(ctx context.Context, p ShouldLogParam) bool {
 	return !p.IgnoreMethod[p.Method]
-}
-
-type CreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo
-
-type CreateLogParam struct {
-	Method    string
-	Error     error
-	StartTime time.Time
-	Metadata  map[string]string
-	Request   interface{}
-	Response  interface{}
-}
-
-type LogInfo struct {
-	Service       string
-	Method        string
-	Status        string
-	Level         string
-	ReceivedAt    time.Time
-	Duration      int64
-	RemoteAddress string
-	Protocol      string
-	Metadata      map[string]interface{}
-	Request       Message
-	Response      Message
 }
 
 var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
@@ -129,15 +96,6 @@ var DefaultCreateLog = func(ctx context.Context, p CreateLogParam) *LogInfo {
 		Request:       request,
 		Response:      response,
 	}
-}
-
-type SendLog = func(ctx context.Context, p SendLogParam) error
-
-type SendLogParam struct {
-	Logger     logging.Logger
-	LogInfo    LogInfo
-	Error      error
-	DeadlineAt *time.Time
 }
 
 var DefaultSendLog = func(ctx context.Context, p SendLogParam) error {
