@@ -44,6 +44,7 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 		Path:      file.Path,
 		MimeType:  file.MimeType,
 		Extension: file.Extension,
+		Size:      file.Size,
 	}
 	return res, nil
 }

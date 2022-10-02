@@ -4,18 +4,15 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 
 ## Todo
-1. Return file size on retrieving file
-- rest-app (http header)
-- grpc-app (stream header)
-2. Change REST using OpenAPI specification & code generation (with API versioning)
-3. Move reusable package to it's own package 
+1. Change REST using OpenAPI specification & code generation (with API versioning)
+2. Move reusable package to it's own package 
 - grpc
 - mux (rest)
 - database (mongo, mysql)
 - healthcheck
 - provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
-4. Add gracefull shutdown (rest & grpc app)
-5. Deploy dev, stg, prod (deployment script)
+3. Add gracefull shutdown (rest & grpc app)
+4. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Simplify factory function interface not returning error

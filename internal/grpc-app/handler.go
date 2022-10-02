@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
@@ -125,6 +126,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 		"file_name":      retrieval.Name,
 		"file_mimetype":  retrieval.MimeType,
 		"file_extension": retrieval.Extension,
+		"file_size":      fmt.Sprintf("%d", retrieval.Size),
 	}))
 	if err != nil {
 		return err

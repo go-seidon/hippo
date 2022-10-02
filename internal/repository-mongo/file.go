@@ -86,6 +86,7 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 		Path      string `bson:"path"`
 		Mimetype  string `bson:"mimetype"`
 		Extension string `bson:"extension"`
+		Size      int64  `bson:"size"`
 	}{}
 	err := cl.FindOne(ctx, findFilter).Decode(&file)
 	if err != nil {
@@ -101,6 +102,7 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 		Path:      file.Path,
 		MimeType:  file.Mimetype,
 		Extension: file.Extension,
+		Size:      file.Size,
 	}
 	return res, nil
 }

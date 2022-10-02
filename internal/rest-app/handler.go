@@ -3,6 +3,7 @@ package rest_app
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -210,6 +211,10 @@ func NewRetrieveFileHandler(log logging.Logger, s serialization.Serializer, retr
 			w.Header().Del("Content-Type")
 		}
 
+		w.Header().Set("X-File-Name", r.Name)
+		w.Header().Set("X-File-Mimetype", r.MimeType)
+		w.Header().Set("X-File-Extension", r.Extension)
+		w.Header().Set("X-File-Size", fmt.Sprintf("%d", r.Size))
 		w.Write(data.Bytes())
 	}
 }
