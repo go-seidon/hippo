@@ -481,6 +481,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -506,6 +507,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -543,6 +545,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -597,6 +600,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -651,6 +655,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -711,6 +716,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -771,6 +777,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -831,6 +838,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
@@ -907,6 +915,7 @@ var _ = Describe("Handler Package", func() {
 					"file_name":      retRes.Name,
 					"file_mimetype":  retRes.MimeType,
 					"file_extension": retRes.Extension,
+					"file_size":      fmt.Sprintf("%d", retRes.Size),
 				})
 				stream.
 					EXPECT().
