@@ -5,8 +5,8 @@ import (
 
 	grpc "github.com/go-seidon/local/internal/grpc"
 	grpc_log "github.com/go-seidon/local/internal/grpc-log"
-	mock_grpclog "github.com/go-seidon/local/internal/grpc-log/mock"
 	grpc_test "github.com/go-seidon/local/internal/grpc-test"
+	mock_grpc "github.com/go-seidon/local/internal/grpc/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -18,7 +18,7 @@ var _ = Describe("Stream Package", func() {
 	Describe("Log Server Stream", func() {
 		var (
 			lss    grpc.ServerStream
-			ss     *mock_grpclog.MockServerStream
+			ss     *mock_grpc.MockServerStream
 			logger *mock_logging.MockLogger
 			msg    *grpc_test.TestData
 		)
@@ -26,7 +26,7 @@ var _ = Describe("Stream Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			ss = mock_grpclog.NewMockServerStream(ctrl)
+			ss = mock_grpc.NewMockServerStream(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			lss = grpc_log.NewLogServerStream(ss, logger)
 			msg = &grpc_test.TestData{}
