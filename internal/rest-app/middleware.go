@@ -61,7 +61,7 @@ func NewBasicAuthMiddleware(a auth.BasicAuth, s serialization.Serializer) func(h
 				)
 				return
 			}
-			if !res.TokenValid {
+			if !res.IsValid() {
 				Response(
 					WithWriterSerializer(w, s),
 					WithMessage("credential is invalid"),
