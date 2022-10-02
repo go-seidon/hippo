@@ -273,10 +273,7 @@ var _ = Describe("Basic Auth Package", func() {
 
 				res, err := basicAuth.CheckCredential(ctx, p)
 
-				expectedRes := &auth.CheckCredentialResult{
-					TokenValid: false,
-				}
-				Expect(res).To(Equal(expectedRes))
+				Expect(res.IsValid()).To(BeFalse())
 				Expect(err).To(BeNil())
 			})
 		})
@@ -303,10 +300,7 @@ var _ = Describe("Basic Auth Package", func() {
 
 				res, err := basicAuth.CheckCredential(ctx, p)
 
-				expectedRes := &auth.CheckCredentialResult{
-					TokenValid: false,
-				}
-				Expect(res).To(Equal(expectedRes))
+				Expect(res.IsValid()).To(BeFalse())
 				Expect(err).To(BeNil())
 			})
 		})
@@ -333,10 +327,7 @@ var _ = Describe("Basic Auth Package", func() {
 
 				res, err := basicAuth.CheckCredential(ctx, p)
 
-				expectedRes := &auth.CheckCredentialResult{
-					TokenValid: true,
-				}
-				Expect(res).To(Equal(expectedRes))
+				Expect(res.IsValid()).To(BeTrue())
 				Expect(err).To(BeNil())
 			})
 		})

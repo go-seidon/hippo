@@ -24,6 +24,10 @@ type CheckCredentialResult struct {
 	TokenValid bool
 }
 
+func (r *CheckCredentialResult) IsValid() bool {
+	return r.TokenValid
+}
+
 type ParseAuthTokenParam struct {
 	Token string
 }
