@@ -17,6 +17,7 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/serialization"
 	"github.com/go-seidon/local/internal/text"
+	"github.com/go-seidon/local/internal/validation"
 
 	"github.com/gorilla/mux"
 )
@@ -106,6 +107,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
+	validator := validation.NewGoValidator()
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
@@ -114,6 +116,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		Identifier:  identifier,
 		DirManager:  dirManager,
 		Locator:     locator,
+		Validator:   validator,
 		Config: &file.FileConfig{
 			UploadDir: p.Config.UploadDirectory,
 		},

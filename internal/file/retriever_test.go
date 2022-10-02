@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
+	mock_validation "github.com/go-seidon/local/internal/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,6 +29,7 @@ var _ = Describe("Retriever", func() {
 			fileRepo      *mock_repository.MockFileRepository
 			fileManager   *mock_filesystem.MockFileManager
 			log           *mock_logging.MockLogger
+			validator     *mock_validation.MockValidator
 			s             file.File
 			retrieveParam repository.RetrieveFileParam
 			retrieveRes   *repository.RetrieveFileResult
@@ -48,6 +50,7 @@ var _ = Describe("Retriever", func() {
 			identifier := mock_text.NewMockIdentifier(ctrl)
 			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
+			validator = mock_validation.NewMockValidator(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
@@ -55,6 +58,7 @@ var _ = Describe("Retriever", func() {
 				Identifier:  identifier,
 				Logger:      log,
 				Locator:     locator,
+				Validator:   validator,
 				Config: &file.FileConfig{
 					UploadDir: "temp",
 				},
@@ -93,18 +97,31 @@ var _ = Describe("Retriever", func() {
 				Times(1)
 		})
 
-		When("file id is not specified", func() {
+		When("parameter are not valid", func() {
 			It("should return error", func() {
 				p.FileId = ""
+
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(fmt.Errorf("invalid data")).
+					Times(1)
+
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid file id parameter")))
+				Expect(err).To(Equal(fmt.Errorf("invalid data")))
 			})
 		})
 
 		When("file record is not found", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -120,6 +137,12 @@ var _ = Describe("Retriever", func() {
 
 		When("failed find file record", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -135,6 +158,12 @@ var _ = Describe("Retriever", func() {
 
 		When("file is not available in disk", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -156,6 +185,12 @@ var _ = Describe("Retriever", func() {
 
 		When("failed open file in disk", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
@@ -177,6 +212,12 @@ var _ = Describe("Retriever", func() {
 
 		When("success retrieve file", func() {
 			It("should return result", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).

@@ -15,6 +15,8 @@ import (
 	"github.com/go-seidon/local/internal/repository"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
+	"github.com/go-seidon/local/internal/validation"
+	mock_validation "github.com/go-seidon/local/internal/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,6 +35,7 @@ var _ = Describe("Uploader", func() {
 			reader           *mock_io.MockReader
 			identifier       *mock_text.MockIdentifier
 			locator          *mock_file.MockUploadLocation
+			validator        *mock_validation.MockValidator
 			s                file.File
 			dirExistsParam   filesystem.IsDirectoryExistsParam
 			createDirParam   filesystem.CreateDirParam
@@ -51,6 +54,7 @@ var _ = Describe("Uploader", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
+			validator = mock_validation.NewMockValidator(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
 			s, _ = file.NewFile(file.NewFileParam{
 				FileRepo:    fileRepo,
@@ -59,6 +63,7 @@ var _ = Describe("Uploader", func() {
 				Logger:      logger,
 				Identifier:  identifier,
 				Locator:     locator,
+				Validator:   validator,
 				Config: &file.FileConfig{
 					UploadDir: "temp",
 				},
@@ -94,17 +99,44 @@ var _ = Describe("Uploader", func() {
 				Times(1)
 		})
 
-		When("file data is not specified", func() {
+		When("there are invalid data", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(validation.Error("invalid data")).
+					Times(1)
+
 				res, err := s.UploadFile(ctx)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("file is not specified")))
+				Expect(err).To(Equal(validation.Error("invalid data")))
+			})
+		})
+
+		When("file data is not specified", func() {
+			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
+				res, err := s.UploadFile(ctx)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(validation.Error("file is not specified")))
 			})
 		})
 
 		When("failed check directory existance", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -126,6 +158,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed create upload directory", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -152,6 +190,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed read from file reader", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -186,6 +230,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed generate file id", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -225,6 +275,12 @@ var _ = Describe("Uploader", func() {
 
 		When("failed create file", func() {
 			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -260,6 +316,12 @@ var _ = Describe("Uploader", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Any()).
+					Return(nil).
+					Times(1)
+
 				locator.
 					EXPECT().
 					GetLocation().
@@ -301,7 +363,6 @@ var _ = Describe("Uploader", func() {
 				Expect(err).To(BeNil())
 			})
 		})
-
 	})
 
 	Context("NewCreateFn function", Label("unit"), func() {

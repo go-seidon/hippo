@@ -3,7 +3,6 @@ package file
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/go-seidon/local/internal/filesystem"
 	"github.com/go-seidon/local/internal/repository"
@@ -13,8 +12,9 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 	s.log.Debug("In function: DeleteFile")
 	defer s.log.Debug("Returning function: DeleteFile")
 
-	if p.FileId == "" {
-		return nil, fmt.Errorf("invalid file id parameter")
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, err
 	}
 
 	delRes, err := s.fileRepo.DeleteFile(ctx, repository.DeleteFileParam{

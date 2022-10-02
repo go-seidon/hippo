@@ -17,6 +17,7 @@ import (
 	"github.com/go-seidon/local/internal/logging"
 	"github.com/go-seidon/local/internal/repository"
 	"github.com/go-seidon/local/internal/text"
+	"github.com/go-seidon/local/internal/validation"
 	"google.golang.org/grpc"
 )
 
@@ -99,6 +100,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	identifier := text.NewKsuid()
+	validator := validation.NewGoValidator()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 
 	fileService, err := file.NewFile(file.NewFileParam{
@@ -108,6 +110,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		Identifier:  identifier,
 		DirManager:  dirManager,
 		Locator:     locator,
+		Validator:   validator,
 		Config: &file.FileConfig{
 			UploadDir: p.Config.UploadDirectory,
 		},

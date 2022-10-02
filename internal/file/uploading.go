@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-seidon/local/internal/filesystem"
 	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/local/internal/validation"
 )
 
 func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, error) {
@@ -18,8 +19,13 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		opt(&p)
 	}
 
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, err
+	}
+
 	if p.fileData == nil && p.fileReader == nil {
-		return nil, fmt.Errorf("file is not specified")
+		return nil, validation.Error("file is not specified")
 	}
 
 	uploadDir := fmt.Sprintf("%s/%s", s.config.UploadDir, s.locator.GetLocation())

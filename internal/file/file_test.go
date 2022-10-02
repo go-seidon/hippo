@@ -10,6 +10,7 @@ import (
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	mock_repository "github.com/go-seidon/local/internal/repository/mock"
 	mock_text "github.com/go-seidon/local/internal/text/mock"
+	mock_validation "github.com/go-seidon/local/internal/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -30,6 +31,7 @@ var _ = Describe("File", func() {
 			logger      *mock_logging.MockLogger
 			identifier  *mock_text.MockIdentifier
 			locator     file.UploadLocation
+			validator   *mock_validation.MockValidator
 			config      *file.FileConfig
 			p           file.NewFileParam
 		)
@@ -43,6 +45,7 @@ var _ = Describe("File", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_text.NewMockIdentifier(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
+			validator = mock_validation.NewMockValidator(ctrl)
 			config = &file.FileConfig{
 				UploadDir: "/storage/",
 			}
@@ -53,6 +56,7 @@ var _ = Describe("File", func() {
 				Logger:      logger,
 				Identifier:  identifier,
 				Locator:     locator,
+				Validator:   validator,
 				Config:      config,
 			}
 		})
@@ -133,6 +137,16 @@ var _ = Describe("File", func() {
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("config is not specified")))
+			})
+		})
+
+		When("validator is not specified", func() {
+			It("should return error", func() {
+				p.Validator = nil
+				res, err := file.NewFile(p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("validator is not specified")))
 			})
 		})
 	})
