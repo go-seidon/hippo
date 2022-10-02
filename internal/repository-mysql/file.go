@@ -117,6 +117,7 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 		Path:      file.Path,
 		MimeType:  file.MimeType,
 		Extension: file.Extension,
+		Size:      file.Size,
 	}
 	return res, nil
 }

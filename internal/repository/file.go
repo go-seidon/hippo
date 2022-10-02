@@ -39,6 +39,7 @@ type RetrieveFileResult struct {
 	Path      string
 	MimeType  string
 	Extension string
+	Size      int64
 }
 
 type CreateFileParam struct {
