@@ -7,29 +7,29 @@
 No doc right now
 
 ## Todo
-1. Add basic auth `grpc-app` implementation
-- unary server
-- streaming server
-2. Add validation package & validation error handling
-3. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
+1. Add validation package & validation error handling
+2. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
 - remove upload WithData support or change the implementation
-4. Return file size on retrieving file
+3. Return file size on retrieving file
 - rest-app (http header)
 - grpc-app (stream header)
-5. Simplify factory function interface not returning error
-6. Change REST using OpenAPI specification & code generation (with API versioning)
-7. Move reusable package to provider package
-- config, context, datetime, encoding, filesystem, hashing
-- healthcheck, io, logging, serialization, text, validation
-8. Add gracefull shutdown
-9. Deploy dev, stg, prod (deployment script)
+4. Change REST using OpenAPI specification & code generation (with API versioning)
+5. Move reusable package to it's own package 
+- grpc
+- mux (rest)
+- database (mongo, mysql)
+- healthcheck
+- provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
+6. Add gracefull shutdown (rest & grpc app)
+7. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
-1. Upload location strategy
-2. Add repo: `repository-postgre`
-3. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
-4. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
-5. Separate unit test and integration test workflow (cqc.yml)
+1. Simplify factory function interface not returning error
+2. Upload location strategy
+3. Add repo: `repository-postgre`
+4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
+5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
+6. Separate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
 1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
