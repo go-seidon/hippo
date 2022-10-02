@@ -15,6 +15,9 @@ func (m Metadata) Get(key string) string {
 	if !ok {
 		return ""
 	}
+	if len(v) == 0 {
+		return ""
+	}
 	return v[0]
 }
 

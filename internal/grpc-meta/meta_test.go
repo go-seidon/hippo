@@ -18,7 +18,7 @@ func TestGrpcMeta(t *testing.T) {
 var _ = Describe("Metadata Package", func() {
 
 	Describe("Metadata type", func() {
-		Context("Get function", func() {
+		Context("Get function", Label("unit"), func() {
 			When("key exists", func() {
 				It("should return result", func() {
 					md := grpc_meta.Metadata{
@@ -52,23 +52,26 @@ var _ = Describe("Metadata Package", func() {
 		})
 	})
 
-	Context("ExtractIncoming function", func() {
+	Context("ExtractIncoming function", Label("unit"), func() {
 		When("metadata are available", func() {
 			It("should return result", func() {
-				ctx := context.Background()
-				md := metadata.NewIncomingContext(ctx, metadata.MD{
+				md := metadata.MD{
 					"key": []string{"value"},
-				})
+				}
+				ctx := metadata.NewIncomingContext(context.Background(), md)
 
 				res := grpc_meta.ExtractIncoming(ctx)
 
-				Expect(res).To(Equal(md))
+				expectRes := grpc_meta.Metadata{
+					"key": []string{"value"},
+				}
+				Expect(res).To(Equal(expectRes))
 			})
 		})
 
 		When("metadata are not available", func() {
 			It("should return result", func() {
-				md := metadata.MD{}
+				md := grpc_meta.Metadata(metadata.Pairs())
 				ctx := context.Background()
 
 				res := grpc_meta.ExtractIncoming(ctx)
@@ -78,23 +81,26 @@ var _ = Describe("Metadata Package", func() {
 		})
 	})
 
-	Context("ExtractOutgoing function", func() {
+	Context("ExtractOutgoing function", Label("unit"), func() {
 		When("metadata are available", func() {
 			It("should return result", func() {
-				ctx := context.Background()
-				md := metadata.NewOutgoingContext(ctx, metadata.MD{
+				md := metadata.MD{
 					"key": []string{"value"},
-				})
+				}
+				ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 				res := grpc_meta.ExtractOutgoing(ctx)
 
-				Expect(res).To(Equal(md))
+				expectRes := grpc_meta.Metadata{
+					"key": []string{"value"},
+				}
+				Expect(res).To(Equal(expectRes))
 			})
 		})
 
 		When("metadata are not available", func() {
 			It("should return result", func() {
-				md := metadata.MD{}
+				md := grpc_meta.Metadata(metadata.Pairs())
 				ctx := context.Background()
 
 				res := grpc_meta.ExtractOutgoing(ctx)
