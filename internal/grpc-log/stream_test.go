@@ -3,6 +3,7 @@ package grpc_log_test
 import (
 	"fmt"
 
+	grpc "github.com/go-seidon/local/internal/grpc"
 	grpc_log "github.com/go-seidon/local/internal/grpc-log"
 	mock_grpclog "github.com/go-seidon/local/internal/grpc-log/mock"
 	grpc_test "github.com/go-seidon/local/internal/grpc-test"
@@ -16,7 +17,7 @@ var _ = Describe("Stream Package", func() {
 
 	Describe("Log Server Stream", func() {
 		var (
-			lss    grpc_log.ServerStream
+			lss    grpc.ServerStream
 			ss     *mock_grpclog.MockServerStream
 			logger *mock_logging.MockLogger
 			msg    *grpc_test.TestData

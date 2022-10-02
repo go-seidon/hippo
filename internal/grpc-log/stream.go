@@ -1,22 +1,10 @@
 package grpc_log
 
 import (
-	"context"
-
 	"github.com/go-seidon/local/internal/logging"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 )
-
-type ServerStream interface {
-	SetHeader(metadata.MD) error
-	SendHeader(metadata.MD) error
-	SetTrailer(metadata.MD)
-	Context() context.Context
-	SendMsg(m interface{}) error
-	RecvMsg(m interface{}) error
-}
 
 type logServerStream struct {
 	grpc.ServerStream
