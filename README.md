@@ -3,25 +3,21 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 
-## Doc
-No doc right now
-
 ## Todo
-1. Add validation error handling
-2. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
+1. Stream instead of reading entire files to the memory (io.Copy) on `rest-app`
 - remove upload WithData support or change the implementation
-3. Return file size on retrieving file
+2. Return file size on retrieving file
 - rest-app (http header)
 - grpc-app (stream header)
-4. Change REST using OpenAPI specification & code generation (with API versioning)
-5. Move reusable package to it's own package 
+3. Change REST using OpenAPI specification & code generation (with API versioning)
+4. Move reusable package to it's own package 
 - grpc
 - mux (rest)
 - database (mongo, mysql)
 - healthcheck
 - provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
-6. Add gracefull shutdown (rest & grpc app)
-7. Deploy dev, stg, prod (deployment script)
+5. Add gracefull shutdown (rest & grpc app)
+6. Deploy dev, stg, prod (deployment script)
 
 ## Nice to have
 1. Simplify factory function interface not returning error
