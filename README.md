@@ -4,7 +4,9 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 
 ## Todo
-1. Change REST using OpenAPI specification & code generation (with API versioning)
+1. OpenAPI specification
+- change handler using generated code
+- change api versioning (/v1)
 2. Move reusable package to it's own package 
 - grpc
 - mux (rest)
@@ -13,6 +15,7 @@
 - provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
 3. Add gracefull shutdown (rest & grpc app)
 4. Deploy dev, stg, prod (deployment script)
+5. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the oapi-codegen `gorilla` support is released
 
 ## Nice to have
 1. Simplify factory function interface not returning error
