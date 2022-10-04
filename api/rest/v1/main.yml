@@ -1,0 +1,62 @@
+openapi: "3.0.0"
+info:
+  title: Go-Seidon Bucket Specification
+  version: 0.0.1-$REVISION
+  description: Bucket server for goseidon
+  contact:
+    name: Support
+    url: https://github.com/go-seidon/
+    email: raka.suryaardi@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:3000/
+    description: local
+    variables:
+      path:
+        enum:
+          - 'v1'
+        default: 'v1'
+        description: base path endpoint
+paths:
+  /health:
+    $ref: "./path/health.yml"
+  /file:
+    $ref: "./path/file.yml"
+  /file/{id}:
+    $ref: "./path/file_id.yml"
+components:
+  parameters:
+    objectId: 
+      $ref: "./parameter/object_id.yml"
+    correlationId: 
+      $ref: "./parameter/correlation_id.yml"
+  schemas:
+    ResponseBodyInfo:
+      $ref: "./schema/response_body_info.yml"
+
+    CheckHealthResponse:
+      $ref: "./operation/check-health/schema_response.yml"
+    CheckHealthData:
+      $ref: "./operation/check-health/schema_data.yml"
+    CheckHealthDetail:
+      $ref: "./operation/check-health/schema_detail.yml"
+
+    DeleteFileResponse:
+      $ref: "./operation/delete-file/schema_response.yml"
+    DeleteFileData:
+      $ref: "./operation/delete-file/schema_data.yml"
+
+    RetrieveFileResponse:
+      $ref: "./operation/retrieve-file/schema_response.yml"
+
+    UploadFileRequest:
+      $ref: "./operation/upload-file/schema_body.yml"
+    UploadFileResponse:
+      $ref: "./operation/upload-file/schema_response.yml"
+    UploadFileData:
+      $ref: "./operation/upload-file/schema_data.yml"
+  securitySchemes:
+    basicAuth:
+      $ref: "./security/basic.yml"

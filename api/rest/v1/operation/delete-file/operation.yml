@@ -1,0 +1,34 @@
+
+operationId: DeleteFileById
+summary: delete file object
+description: delete file object
+tags:
+  - file
+parameters:
+  - $ref: "./../../parameter/correlation_id.yml"
+  - $ref: "./../../parameter/object_id.yml"
+responses:
+  '200':
+    description: success delete file
+    content: 
+      application/json:
+        schema:
+          $ref: "./schema_response.yml"
+        examples:
+          'Success':
+            $ref: "./example_success.yml"
+  '400':
+    description: failed delete file
+    content: 
+      application/json:
+        schema:
+          $ref: "./../../schema/response_body_info.yml"
+        examples:
+          'General Error':
+            $ref: "./../../response/example_general_error.yml"
+          'Invalid Param':
+            $ref: "./../../response/example_invalid_param.yml"
+  '404':
+    $ref: "./../../response/not_found.yml"
+security:
+  - basicAuth: []
