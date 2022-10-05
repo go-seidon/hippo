@@ -136,9 +136,22 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	encoder := encoding.NewBase64Encoder()
 	hasher := hashing.NewBcryptHasher()
 
-	router := mux.NewRouter()
-	generalRouter := router.NewRoute().Subrouter()
-	fileRouter := router.NewRoute().Subrouter()
+	basicHandler := NewBasicHandler(BasicHandlerParam{
+		Logger:     p.Logger,
+		Serializer: serializer,
+		Config:     raCfg,
+	})
+	healthHandler := NewHealthHandler(HealthHandlerParam{
+		Logger:        p.Logger,
+		Serializer:    serializer,
+		HealthService: healthService,
+	})
+	fileHandler := NewFileHandler(FileHandlerParam{
+		Logger:      p.Logger,
+		Serializer:  serializer,
+		Config:      raCfg,
+		FileService: fileService,
+	})
 
 	RequestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
 		Logger: logger,
@@ -153,34 +166,23 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		return nil, err
 	}
 
+	router := mux.NewRouter()
+	generalRouter := router.NewRoute().Subrouter()
+	fileRouter := router.NewRoute().Subrouter()
+
 	router.Use(RequestLogMiddleware)
 	router.Use(NewDefaultMiddleware(DefaultMiddlewareParam{
 		CorrelationIdHeaderKey: "X-Correlation-Id",
 		CorrelationIdCtxKey:    CorrelationIdCtxKey,
 	}))
-	router.HandleFunc(
-		"/",
-		NewRootHandler(logger, serializer, raCfg),
-	)
-	generalRouter.HandleFunc(
-		"/health",
-		NewHealthCheckHandler(logger, serializer, healthService),
-	).Methods(http.MethodGet)
-	fileRouter.HandleFunc(
-		"/file/{id}",
-		NewDeleteFileHandler(logger, serializer, fileService),
-	).Methods(http.MethodDelete)
-	fileRouter.HandleFunc(
-		"/file/{id}",
-		NewRetrieveFileHandler(logger, serializer, fileService),
-	).Methods(http.MethodGet)
-	fileRouter.HandleFunc(
-		"/file",
-		NewUploadFileHandler(logger, serializer, fileService, raCfg),
-	).Methods(http.MethodPost)
+	router.HandleFunc("/", basicHandler.GetAppInfo)
+	router.NotFoundHandler = http.HandlerFunc(basicHandler.GetAppInfo)
+	router.MethodNotAllowedHandler = http.HandlerFunc(basicHandler.MethodNotAllowed)
 
-	router.NotFoundHandler = NewNotFoundHandler(logger, serializer)
-	router.MethodNotAllowedHandler = NewMethodNotAllowedHandler(logger, serializer)
+	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(http.MethodGet)
+	fileRouter.HandleFunc("/file/{id}", fileHandler.DeleteFileById).Methods(http.MethodDelete)
+	fileRouter.HandleFunc("/file/{id}", fileHandler.RetrieveFileById).Methods(http.MethodGet)
+	fileRouter.HandleFunc("/file", fileHandler.UploadFile).Methods(http.MethodPost)
 
 	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
 		Encoder:  encoder,
