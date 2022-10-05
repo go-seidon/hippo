@@ -1,0 +1,23 @@
+type: object
+required:
+- id
+- name
+- mimetype
+- extension
+- size
+- uploaded_at
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  mimetype:
+    type: string
+  extension:
+    type: string
+  size:
+    type: integer
+    format: int64
+  uploaded_at:
+    type: integer
+    format: int64

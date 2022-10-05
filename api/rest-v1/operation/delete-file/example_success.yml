@@ -1,0 +1,5 @@
+value:
+  code: 1000
+  message: success delete file
+  data:
+    deleted_at: 1664803257299

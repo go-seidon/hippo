@@ -10,10 +10,9 @@ import (
 	"net/http/httptest"
 	"time"
 
+	rest_v1 "github.com/go-seidon/local/generated/rest-v1"
 	"github.com/go-seidon/local/internal/file"
 	mock_file "github.com/go-seidon/local/internal/file/mock"
-	"github.com/go-seidon/local/internal/healthcheck"
-	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
 	mock_io "github.com/go-seidon/local/internal/io/mock"
 	mock_logging "github.com/go-seidon/local/internal/logging/mock"
 	rest_app "github.com/go-seidon/local/internal/rest-app"
@@ -27,316 +26,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Handler Package", func() {
+var _ = Describe("File Handler", func() {
 
-	Context("NotFoundHandler", Label("unit"), func() {
-		var (
-			handler    http.HandlerFunc
-			r          *http.Request
-			w          *mock_restapp.MockResponseWriter
-			log        *mock_logging.MockLogger
-			serializer *mock_serialization.MockSerializer
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			r = &http.Request{}
-			ctrl := gomock.NewController(t)
-			w = mock_restapp.NewMockResponseWriter(ctrl)
-			log = mock_logging.NewMockLogger(ctrl)
-			serializer = mock_serialization.NewMockSerializer(ctrl)
-			handler = rest_app.NewNotFoundHandler(log, serializer)
-		})
-
-		When("success call the function", func() {
-			It("should write response", func() {
-
-				b := rest_app.ResponseBody{
-					Code:    1004,
-					Message: "resource not found",
-				}
-
-				serializer.
-					EXPECT().
-					Marshal(b).
-					Return([]byte{}, nil).
-					Times(1)
-
-				w.
-					EXPECT().
-					Header().
-					Return(http.Header{}).
-					Times(1)
-
-				w.
-					EXPECT().
-					WriteHeader(http.StatusNotFound).
-					Times(1)
-
-				w.
-					EXPECT().
-					Write([]byte{}).
-					Times(1)
-
-				handler.ServeHTTP(w, r)
-			})
-		})
-	})
-
-	Context("MethodNowAllowedHandler", Label("unit"), func() {
-		var (
-			handler    http.HandlerFunc
-			r          *http.Request
-			w          *mock_restapp.MockResponseWriter
-			log        *mock_logging.MockLogger
-			serializer *mock_serialization.MockSerializer
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			r = &http.Request{}
-			ctrl := gomock.NewController(t)
-			w = mock_restapp.NewMockResponseWriter(ctrl)
-			log = mock_logging.NewMockLogger(ctrl)
-			serializer = mock_serialization.NewMockSerializer(ctrl)
-			handler = rest_app.NewMethodNotAllowedHandler(log, serializer)
-		})
-
-		When("success call the function", func() {
-			It("should write response", func() {
-
-				b := rest_app.ResponseBody{
-					Code:    1001,
-					Message: "method is not allowed",
-				}
-
-				serializer.
-					EXPECT().
-					Marshal(b).
-					Return([]byte{}, nil).
-					Times(1)
-
-				w.
-					EXPECT().
-					Header().
-					Return(http.Header{}).
-					Times(1)
-
-				w.
-					EXPECT().
-					WriteHeader(http.StatusMethodNotAllowed).
-					Times(1)
-
-				w.
-					EXPECT().
-					Write([]byte{}).
-					Times(1)
-
-				handler.ServeHTTP(w, r)
-			})
-		})
-	})
-
-	Context("RootHandler", Label("unit"), func() {
-		var (
-			handler    http.HandlerFunc
-			r          *http.Request
-			w          *mock_restapp.MockResponseWriter
-			log        *mock_logging.MockLogger
-			serializer *mock_serialization.MockSerializer
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			r = &http.Request{}
-			ctrl := gomock.NewController(t)
-			w = mock_restapp.NewMockResponseWriter(ctrl)
-			log = mock_logging.NewMockLogger(ctrl)
-			serializer = mock_serialization.NewMockSerializer(ctrl)
-			cfg := &rest_app.RestAppConfig{
-				AppName:    "mock-name",
-				AppVersion: "mock-version",
-			}
-			handler = rest_app.NewRootHandler(log, serializer, cfg)
-		})
-
-		When("success call the function", func() {
-			It("should write response", func() {
-
-				b := rest_app.ResponseBody{
-					Code:    1000,
-					Message: "success",
-					Data: struct {
-						AppName    string `json:"app_name"`
-						AppVersion string `json:"app_version"`
-					}{
-						AppName:    "mock-name",
-						AppVersion: "mock-version",
-					},
-				}
-
-				serializer.
-					EXPECT().
-					Marshal(b).
-					Return([]byte{}, nil).
-					Times(1)
-
-				w.
-					EXPECT().
-					WriteHeader(gomock.Eq(200))
-
-				w.
-					EXPECT().
-					Write([]byte{}).
-					Times(1)
-
-				handler.ServeHTTP(w, r)
-			})
-		})
-	})
-
-	Context("HealthCheckHandler", Label("unit"), func() {
-		var (
-			handler       http.HandlerFunc
-			r             *http.Request
-			w             *mock_restapp.MockResponseWriter
-			log           *mock_logging.MockLogger
-			serializer    *mock_serialization.MockSerializer
-			healthService *mock_healthcheck.MockHealthCheck
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			r = &http.Request{}
-			ctrl := gomock.NewController(t)
-			w = mock_restapp.NewMockResponseWriter(ctrl)
-			log = mock_logging.NewMockLogger(ctrl)
-			serializer = mock_serialization.NewMockSerializer(ctrl)
-			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
-			handler = rest_app.NewHealthCheckHandler(log, serializer, healthService)
-		})
-
-		When("failed check service health", func() {
-			It("should write response", func() {
-
-				err := fmt.Errorf("failed check health")
-
-				b := rest_app.ResponseBody{
-					Code:    1001,
-					Message: err.Error(),
-				}
-
-				healthService.
-					EXPECT().
-					Check().
-					Return(nil, err).
-					Times(1)
-
-				serializer.
-					EXPECT().
-					Marshal(b).
-					Return([]byte{}, nil).
-					Times(1)
-
-				w.
-					EXPECT().
-					WriteHeader(gomock.Eq(400)).
-					Times(1)
-
-				w.
-					EXPECT().
-					Write([]byte{}).
-					Times(1)
-
-				handler.ServeHTTP(w, r)
-			})
-		})
-
-		When("success check service health", func() {
-			It("should write response", func() {
-
-				currentTimestamp := time.Now()
-				res := &healthcheck.CheckResult{
-					Status: "WARNING",
-					Items: map[string]healthcheck.CheckResultItem{
-						"app-disk": {
-							Name:      "app-disk",
-							Status:    "FAILED",
-							Error:     "Critical: disk usage too high 96.71 percent",
-							CheckedAt: currentTimestamp,
-						},
-						"internet-connection": {
-							Name:      "internet-connection",
-							Status:    "OK",
-							Error:     "",
-							CheckedAt: currentTimestamp,
-						},
-					},
-				}
-				jobs := map[string]struct {
-					Name      string `json:"name"`
-					Status    string `json:"status"`
-					CheckedAt int64  `json:"checked_at"`
-					Error     string `json:"error"`
-				}{
-					"app-disk": {
-						Name:      "app-disk",
-						Status:    "FAILED",
-						Error:     "Critical: disk usage too high 96.71 percent",
-						CheckedAt: currentTimestamp.UnixMilli(),
-					},
-					"internet-connection": {
-						Name:      "internet-connection",
-						Status:    "OK",
-						Error:     "",
-						CheckedAt: currentTimestamp.UnixMilli(),
-					},
-				}
-
-				b := rest_app.ResponseBody{
-					Data: struct {
-						Status  string `json:"status"`
-						Details map[string]struct {
-							Name      string `json:"name"`
-							Status    string `json:"status"`
-							CheckedAt int64  `json:"checked_at"`
-							Error     string `json:"error"`
-						} `json:"details"`
-					}{
-						Status:  "WARNING",
-						Details: jobs,
-					},
-					Code:    1000,
-					Message: "success check service health",
-				}
-
-				healthService.
-					EXPECT().
-					Check().
-					Return(res, nil).
-					Times(1)
-
-				serializer.
-					EXPECT().
-					Marshal(b).
-					Return([]byte{}, nil).
-					Times(1)
-
-				w.
-					EXPECT().
-					WriteHeader(gomock.Eq(200))
-
-				w.
-					EXPECT().
-					Write([]byte{}).
-					Times(1)
-
-				handler.ServeHTTP(w, r)
-			})
-		})
-	})
-
-	Context("NewDeleteFileHandler", Label("unit"), func() {
+	Context("DeleteFile Handler", Label("unit"), func() {
 		var (
 			handler     http.HandlerFunc
 			r           *http.Request
@@ -357,7 +49,13 @@ var _ = Describe("Handler Package", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			fileService = mock_file.NewMockFile(ctrl)
-			handler = rest_app.NewDeleteFileHandler(log, serializer, fileService)
+			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+				Logger:      log,
+				Serializer:  serializer,
+				Config:      &rest_app.RestAppConfig{},
+				FileService: fileService,
+			})
+			handler = fileHandler.DeleteFileById
 			p = file.DeleteFileParam{
 				FileId: "mock-file-id",
 			}
@@ -479,9 +177,7 @@ var _ = Describe("Handler Package", func() {
 				b := rest_app.ResponseBody{
 					Code:    1000,
 					Message: "success delete file",
-					Data: struct {
-						DeletedAt int64 `json:"deleted_at"`
-					}{
+					Data: &rest_v1.DeleteFileData{
 						DeletedAt: res.DeletedAt.UnixMilli(),
 					},
 				}
@@ -513,7 +209,7 @@ var _ = Describe("Handler Package", func() {
 		})
 	})
 
-	Context("NewRetrieveFileHandler", Label("unit"), func() {
+	Context("RetrieveFile Handler", Label("unit"), func() {
 		var (
 			handler     http.HandlerFunc
 			r           *http.Request
@@ -536,7 +232,13 @@ var _ = Describe("Handler Package", func() {
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			fileService = mock_file.NewMockFile(ctrl)
 			fileData = mock_io.NewMockReadCloser(ctrl)
-			handler = rest_app.NewRetrieveFileHandler(log, serializer, fileService)
+			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+				Logger:      log,
+				Serializer:  serializer,
+				Config:      &rest_app.RestAppConfig{},
+				FileService: fileService,
+			})
+			handler = fileHandler.RetrieveFileById
 			p = file.RetrieveFileParam{
 				FileId: "mock-file-id",
 			}
@@ -790,7 +492,7 @@ var _ = Describe("Handler Package", func() {
 		})
 	})
 
-	Context("NewUploadFileHandler", Label("integration"), Ordered, func() {
+	Context("UploadFile Handler", Label("integration"), Ordered, func() {
 		var (
 			currentTimestamp time.Time
 			ctx              context.Context
@@ -824,11 +526,13 @@ var _ = Describe("Handler Package", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = serialization.NewJsonSerializer()
 			uploadService = mock_file.NewMockFile(ctrl)
-			cfg := &rest_app.RestAppConfig{}
-			handler = rest_app.NewUploadFileHandler(
-				log, serializer,
-				uploadService, cfg,
-			)
+			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+				Logger:      log,
+				Serializer:  serializer,
+				Config:      &rest_app.RestAppConfig{},
+				FileService: uploadService,
+			})
+			handler = fileHandler.UploadFile
 		})
 
 		When("failed parse form file", func() {
@@ -919,8 +623,8 @@ var _ = Describe("Handler Package", func() {
 				data := map[string]interface{}{
 					"id":          uploadRes.UniqueId,
 					"name":        uploadRes.Name,
-					"mimetype":    uploadRes.Mimetype,
 					"extension":   uploadRes.Extension,
+					"mimetype":    uploadRes.Mimetype,
 					"size":        float64(200),
 					"uploaded_at": float64(uploadRes.UploadedAt.UnixMilli()),
 				}
