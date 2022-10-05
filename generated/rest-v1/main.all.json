@@ -1,0 +1,640 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Go-Seidon Bucket Specification",
+    "version": "0.0.1-$REVISION",
+    "description": "Bucket server for goseidon",
+    "contact": {
+      "name": "Support",
+      "url": "https://github.com/go-seidon/",
+      "email": "raka.suryaardi@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/",
+      "description": "local",
+      "variables": {
+        "path": {
+          "enum": [
+            "v1"
+          ],
+          "default": "v1",
+          "description": "base path endpoint"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "CheckHealth",
+        "summary": "check service health",
+        "description": "check service health",
+        "tags": [
+          "healthcheck"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/correlationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success check service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckHealthResponse"
+                },
+                "examples": {
+                  "All Good": {
+                    "value": {
+                      "code": 1000,
+                      "message": "success check service health",
+                      "data": {
+                        "status": "OK",
+                        "details": {
+                          "app-disk": {
+                            "name": "app-disk",
+                            "status": "OK",
+                            "checked_at": 1664803257299,
+                            "error": ""
+                          },
+                          "internet-connection": {
+                            "name": "internet-connection",
+                            "status": "OK",
+                            "checked_at": 1664803257299,
+                            "error": ""
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "Some Failed": {
+                    "value": {
+                      "code": 1000,
+                      "message": "success check service health",
+                      "data": {
+                        "status": "WARNING",
+                        "details": {
+                          "app-disk": {
+                            "name": "app-disk",
+                            "status": "FAILED",
+                            "checked_at": 1664803257299,
+                            "error": "Critical: disk usage too high 62.32 percent"
+                          },
+                          "internet-connection": {
+                            "name": "internet-connection",
+                            "status": "OK",
+                            "checked_at": 1664803257299,
+                            "error": ""
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "All Failed": {
+                    "value": {
+                      "code": 1000,
+                      "message": "success check service health",
+                      "data": {
+                        "status": "FAILED",
+                        "details": {
+                          "app-disk": {
+                            "name": "app-disk",
+                            "status": "FAILED",
+                            "checked_at": 1664803257299,
+                            "error": "Critical: disk usage too high 62.32 percent"
+                          },
+                          "internet-connection": {
+                            "name": "internet-connection",
+                            "status": "FAILED",
+                            "checked_at": 1664803257299,
+                            "error": "Cannot ping google.com"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "action failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodyInfo"
+                },
+                "examples": {
+                  "Bad Request": {
+                    "$ref": "#/paths/~1file/post/responses/400/content/application~1json/examples/General%20Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/file": {
+      "post": {
+        "operationId": "UploadFile",
+        "summary": "upload file object",
+        "description": "upload file object",
+        "tags": [
+          "file"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/correlationId"
+          }
+        ],
+        "requestBody": {
+          "description": "file to be uploaded",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFileRequest"
+              },
+              "examples": {
+                "file": {
+                  "summary": "file object",
+                  "externalValue": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success upload file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadFileResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "value": {
+                      "code": 1000,
+                      "message": "success upload file",
+                      "data": {
+                        "id": "2FfnA2ifBQDT5bMFRCvcdnIhVmg",
+                        "name": "soccer-1",
+                        "mimetype": "image/jpeg",
+                        "extension": "jpg",
+                        "size": 41658,
+                        "uploaded_at": 1664891858856
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "failed upload file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodyInfo"
+                },
+                "examples": {
+                  "General Error": {
+                    "value": {
+                      "code": 1001,
+                      "message": "database error"
+                    }
+                  },
+                  "Invalid Param": {
+                    "value": {
+                      "code": 1002,
+                      "message": "property must be at least 5 characters in length"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/file/{id}": {
+      "get": {
+        "operationId": "RetrieveFileById",
+        "summary": "retrieve file object",
+        "description": "retrieve file object",
+        "tags": [
+          "file"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/correlationId"
+          },
+          {
+            "$ref": "#/components/parameters/objectId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success retrieve file",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveFileResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-File-Name": {
+                "schema": {
+                  "type": "string",
+                  "description": "file name",
+                  "example": "dolphin"
+                }
+              },
+              "X-File-Extension": {
+                "schema": {
+                  "type": "string",
+                  "description": "file extension",
+                  "example": "jpg"
+                }
+              },
+              "X-File-Mimetype": {
+                "schema": {
+                  "type": "string",
+                  "description": "file mimetype",
+                  "example": "image/jpeg"
+                }
+              },
+              "X-File-Size": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "file size",
+                  "example": 18934
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "failed retrieve file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodyInfo"
+                },
+                "examples": {
+                  "General Error": {
+                    "$ref": "#/paths/~1file/post/responses/400/content/application~1json/examples/General%20Error"
+                  },
+                  "Invalid Param": {
+                    "$ref": "#/paths/~1file/post/responses/400/content/application~1json/examples/Invalid%20Param"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "Not Found": {
+                    "value": {
+                      "code": 1004,
+                      "message": "not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteFileById",
+        "summary": "delete file object",
+        "description": "delete file object",
+        "tags": [
+          "file"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/correlationId"
+          },
+          {
+            "$ref": "#/components/parameters/objectId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success delete file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFileResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "value": {
+                      "code": 1000,
+                      "message": "success delete file",
+                      "data": {
+                        "deleted_at": 1664803257299
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "failed delete file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodyInfo"
+                },
+                "examples": {
+                  "General Error": {
+                    "$ref": "#/paths/~1file/post/responses/400/content/application~1json/examples/General%20Error"
+                  },
+                  "Invalid Param": {
+                    "$ref": "#/paths/~1file/post/responses/400/content/application~1json/examples/Invalid%20Param"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodyInfo"
+                },
+                "examples": {
+                  "Not Found": {
+                    "$ref": "#/paths/~1file~1%7Bid%7D/get/responses/404/content/application~1json/examples/Not%20Found"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "objectId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "object id",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "correlationId": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "required": false,
+        "description": "correlation id for tracing purposes",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "ResponseBodyInfo": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "CheckHealthResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CheckHealthData"
+          }
+        }
+      },
+      "CheckHealthData": {
+        "type": "object",
+        "required": [
+          "status",
+          "details"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CheckHealthDetail"
+            }
+          }
+        }
+      },
+      "CheckHealthDetail": {
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "checked_at",
+          "error"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "checked_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteFileResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeleteFileData"
+          }
+        }
+      },
+      "DeleteFileData": {
+        "type": "object",
+        "required": [
+          "deleted_at"
+        ],
+        "properties": {
+          "deleted_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RetrieveFileResponse": {
+        "type": "string",
+        "format": "binary"
+      },
+      "UploadFileRequest": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "UploadFileResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UploadFileData"
+          }
+        }
+      },
+      "UploadFileData": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "mimetype",
+          "extension",
+          "size",
+          "uploaded_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "extension": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uploaded_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
+

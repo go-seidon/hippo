@@ -85,18 +85,18 @@ generate-mock:
 
 .PHONY: generate-swagger
 generate-swagger:
-	swagger-cli bundle api/rest/v1/main.yml --type yaml > generated/rest/v1/main.all.yml
+	swagger-cli bundle api/rest-v1/main.yml --type yaml > generated/rest-v1/main.all.yml
 
 .PHONY: verify-swagger
 verify-swagger:
-	swagger-cli bundle api/rest/v1/main.yml --type json > generated/rest/v1/main.all.json
-	swagger-cli validate generated/rest/v1/main.all.json 
+	swagger-cli bundle api/rest-v1/main.yml --type json > generated/rest-v1/main.all.json
+	swagger-cli validate generated/rest-v1/main.all.json 
 
 .PHONY: generate-oapi
 generate-oapi:
 	make generate-swagger
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest/v1/type.gen.yaml generated/rest/v1/main.all.yml
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest/v1/server.gen.yaml generated/rest/v1/main.all.yml
+	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/type.gen.yaml generated/rest-v1/main.all.yml
+	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/server.gen.yaml generated/rest-v1/main.all.yml
 # todo: update script once the oapi-codegen gorilla support is released
 # oapi-codegen -old-config-style -config api/rest/v1/codegen.yaml api/rest/v1/main.all.yml
 
