@@ -83,22 +83,23 @@ generate-mock:
 	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
 	mockgen -package=mock_validation -source internal/validation/validator.go -destination=internal/validation/mock/validator_mock.go
 
-.PHONY: generate-swagger
-generate-swagger:
-	swagger-cli bundle api/rest-v1/main.yml --type yaml > generated/rest-v1/main.all.yml
-
 .PHONY: verify-swagger
 verify-swagger:
 	swagger-cli bundle api/rest-v1/main.yml --type json > generated/rest-v1/main.all.json
 	swagger-cli validate generated/rest-v1/main.all.json 
 
+.PHONY: generate-swagger
+generate-swagger:
+	swagger-cli bundle api/rest-v1/main.yml --type yaml > generated/rest-v1/main.all.yml
+
 .PHONY: generate-oapi
 generate-oapi:
 	make generate-swagger
+	make generate-oapi-type
+
+.PHONY: generate-oapi-type
+generate-oapi-type:
 	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/type.gen.yaml generated/rest-v1/main.all.yml
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/server.gen.yaml generated/rest-v1/main.all.yml
-# todo: update script once the oapi-codegen gorilla support is released
-# oapi-codegen -old-config-style -config api/rest/v1/codegen.yaml api/rest/v1/main.all.yml
 
 .PHONY: run-grpc-app
 run-grpc-app:
