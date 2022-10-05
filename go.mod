@@ -25,10 +25,11 @@ require (
 )
 
 require (
-	github.com/deepmap/oapi-codegen v1.11.1-0.20221003111356-96482c12b2bc
+	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
