@@ -5,7 +5,7 @@
 
 ## Todo
 1. Change GRPC foldering
-2. Add ctx.Context to healthcheck
+2. Add `ctx.Context` to healthcheck
 3. Move reusable package to it's own package 
 - grpc
 - mux (rest)
