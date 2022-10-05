@@ -11,20 +11,16 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: http://localhost:3000/{path}
+  - url: http://localhost:3000/
     description: local
-    variables:
-      path:
-        enum:
-          - 'v1'
-        default: 'v1'
-        description: base path endpoint
 paths:
-  /health:
+  /:
+    $ref: "./path/info.yml"
+  /v1/health:
     $ref: "./path/health.yml"
-  /file:
+  /v1/file:
     $ref: "./path/file.yml"
-  /file/{id}:
+  /v1/file/{id}:
     $ref: "./path/file_id.yml"
 components:
   parameters:
@@ -35,6 +31,11 @@ components:
   schemas:
     ResponseBodyInfo:
       $ref: "./schema/response_body_info.yml"
+
+    GetAppInfoResponse:
+      $ref: "./operation/get-app-info/schema_response.yml"
+    GetAppInfoData:
+      $ref: "./operation/get-app-info/schema_data.yml"
 
     CheckHealthResponse:
       $ref: "./operation/check-health/schema_response.yml"

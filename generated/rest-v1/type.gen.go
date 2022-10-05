@@ -44,6 +44,19 @@ type DeleteFileResponse struct {
 	Message string         `json:"message"`
 }
 
+// GetAppInfoData defines model for GetAppInfoData.
+type GetAppInfoData struct {
+	AppName    string `json:"app_name"`
+	AppVersion string `json:"app_version"`
+}
+
+// GetAppInfoResponse defines model for GetAppInfoResponse.
+type GetAppInfoResponse struct {
+	Code    int32          `json:"code"`
+	Data    GetAppInfoData `json:"data"`
+	Message string         `json:"message"`
+}
+
 // ResponseBodyInfo defines model for ResponseBodyInfo.
 type ResponseBodyInfo struct {
 	Code    int32  `json:"code"`
@@ -80,6 +93,12 @@ type CorrelationId = string
 
 // ObjectId defines model for objectId.
 type ObjectId = string
+
+// GetAppInfoParams defines parameters for GetAppInfo.
+type GetAppInfoParams struct {
+	// XCorrelationId correlation id for tracing purposes
+	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
+}
 
 // UploadFileParams defines parameters for UploadFile.
 type UploadFileParams struct {
