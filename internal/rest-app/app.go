@@ -180,9 +180,9 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	router.MethodNotAllowedHandler = http.HandlerFunc(basicHandler.MethodNotAllowed)
 
 	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(http.MethodGet)
-	fileRouter.HandleFunc("/file/{id}", fileHandler.DeleteFileById).Methods(http.MethodDelete)
-	fileRouter.HandleFunc("/file/{id}", fileHandler.RetrieveFileById).Methods(http.MethodGet)
-	fileRouter.HandleFunc("/file", fileHandler.UploadFile).Methods(http.MethodPost)
+	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.DeleteFileById).Methods(http.MethodDelete)
+	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.RetrieveFileById).Methods(http.MethodGet)
+	fileRouter.HandleFunc("/v1/file", fileHandler.UploadFile).Methods(http.MethodPost)
 
 	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
 		Encoder:  encoder,

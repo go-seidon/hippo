@@ -100,6 +100,12 @@ type GetAppInfoParams struct {
 	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
 }
 
+// CheckHealthParams defines parameters for CheckHealth.
+type CheckHealthParams struct {
+	// XCorrelationId correlation id for tracing purposes
+	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
+}
+
 // UploadFileParams defines parameters for UploadFile.
 type UploadFileParams struct {
 	// XCorrelationId correlation id for tracing purposes
@@ -114,12 +120,6 @@ type DeleteFileByIdParams struct {
 
 // RetrieveFileByIdParams defines parameters for RetrieveFileById.
 type RetrieveFileByIdParams struct {
-	// XCorrelationId correlation id for tracing purposes
-	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
-}
-
-// CheckHealthParams defines parameters for CheckHealth.
-type CheckHealthParams struct {
 	// XCorrelationId correlation id for tracing purposes
 	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
 }

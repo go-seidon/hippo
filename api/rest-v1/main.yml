@@ -16,7 +16,7 @@ servers:
 paths:
   /:
     $ref: "./path/info.yml"
-  /v1/health:
+  /health:
     $ref: "./path/health.yml"
   /v1/file:
     $ref: "./path/file.yml"
