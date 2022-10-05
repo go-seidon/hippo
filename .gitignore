@@ -12,5 +12,5 @@ temp/*
 storage/*
 
 # open api
-generated/rest/**/main.all.yml
-generated/rest/**/main.all.json
+generated/rest-v1/main.all.yml
+generated/rest-v1/main.all.json
