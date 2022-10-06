@@ -5,6 +5,7 @@
 package mock_healthcheck
 
 import (
+	context "context"
 	reflect "reflect"
 
 	healthcheck "github.com/go-seidon/local/internal/healthcheck"
@@ -35,46 +36,46 @@ func (m *MockHealthCheck) EXPECT() *MockHealthCheckMockRecorder {
 }
 
 // Check mocks base method.
-func (m *MockHealthCheck) Check() (*healthcheck.CheckResult, error) {
+func (m *MockHealthCheck) Check(ctx context.Context) (*healthcheck.CheckResult, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Check")
+	ret := m.ctrl.Call(m, "Check", ctx)
 	ret0, _ := ret[0].(*healthcheck.CheckResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Check indicates an expected call of Check.
-func (mr *MockHealthCheckMockRecorder) Check() *gomock.Call {
+func (mr *MockHealthCheckMockRecorder) Check(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Check", reflect.TypeOf((*MockHealthCheck)(nil).Check))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Check", reflect.TypeOf((*MockHealthCheck)(nil).Check), ctx)
 }
 
 // Start mocks base method.
-func (m *MockHealthCheck) Start() error {
+func (m *MockHealthCheck) Start(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Start")
+	ret := m.ctrl.Call(m, "Start", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Start indicates an expected call of Start.
-func (mr *MockHealthCheckMockRecorder) Start() *gomock.Call {
+func (mr *MockHealthCheckMockRecorder) Start(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockHealthCheck)(nil).Start))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockHealthCheck)(nil).Start), ctx)
 }
 
 // Stop mocks base method.
-func (m *MockHealthCheck) Stop() error {
+func (m *MockHealthCheck) Stop(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Stop")
+	ret := m.ctrl.Call(m, "Stop", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Stop indicates an expected call of Stop.
-func (mr *MockHealthCheckMockRecorder) Stop() *gomock.Call {
+func (mr *MockHealthCheckMockRecorder) Stop(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockHealthCheck)(nil).Stop))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockHealthCheck)(nil).Stop), ctx)
 }
 
 // MockChecker is a mock of Checker interface.

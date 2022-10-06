@@ -202,7 +202,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Start().
+					Start(gomock.Eq(ctx)).
 					Return(fmt.Errorf("healthcheck error")).
 					Times(1)
 
@@ -221,7 +221,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Start().
+					Start(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -246,7 +246,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Start().
+					Start(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -282,7 +282,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Start().
+					Start(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -349,7 +349,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Stop().
+					Stop(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -374,7 +374,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Stop().
+					Stop(gomock.Eq(ctx)).
 					Return(nil).
 					Times(1)
 
@@ -399,7 +399,7 @@ var _ = Describe("App Package", func() {
 
 				healthService.
 					EXPECT().
-					Stop().
+					Stop(gomock.Eq(ctx)).
 					Return(fmt.Errorf("routine error")).
 					Times(1)
 

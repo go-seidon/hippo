@@ -1,6 +1,7 @@
 package healthcheck_test
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -82,12 +83,14 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Start function", Label("unit"), func() {
 		var (
+			ctx    context.Context
 			client *mock_healthcheck.MockHealthClient
 			s      healthcheck.HealthCheck
 			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
+			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			client = mock_healthcheck.NewMockHealthClient(ctrl)
@@ -114,7 +117,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(fmt.Errorf("failed add checkers")).
 					Times(1)
 
-				err := s.Start()
+				err := s.Start(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("failed add checkers")))
 			})
@@ -134,7 +137,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(fmt.Errorf("failed start app")).
 					Times(1)
 
-				err := s.Start()
+				err := s.Start(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("failed start app")))
 			})
@@ -154,7 +157,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(nil).
 					Times(1)
 
-				err := s.Start()
+				err := s.Start(ctx)
 
 				Expect(err).To(BeNil())
 			})
@@ -174,8 +177,8 @@ var _ = Describe("Go Health Check", func() {
 					Return(nil).
 					Times(1)
 
-				err1 := s.Start()
-				err2 := s.Start()
+				err1 := s.Start(ctx)
+				err2 := s.Start(ctx)
 
 				Expect(err1).To(BeNil())
 				Expect(err2).To(BeNil())
@@ -185,12 +188,14 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Stop function", Label("unit"), func() {
 		var (
+			ctx    context.Context
 			client *mock_healthcheck.MockHealthClient
 			s      healthcheck.HealthCheck
 			logger *mock_logging.MockLogger
 		)
 
 		BeforeEach(func() {
+			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			client = mock_healthcheck.NewMockHealthClient(ctrl)
@@ -217,7 +222,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(fmt.Errorf("failed stop app")).
 					Times(1)
 
-				err := s.Stop()
+				err := s.Stop(ctx)
 
 				Expect(err).To(Equal(fmt.Errorf("failed stop app")))
 			})
@@ -231,7 +236,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(nil).
 					Times(1)
 
-				err := s.Stop()
+				err := s.Stop(ctx)
 
 				Expect(err).To(BeNil())
 			})
@@ -240,6 +245,7 @@ var _ = Describe("Go Health Check", func() {
 
 	Context("Check function", Label("unit"), func() {
 		var (
+			ctx              context.Context
 			client           *mock_healthcheck.MockHealthClient
 			s                healthcheck.HealthCheck
 			currentTimestamp time.Time
@@ -247,6 +253,7 @@ var _ = Describe("Go Health Check", func() {
 		)
 
 		BeforeEach(func() {
+			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			client = mock_healthcheck.NewMockHealthClient(ctrl)
@@ -274,7 +281,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(nil, true, fmt.Errorf("network error")).
 					Times(1)
 
-				res, err := s.Check()
+				res, err := s.Check(ctx)
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("network error")))
@@ -289,7 +296,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(nil, true, nil).
 					Times(1)
 
-				res, err := s.Check()
+				res, err := s.Check(ctx)
 
 				expected := &healthcheck.CheckResult{
 					Status: "FAILED",
@@ -319,7 +326,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(states, false, nil).
 					Times(1)
 
-				res, err := s.Check()
+				res, err := s.Check(ctx)
 
 				expected := &healthcheck.CheckResult{
 					Status: "OK",
@@ -357,7 +364,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(states, false, nil).
 					Times(1)
 
-				res, err := s.Check()
+				res, err := s.Check(ctx)
 
 				expected := &healthcheck.CheckResult{
 					Status: "FAILED",
@@ -403,7 +410,7 @@ var _ = Describe("Go Health Check", func() {
 					Return(states, false, nil).
 					Times(1)
 
-				res, err := s.Check()
+				res, err := s.Check(ctx)
 
 				expected := &healthcheck.CheckResult{
 					Status: "WARNING",

@@ -17,7 +17,7 @@ type healthHandler struct {
 }
 
 func (h *healthHandler) CheckHealth(w http.ResponseWriter, req *http.Request) {
-	r, err := h.healthService.Check()
+	r, err := h.healthService.Check(req.Context())
 	if err != nil {
 
 		Response(

@@ -39,7 +39,7 @@ type restApp struct {
 func (a *restApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
-	err := a.healthService.Start()
+	err := a.healthService.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (a *restApp) Run(ctx context.Context) error {
 func (a *restApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
 
-	err := a.healthService.Stop()
+	err := a.healthService.Stop(ctx)
 	if err != nil {
 		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
 	}
@@ -176,7 +176,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		CorrelationIdCtxKey:    CorrelationIdCtxKey,
 	}))
 	router.HandleFunc("/", basicHandler.GetAppInfo)
-	router.NotFoundHandler = http.HandlerFunc(basicHandler.GetAppInfo)
+	router.NotFoundHandler = http.HandlerFunc(basicHandler.NotFound)
 	router.MethodNotAllowedHandler = http.HandlerFunc(basicHandler.MethodNotAllowed)
 
 	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(http.MethodGet)
