@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/InVisionApp/go-health"
@@ -19,7 +20,7 @@ type goHealthCheck struct {
 	runStatus bool
 }
 
-func (s *goHealthCheck) Start() error {
+func (s *goHealthCheck) Start(ctx context.Context) error {
 	if s.runStatus {
 		return nil
 	}
@@ -47,11 +48,11 @@ func (s *goHealthCheck) Start() error {
 	return nil
 }
 
-func (s *goHealthCheck) Stop() error {
+func (s *goHealthCheck) Stop(ctx context.Context) error {
 	return s.client.Stop()
 }
 
-func (s *goHealthCheck) Check() (*CheckResult, error) {
+func (s *goHealthCheck) Check(ctx context.Context) (*CheckResult, error) {
 	states, isFailed, err := s.client.State()
 	if err != nil {
 		return nil, err

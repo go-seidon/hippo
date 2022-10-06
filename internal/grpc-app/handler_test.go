@@ -52,7 +52,7 @@ var _ = Describe("Handler Package", func() {
 
 				healthService.
 					EXPECT().
-					Check().
+					Check(gomock.Eq(ctx)).
 					Return(nil, expectedErr).
 					Times(1)
 
@@ -74,7 +74,7 @@ var _ = Describe("Handler Package", func() {
 
 				healthService.
 					EXPECT().
-					Check().
+					Check(gomock.Eq(ctx)).
 					Return(checkRes, nil).
 					Times(1)
 
@@ -120,7 +120,7 @@ var _ = Describe("Handler Package", func() {
 
 				healthService.
 					EXPECT().
-					Check().
+					Check(gomock.Eq(ctx)).
 					Return(checkRes, nil).
 					Times(1)
 

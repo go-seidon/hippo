@@ -1,6 +1,7 @@
 package rest_app_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -20,6 +21,7 @@ var _ = Describe("Health Handler", func() {
 
 	Context("CheckHealth Handler", Label("unit"), func() {
 		var (
+			ctx           context.Context
 			handler       http.HandlerFunc
 			r             *http.Request
 			w             *mock_restapp.MockResponseWriter
@@ -29,6 +31,7 @@ var _ = Describe("Health Handler", func() {
 		)
 
 		BeforeEach(func() {
+			ctx = context.Background()
 			t := GinkgoT()
 			r = &http.Request{}
 			ctrl := gomock.NewController(t)
@@ -56,7 +59,7 @@ var _ = Describe("Health Handler", func() {
 
 				healthService.
 					EXPECT().
-					Check().
+					Check(gomock.Eq(ctx)).
 					Return(nil, err).
 					Times(1)
 
@@ -127,7 +130,7 @@ var _ = Describe("Health Handler", func() {
 
 				healthService.
 					EXPECT().
-					Check().
+					Check(gomock.Eq(ctx)).
 					Return(res, nil).
 					Times(1)
 

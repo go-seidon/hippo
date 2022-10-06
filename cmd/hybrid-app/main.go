@@ -37,26 +37,8 @@ func main() {
 		panic(err)
 	}
 
-	logger, err := app.NewDefaultLog(appConfig)
-	if err != nil {
-		panic(err)
-	}
-
-	repository, err := app.NewDefaultRepository(appConfig)
-	if err != nil {
-		panic(err)
-	}
-
-	healthService, err := app.NewDefaultHealthCheck(logger, repository)
-	if err != nil {
-		panic(err)
-	}
-
 	restApp, err := rest_app.NewRestApp(
 		rest_app.WithConfig(appConfig),
-		rest_app.WithLogger(logger),
-		rest_app.WithRepository(repository),
-		rest_app.WithService(healthService),
 	)
 	if err != nil {
 		panic(err)
@@ -64,9 +46,6 @@ func main() {
 
 	grpcApp, err := grpc_app.NewGrpcApp(
 		grpc_app.WithConfig(appConfig),
-		grpc_app.WithLogger(logger),
-		grpc_app.WithRepository(repository),
-		grpc_app.WithService(healthService),
 	)
 	if err != nil {
 		panic(err)

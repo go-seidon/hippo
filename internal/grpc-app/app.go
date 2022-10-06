@@ -32,7 +32,7 @@ type grpcApp struct {
 func (a *grpcApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
-	err := a.healthService.Start()
+	err := a.healthService.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (a *grpcApp) Run(ctx context.Context) error {
 func (a *grpcApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
 
-	err := a.healthService.Stop()
+	err := a.healthService.Stop(ctx)
 	if err != nil {
 		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
 	}

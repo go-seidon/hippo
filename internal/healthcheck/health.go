@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"context"
 	"time"
 
 	"github.com/go-seidon/local/internal/logging"
@@ -13,9 +14,9 @@ const (
 )
 
 type HealthCheck interface {
-	Start() error
-	Stop() error
-	Check() (*CheckResult, error)
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+	Check(ctx context.Context) (*CheckResult, error)
 }
 
 type CheckResult struct {

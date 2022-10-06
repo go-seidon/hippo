@@ -23,7 +23,7 @@ type healthHandler struct {
 }
 
 func (s *healthHandler) CheckHealth(ctx context.Context, p *grpc_v1.CheckHealthParam) (*grpc_v1.CheckHealthResult, error) {
-	checkRes, err := s.healthService.Check()
+	checkRes, err := s.healthService.Check(ctx)
 	if err != nil {
 		return nil, grpc_status.Error(codes.Unknown, err.Error())
 	}
