@@ -54,7 +54,7 @@ test-watch-integration:
 
 .PHONY: generate-mock
 generate-mock:
-	mockgen -package=mock_grpcv1 -source generated/proto/api/grpc/v1/file_grpc.pb.go -destination=generated/proto/api/grpc/v1/mock/file_grpc_mock.go
+	mockgen -package=mock_grpcv1 -source generated/grpc-v1/file_grpc.pb.go -destination=generated/grpc-v1/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
 	mockgen -package=mock_context -source internal/context/context.go -destination=internal/context/mock/context_mock.go
@@ -82,6 +82,10 @@ generate-mock:
 	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
 	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
 	mockgen -package=mock_validation -source internal/validation/validator.go -destination=internal/validation/mock/validator_mock.go
+
+.PHONY: generate-proto
+generate-proto:
+	buf generate api/
 
 .PHONY: verify-swagger
 verify-swagger:
