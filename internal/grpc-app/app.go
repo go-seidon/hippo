@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
+	grpc_v1 "github.com/go-seidon/local/generated/grpc-v1"
 	"github.com/go-seidon/local/internal/app"
 	"github.com/go-seidon/local/internal/auth"
 	"github.com/go-seidon/local/internal/encoding"

@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
-	mock_grpcv1 "github.com/go-seidon/local/generated/proto/api/grpc/v1/mock"
+	grpc_v1 "github.com/go-seidon/local/generated/grpc-v1"
+	mock_grpcv1 "github.com/go-seidon/local/generated/grpc-v1/mock"
 	mock_context "github.com/go-seidon/local/internal/context/mock"
 	"github.com/go-seidon/local/internal/file"
 	mock_file "github.com/go-seidon/local/internal/file/mock"

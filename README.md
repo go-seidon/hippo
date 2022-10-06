@@ -4,17 +4,18 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 
 ## Todo
-1. Change GRPC foldering
-2. Add `ctx.Context` to healthcheck
-3. Move reusable package to it's own package 
+1. Add `ctx.Context` to healthcheck
+2. Move reusable package to it's own package 
 - grpc
 - mux (rest)
 - database (mongo, mysql)
 - healthcheck
 - provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
-4. Add gracefull shutdown (rest & grpc app)
-5. Deploy dev, stg, prod (deployment script)
-6. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
+3. Add gracefull shutdown (rest & grpc app)
+4. Deploy dev, stg, prod (deployment script)
+
+## Blocker
+1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
 
 ## Nice to have
 1. Simplify factory function interface not returning error

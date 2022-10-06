@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             (unknown)
-// source: api/grpc/v1/file.proto
+// source: grpc-v1/file.proto
 
 package grpc_v1
 
@@ -233,5 +233,5 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "api/grpc/v1/file.proto",
+	Metadata: "grpc-v1/file.proto",
 }
