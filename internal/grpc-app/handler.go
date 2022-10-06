@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	grpc_v1 "github.com/go-seidon/local/generated/proto/api/grpc/v1"
+	grpc_v1 "github.com/go-seidon/local/generated/grpc-v1"
 	"github.com/go-seidon/local/internal/file"
 	"github.com/go-seidon/local/internal/healthcheck"
 	"github.com/go-seidon/local/internal/status"
