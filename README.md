@@ -1,7 +1,7 @@
 # Hippo
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_hippo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=go-seidon_hippo)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_hippo&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_hippo)
 
 Bucket like local storage implementation
 
