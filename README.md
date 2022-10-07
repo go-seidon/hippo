@@ -166,14 +166,14 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Move reusable package to it's own package 
+1. Upload docker image to docker hub
+2. Move reusable package to it's own package 
 - grpc
 - mux (rest)
 - database (mongo, mysql)
 - healthcheck
 - provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
-2. Add gracefull shutdown (rest & grpc app)
-3. Deploy dev, stg, prod (deployment script)
+3. Add gracefull shutdown (rest & grpc app)
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
