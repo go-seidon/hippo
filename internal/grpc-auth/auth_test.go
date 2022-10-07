@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	grpc_auth "github.com/go-seidon/local/internal/grpc-auth"
+	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	"google.golang.org/grpc/metadata"
 
 	. "github.com/onsi/ginkgo/v2"

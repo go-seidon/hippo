@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/go-seidon/local/internal/healthcheck"
-	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
+	"github.com/go-seidon/hippo/internal/healthcheck"
+	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

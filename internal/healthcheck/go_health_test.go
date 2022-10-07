@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/InVisionApp/go-health"
-	"github.com/go-seidon/local/internal/healthcheck"
-	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
+	"github.com/go-seidon/hippo/internal/healthcheck"
+	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
+	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

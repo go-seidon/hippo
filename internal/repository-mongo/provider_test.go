@@ -10,9 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 
-	mock_db_mongo "github.com/go-seidon/local/internal/db-mongo/mock"
-	"github.com/go-seidon/local/internal/repository"
-	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
+	mock_db_mongo "github.com/go-seidon/hippo/internal/db-mongo/mock"
+	"github.com/go-seidon/hippo/internal/repository"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
 )
 
 var _ = Describe("Repository Provider", func() {

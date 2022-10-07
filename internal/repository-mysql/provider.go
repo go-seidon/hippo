@@ -3,8 +3,8 @@ package repository_mysql
 import (
 	"context"
 
-	db_mysql "github.com/go-seidon/local/internal/db-mysql"
-	"github.com/go-seidon/local/internal/repository"
+	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
+	"github.com/go-seidon/hippo/internal/repository"
 )
 
 type provider struct {

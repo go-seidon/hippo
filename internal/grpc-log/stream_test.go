@@ -3,11 +3,11 @@ package grpc_log_test
 import (
 	"fmt"
 
-	grpc "github.com/go-seidon/local/internal/grpc"
-	grpc_log "github.com/go-seidon/local/internal/grpc-log"
-	grpc_test "github.com/go-seidon/local/internal/grpc-test"
-	mock_grpc "github.com/go-seidon/local/internal/grpc/mock"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
+	grpc "github.com/go-seidon/hippo/internal/grpc"
+	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
+	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
+	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
+	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

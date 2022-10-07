@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-seidon/local/internal/serialization"
-	"github.com/go-seidon/local/internal/status"
+	"github.com/go-seidon/hippo/internal/serialization"
+	"github.com/go-seidon/hippo/internal/status"
 )
 
 type ResponseBody struct {

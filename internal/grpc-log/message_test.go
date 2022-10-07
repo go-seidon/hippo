@@ -1,8 +1,8 @@
 package grpc_log_test
 
 import (
-	grpc_log "github.com/go-seidon/local/internal/grpc-log"
-	grpc_test "github.com/go-seidon/local/internal/grpc-test"
+	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
+	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

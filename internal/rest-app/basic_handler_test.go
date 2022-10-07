@@ -3,11 +3,11 @@ package rest_app_test
 import (
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/local/generated/rest-v1"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	rest_app "github.com/go-seidon/local/internal/rest-app"
-	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
-	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
+	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
+	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	mock_serialization "github.com/go-seidon/hippo/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 )

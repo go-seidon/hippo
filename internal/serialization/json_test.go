@@ -3,7 +3,7 @@ package serialization_test
 import (
 	"encoding/json"
 
-	"github.com/go-seidon/local/internal/serialization"
+	"github.com/go-seidon/hippo/internal/serialization"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

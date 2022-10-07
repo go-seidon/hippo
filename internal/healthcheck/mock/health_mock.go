@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	healthcheck "github.com/go-seidon/local/internal/healthcheck"
+	healthcheck "github.com/go-seidon/hippo/internal/healthcheck"
 	gomock "github.com/golang/mock/gomock"
 )
 

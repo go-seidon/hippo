@@ -3,10 +3,10 @@ package rest_app
 import (
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/local/generated/rest-v1"
-	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/serialization"
-	"github.com/go-seidon/local/internal/status"
+	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/hippo/internal/serialization"
+	"github.com/go-seidon/hippo/internal/status"
 )
 
 type basicHandler struct {

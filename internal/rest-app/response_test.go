@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	rest_app "github.com/go-seidon/local/internal/rest-app"
-	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
-	mock_serialization "github.com/go-seidon/local/internal/serialization/mock"
+	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	mock_serialization "github.com/go-seidon/hippo/internal/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

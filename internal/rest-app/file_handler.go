@@ -7,12 +7,12 @@ import (
 	"io"
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/local/generated/rest-v1"
-	"github.com/go-seidon/local/internal/file"
-	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/serialization"
-	"github.com/go-seidon/local/internal/status"
-	"github.com/go-seidon/local/internal/validation"
+	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	"github.com/go-seidon/hippo/internal/file"
+	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/hippo/internal/serialization"
+	"github.com/go-seidon/hippo/internal/status"
+	"github.com/go-seidon/hippo/internal/validation"
 	"github.com/gorilla/mux"
 )
 

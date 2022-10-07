@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-seidon/local/internal/app"
-	"github.com/go-seidon/local/internal/config"
-	rest_app "github.com/go-seidon/local/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/app"
+	"github.com/go-seidon/hippo/internal/config"
+	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 )
 
 func main() {

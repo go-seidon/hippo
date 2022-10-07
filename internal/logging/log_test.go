@@ -3,7 +3,7 @@ package logging_test
 import (
 	"testing"
 
-	"github.com/go-seidon/local/internal/logging"
+	"github.com/go-seidon/hippo/internal/logging"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

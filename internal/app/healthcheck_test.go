@@ -1,9 +1,9 @@
 package app_test
 
 import (
-	"github.com/go-seidon/local/internal/app"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	mock_repository "github.com/go-seidon/local/internal/repository/mock"
+	"github.com/go-seidon/hippo/internal/app"
+	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
+	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

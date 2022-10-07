@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	grpc_meta "github.com/go-seidon/local/internal/grpc-meta"
+	grpc_meta "github.com/go-seidon/hippo/internal/grpc-meta"
 )
 
 const (

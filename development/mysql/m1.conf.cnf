@@ -19,4 +19,4 @@ binlog_format = ROW
 # add more database by entering new entry, e.g:
 # binlog_do_db = db1
 # binlog_do_db = db2
-binlog_do_db = goseidon_local 
+binlog_do_db = hippo 

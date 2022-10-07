@@ -7,7 +7,7 @@ package mock_io
 import (
 	reflect "reflect"
 
-	io "github.com/go-seidon/local/internal/io"
+	io "github.com/go-seidon/hippo/internal/io"
 	gomock "github.com/golang/mock/gomock"
 )
 

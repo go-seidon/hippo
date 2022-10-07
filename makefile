@@ -3,7 +3,7 @@ default: help
 
 .PHONY: help
 help:
-	@echo 'local-storage'
+	@echo 'hippo'
 	@echo 'usage: make [target] ...'
 
 .PHONY: install-tool
@@ -78,7 +78,6 @@ generate-mock:
 	mockgen -package=mock_repository -source internal/repository/file.go -destination=internal/repository/mock/file_mock.go
 	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
 	mockgen -package=mock_restapp -source internal/rest-app/server.go -destination=internal/rest-app/mock/server_mock.go
-	mockgen -package=mock_retrieving -source internal/retrieving/retriever.go -destination=internal/retrieving/mock/retriever_mock.go
 	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
 	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
 	mockgen -package=mock_validation -source internal/validation/validator.go -destination=internal/validation/mock/validator_mock.go
@@ -161,8 +160,8 @@ dummy: ## used by migrate script as do-nothing targets
 	@:
 
 
-MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3308)/goseidon_local?x-tls-insecure-skip-verify=true
-MONGO_DB_URI=mongodb://admin:123456@localhost:27030/goseidon_local
+MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3308)/hippo?x-tls-insecure-skip-verify=true
+MONGO_DB_URI=mongodb://admin:123456@localhost:27030/hippo
 
 .PHONY: migrate-mysql
 migrate-mysql:

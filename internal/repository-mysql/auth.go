@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-seidon/local/internal/datetime"
-	db_mysql "github.com/go-seidon/local/internal/db-mysql"
-	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/hippo/internal/datetime"
+	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
+	"github.com/go-seidon/hippo/internal/repository"
 )
 
 type authRepository struct {

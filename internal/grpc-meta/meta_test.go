@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	grpc_meta "github.com/go-seidon/local/internal/grpc-meta"
+	grpc_meta "github.com/go-seidon/hippo/internal/grpc-meta"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/grpc/metadata"

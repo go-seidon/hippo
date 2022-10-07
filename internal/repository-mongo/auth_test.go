@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
-	"github.com/go-seidon/local/internal/repository"
-	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
+	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
+	"github.com/go-seidon/hippo/internal/repository"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -81,14 +81,14 @@ var _ = Describe("Auth Repository", func() {
 			client = dbClient
 
 			err = RunDbMigration(dbClient, RunDbMigrationParam{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare db migration: " + err.Error())
 			}
 			ctx = context.Background()
 			dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
 			repo, _ = repository_mongo.NewAuthRepository(dbClientOpt, dbCfgOpt)
@@ -103,7 +103,7 @@ var _ = Describe("Auth Repository", func() {
 				Name:         "mock-client-name",
 				ClientId:     "mock-client-id",
 				ClientSecret: "mock-client-secret",
-				DbName:       "goseidon_local_test",
+				DbName:       "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare seed data: " + err.Error())
@@ -112,7 +112,7 @@ var _ = Describe("Auth Repository", func() {
 
 		AfterEach(func() {
 			_, err := client.
-				Database("goseidon_local_test").
+				Database("hippo_test").
 				Collection("auth_client").
 				DeleteOne(ctx, bson.D{
 					{

@@ -19,7 +19,7 @@ relay-log = /var/log/mysql/mysql-relay-bin.log
 # add more database by entering new entry, e.g:
 # binlog_do_db = db1
 # binlog_do_db = db2
-binlog_do_db = goseidon_local
+binlog_do_db = hippo
 
 # update bin log when performing sync with other replica
 log-slave-updates

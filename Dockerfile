@@ -3,7 +3,7 @@
 # 1. use golang image with 1.17-alpine tag as base builder for `deploy image`
 FROM golang:1.17-alpine as builder
 # 2. define exposed environment variable
-ENV APP_HOME $GOPATH/src/github.com/go-seidon/local
+ENV APP_HOME $GOPATH/src/github.com/go-seidon/hippo
 # 3. update os index packages
 RUN apk update
 # 4. install package (git, ca-certificates, update-ca-certificates)

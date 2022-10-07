@@ -1,7 +1,7 @@
 package datetime_test
 
 import (
-	"github.com/go-seidon/local/internal/datetime"
+	"github.com/go-seidon/hippo/internal/datetime"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

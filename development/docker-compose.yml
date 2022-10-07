@@ -6,7 +6,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     volumes:
       - mysql-db-data:/var/lib/mysql
@@ -22,7 +22,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     depends_on:
       - mysql-db
@@ -40,7 +40,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     depends_on:
       - mysql-db-r1
@@ -58,7 +58,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=goseidon_local
+      - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     depends_on:
       - mysql-db-r1
@@ -76,7 +76,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=goseidon_local_test
+      - MYSQL_DATABASE=hippo_test
       - MYSQL_ROOT_PASSWORD=toor
     ports:
       - 3307:3306
@@ -108,7 +108,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=toor
       - MONGO_INITDB_USERNAME=admin
       - MONGO_INITDB_PASSWORD=123456
-      - MONGO_INITDB_DATABASE=goseidon_local
+      - MONGO_INITDB_DATABASE=hippo
     volumes:
       - mongo-db-1-data:/data/db
       - ./mongo/mongodb.key:/data/auth/mongodb.key
@@ -121,7 +121,7 @@ services:
           chmod 400 /data/auth/mongodb.key
           chown 999:999 /data/auth/mongodb.key
           exec docker-entrypoint.sh $$@
-    command: mongod --bind_ip_all --port 27031 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
+    command: mongod --bind_ip_all --port 27031 --replSet rs-hippo --keyFile /data/auth/mongodb.key
     ports:
       - 27031:27031
     networks:
@@ -135,7 +135,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=toor
       - MONGO_INITDB_USERNAME=admin
       - MONGO_INITDB_PASSWORD=123456
-      - MONGO_INITDB_DATABASE=goseidon_local
+      - MONGO_INITDB_DATABASE=hippo
     volumes:
       - mongo-db-2-data:/data/db
       - ./mongo/mongodb.key:/data/auth/mongodb.key
@@ -147,7 +147,7 @@ services:
           chmod 400 /data/auth/mongodb.key
           chown 999:999 /data/auth/mongodb.key
           exec docker-entrypoint.sh $$@
-    command: mongod --bind_ip_all --port 27032 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
+    command: mongod --bind_ip_all --port 27032 --replSet rs-hippo --keyFile /data/auth/mongodb.key
     ports:
       - 27032:27032
     networks:
@@ -161,7 +161,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=toor
       - MONGO_INITDB_USERNAME=admin
       - MONGO_INITDB_PASSWORD=123456
-      - MONGO_INITDB_DATABASE=goseidon_local
+      - MONGO_INITDB_DATABASE=hippo
     volumes:
       - mongo-db-3-data:/data/db
       - ./mongo/mongodb.key:/data/auth/mongodb.key
@@ -173,7 +173,7 @@ services:
           chmod 400 /data/auth/mongodb.key
           chown 999:999 /data/auth/mongodb.key
           exec docker-entrypoint.sh $$@
-    command: mongod --bind_ip_all --port 27033 --replSet rs-goseidon --keyFile /data/auth/mongodb.key
+    command: mongod --bind_ip_all --port 27033 --replSet rs-hippo --keyFile /data/auth/mongodb.key
     ports:
       - 27033:27033
     networks:
@@ -187,7 +187,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=toor
       - MONGO_INITDB_USERNAME=admin
       - MONGO_INITDB_PASSWORD=123456
-      - MONGO_INITDB_DATABASE=goseidon_local_test
+      - MONGO_INITDB_DATABASE=hippo_test
     volumes:
       - ./mongo/init.sh:/docker-entrypoint-initdb.d/init.sh
     ports:

@@ -3,7 +3,7 @@ package encoding_test
 import (
 	"encoding/base64"
 
-	"github.com/go-seidon/local/internal/encoding"
+	"github.com/go-seidon/hippo/internal/encoding"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

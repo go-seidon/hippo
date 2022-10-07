@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-seidon/local/internal/app"
-	"github.com/go-seidon/local/internal/config"
-	grpc_app "github.com/go-seidon/local/internal/grpc-app"
-	rest_app "github.com/go-seidon/local/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/app"
+	"github.com/go-seidon/hippo/internal/config"
+	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
+	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 )
 
 func main() {

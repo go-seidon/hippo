@@ -1,7 +1,7 @@
 package grpc_log
 
 import (
-	"github.com/go-seidon/local/internal/logging"
+	"github.com/go-seidon/hippo/internal/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )

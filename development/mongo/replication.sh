@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variable definition
-replica_set_name='rs-goseidon'
+replica_set_name='rs-hippo'
 
 h1_ct_name='mongo-db-1'
 h1_db_host='localhost'
@@ -36,15 +36,15 @@ execute-query() {
 
 # 1. turn off docker-compose (if any)
 echo "[1] turning off docker compose...  "
-docker-compose stop mongo-db mongo-db-r1 mongo-db-r2
-docker-compose rm -v -f mongo-db mongo-db-r1 mongo-db-r2
+docker-compose stop mongo-db-1 mongo-db-2 mongo-db-3
+docker-compose rm -v -f mongo-db-1 mongo-db-2 mongo-db-3
 printf "[DONE]\n\n"
 
 # 2. remove mongo-db replica data volume (if any)
 echo "[2] removing $h1_ct_name data volume...  "
-docker volume rm goseidon-local_mongo-db-data
-docker volume rm goseidon-local_mongo-db-r1-data
-docker volume rm goseidon-local_mongo-db-r2-data
+docker volume rm hippo_mongo-db-1-data
+docker volume rm hippo_mongo-db-2-data
+docker volume rm hippo_mongo-db-3-data
 printf "[DONE]\n\n"
 
 # 3. rebuild and run docker-compose
@@ -84,16 +84,16 @@ h1_status_res=`execute-query $h1_ct_name $h1_db_host $h1_db_port $h1_db_root_use
 echo "rs status            : $h1_status_res"
 printf "[DONE]\n\n"
 
-# 8. enable read in r1 db
+# 8. enable read in 2 db
 echo "[8] enable read in $h2_ct_name...  "
 h2_enable_res=`execute-query $h2_ct_name $h2_db_host $h2_db_port $h2_db_root_username $h2_db_root_password 'rs.secondaryOk();'`
-echo "enable read r1            : $h2_enable_res"
+echo "enable read 2            : $h2_enable_res"
 printf "[DONE]\n\n"
 
-# 9. enable read in r2 db
+# 9. enable read in 3 db
 echo "[9] enable read in $h3_ct_name...  "
 h3_enable_res=`execute-query $h3_ct_name $h3_db_host $h3_db_port $h3_db_root_username $h3_db_root_password 'rs.secondaryOk();'`
-echo "enable read r2            : $h3_enable_res"
+echo "enable read 3            : $h3_enable_res"
 printf "[DONE]\n\n"
 
 # 10. done

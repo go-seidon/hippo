@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	db_mongo "github.com/go-seidon/local/internal/db-mongo"
-	"github.com/go-seidon/local/internal/repository"
+	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
+	"github.com/go-seidon/hippo/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 )
