@@ -3,7 +3,7 @@ package hashing_test
 import (
 	"fmt"
 
-	"github.com/go-seidon/local/internal/hashing"
+	"github.com/go-seidon/hippo/internal/hashing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

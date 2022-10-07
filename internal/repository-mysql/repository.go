@@ -3,8 +3,8 @@ package repository_mysql
 import (
 	"fmt"
 
-	"github.com/go-seidon/local/internal/datetime"
-	db_mysql "github.com/go-seidon/local/internal/db-mysql"
+	"github.com/go-seidon/hippo/internal/datetime"
+	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 )
 
 type RepositoryParam struct {

@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	grpc_v1 "github.com/go-seidon/local/generated/grpc-v1"
+	grpc_v1 "github.com/go-seidon/hippo/generated/grpc-v1"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"

@@ -8,7 +8,7 @@ h1_db_root_password='toor'
 
 mongo --host ${h1_db_host} --port ${h1_db_port} -u ${h1_db_root_username} -p ${h1_db_root_password} <<EOF
 var config = {
-  "_id": "rs-goseidon",
+  "_id": "rs-hippo",
   "version": 1,
   "members": [
     {

@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	auth "github.com/go-seidon/local/internal/auth"
+	auth "github.com/go-seidon/hippo/internal/auth"
 	gomock "github.com/golang/mock/gomock"
 )
 

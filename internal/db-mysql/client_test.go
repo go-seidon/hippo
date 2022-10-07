@@ -3,7 +3,7 @@ package db_mysql_test
 import (
 	"testing"
 
-	db_mysql "github.com/go-seidon/local/internal/db-mysql"
+	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

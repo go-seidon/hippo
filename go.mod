@@ -1,4 +1,4 @@
-module github.com/go-seidon/local
+module github.com/go-seidon/hippo
 
 go 1.16
 

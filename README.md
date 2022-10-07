@@ -1,33 +1,9 @@
-# local-storage
+# Hippo
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=go-seidon_local&metric=coverage)](https://sonarcloud.io/summary/new_code?id=go-seidon_local)
 
-## Todo
-1. Move reusable package to it's own package 
-- grpc
-- mux (rest)
-- database (mongo, mysql)
-- healthcheck
-- provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
-2. Add gracefull shutdown (rest & grpc app)
-3. Deploy dev, stg, prod (deployment script)
-
-## Blocker
-1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
-
-## Nice to have
-1. Simplify factory function interface not returning error
-2. Upload location strategy
-3. Add repo: `repository-postgre`
-4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
-5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
-6. Separate unit test and integration test workflow (cqc.yml)
-
-## Tech Debt
-1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
-2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
-3. Change NewDailyRotate using optional param
+Bucket like local storage implementation
 
 ## Technical Stack
 1. Transport layer
@@ -36,7 +12,6 @@
 2. Database
 - mysql
 - mongo
-- postgre (NTH)
 3. Config
 - system environment
 - file (config/*.toml and .env)
@@ -95,7 +70,7 @@ This command should run all the test available on this project.
 ### Docker
 1. Build docker image
 ```
-  $ docker build -t goseidon-local .
+  $ docker build -t hippo .
 ```
 
 2. Check build result
@@ -105,7 +80,7 @@ This command should run all the test available on this project.
 
 3. Create docker container
 ```
-  $ docker container create --name goseidon-local-app ^
+  $ docker container create --name hippo-app ^
     -e REST_APP_HOST="0.0.0.0" ^
     -e REST_APP_PORT=3000 ^
     -e RPC_APP_HOST="0.0.0.0" ^
@@ -113,8 +88,8 @@ This command should run all the test available on this project.
     -e MYSQL_MASTER_HOST="host.docker.internal" ^
     -e MYSQL_REPLICA_HOST="host.docker.internal" ^
     -p 3000:3000 -p 5000:5000 ^
-    -v D:\startup\goseidon\local\storage:/storage ^
-    goseidon-local
+    -v D:\startup\goseidon\hippo\storage:/storage ^
+    hippo
 ```
 
 4. Check container
@@ -124,7 +99,7 @@ This command should run all the test available on this project.
 
 5. Start container
 ```
-  $ docker container start goseidon-local-app
+  $ docker container start hippo-app
 ```
 
 6. Check container status
@@ -144,14 +119,14 @@ This command should run all the test available on this project.
 ### Database migration
 1. MySQL Migration
 ```bash
-  $ migrate-mysql-create [args] # args e.g: migrate-mysql-create file-table
-  $ migrate-mysql [args] # args e.g: migrate-mysql up
+  $ make migrate-mysql-create [args] # args e.g: migrate-mysql-create file-table
+  $ make migrate-mysql [args] # args e.g: migrate-mysql up
 ```
 
 2. Mongo Migration
 ```bash
-  $ migrate-mongo-create [args] # args e.g: migrate-mongo-create file-table
-  $ migrate-mongo [args] # args e.g: migrate-mongo up
+  $ make migrate-mongo-create [args] # args e.g: migrate-mongo-create file-table
+  $ make migrate-mongo [args] # args e.g: migrate-mongo up
 ```
 
 ### MySQL Replication Setup
@@ -189,3 +164,34 @@ C:\Windows\System32\drivers\etc\hosts
 ```bash
   $ ./development/mongo/replication.sh
 ```
+
+## Todo
+1. Upload docker image to docker hub
+2. Move reusable package to it's own package 
+- grpc
+- mux (rest)
+- database (mongo, mysql)
+- healthcheck
+- provider (context, datetime, encoding, filesystem, hashing, io, logging, serialization, text)
+3. Add gracefull shutdown (rest & grpc app)
+
+## Blocker
+1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
+
+## Nice to have
+1. Simplify factory function interface not returning error
+2. Upload location strategy
+3. Add repo: `repository-postgre`
+4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
+5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
+6. Separate unit test and integration test workflow (cqc.yml)
+
+## Tech Debt
+1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
+2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
+3. Change NewDailyRotate using optional param
+
+## Issue
+1. Verify script EOL
+If you're using window make sure to change the bash script from CRLF to LF
+Issue: https://stackoverflow.com/questions/29140377/sh-file-not-found

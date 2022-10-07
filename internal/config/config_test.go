@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/go-seidon/local/internal/config"
+	"github.com/go-seidon/hippo/internal/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

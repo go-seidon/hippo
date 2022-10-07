@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/go-seidon/local/internal/filesystem"
-	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/hippo/internal/filesystem"
+	"github.com/go-seidon/hippo/internal/repository"
 )
 
 func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, error) {

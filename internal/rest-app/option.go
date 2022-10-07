@@ -3,10 +3,10 @@ package rest_app
 import (
 	"fmt"
 
-	"github.com/go-seidon/local/internal/app"
-	"github.com/go-seidon/local/internal/healthcheck"
-	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/hippo/internal/app"
+	"github.com/go-seidon/hippo/internal/healthcheck"
+	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/hippo/internal/repository"
 )
 
 type RestAppConfig struct {

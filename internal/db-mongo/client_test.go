@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	db_mongo "github.com/go-seidon/local/internal/db-mongo"
+	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

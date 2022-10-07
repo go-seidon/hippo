@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
-	"github.com/go-seidon/local/internal/repository"
-	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
+	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
+	"github.com/go-seidon/hippo/internal/repository"
+	repository_mysql "github.com/go-seidon/hippo/internal/repository-mysql"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo/v2"

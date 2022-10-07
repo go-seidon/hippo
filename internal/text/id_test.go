@@ -3,7 +3,7 @@ package text_test
 import (
 	"testing"
 
-	"github.com/go-seidon/local/internal/text"
+	"github.com/go-seidon/hippo/internal/text"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

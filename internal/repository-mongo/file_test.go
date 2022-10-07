@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	mock_datetime "github.com/go-seidon/local/internal/datetime/mock"
-	"github.com/go-seidon/local/internal/repository"
-	repository_mongo "github.com/go-seidon/local/internal/repository-mongo"
+	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
+	"github.com/go-seidon/hippo/internal/repository"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson"
@@ -80,14 +80,14 @@ var _ = Describe("File Repository", func() {
 			client = dbClient
 
 			err = RunDbMigration(dbClient, RunDbMigrationParam{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare db migration: " + err.Error())
 			}
 			ctx = context.Background()
 			dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
 			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
@@ -109,7 +109,7 @@ var _ = Describe("File Repository", func() {
 				Size:      200,
 				CreatedAt: 1660380011999,
 				UpdatedAt: 1660380011999,
-				DbName:    "goseidon_local_test",
+				DbName:    "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare seed data: " + err.Error())
@@ -118,7 +118,7 @@ var _ = Describe("File Repository", func() {
 
 		AfterEach(func() {
 			_, err := client.
-				Database("goseidon_local_test").
+				Database("hippo_test").
 				Collection("file").
 				DeleteOne(ctx, bson.D{
 					{
@@ -186,14 +186,14 @@ var _ = Describe("File Repository", func() {
 			client = dbClient
 
 			err = RunDbMigration(dbClient, RunDbMigrationParam{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare db migration: " + err.Error())
 			}
 			ctx = context.Background()
 			dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
 			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
@@ -212,7 +212,7 @@ var _ = Describe("File Repository", func() {
 				Size:      200,
 				CreatedAt: 1660380011999,
 				UpdatedAt: 1660380011999,
-				DbName:    "goseidon_local_test",
+				DbName:    "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare seed data: " + err.Error())
@@ -221,7 +221,7 @@ var _ = Describe("File Repository", func() {
 
 		AfterEach(func() {
 			_, err := client.
-				Database("goseidon_local_test").
+				Database("hippo_test").
 				Collection("file").
 				DeleteOne(ctx, bson.D{
 					{
@@ -277,14 +277,14 @@ var _ = Describe("File Repository", func() {
 			client = dbClient
 
 			err = RunDbMigration(dbClient, RunDbMigrationParam{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			if err != nil {
 				AbortSuite("failed prepare db migration: " + err.Error())
 			}
 			ctx = context.Background()
 			dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-				DbName: "goseidon_local_test",
+				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
 			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
@@ -306,7 +306,7 @@ var _ = Describe("File Repository", func() {
 
 		AfterEach(func() {
 			_, err := client.
-				Database("goseidon_local_test").
+				Database("hippo_test").
 				Collection("file").
 				DeleteOne(ctx, bson.D{
 					{
@@ -351,7 +351,7 @@ var _ = Describe("File Repository", func() {
 			It("shold return error", func() {
 				currentTimestamp := time.Now()
 				_, err := client.
-					Database("goseidon_local_test").
+					Database("hippo_test").
 					Collection("file").
 					InsertOne(ctx, bson.D{
 						{

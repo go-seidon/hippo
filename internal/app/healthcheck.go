@@ -3,9 +3,9 @@ package app
 import (
 	"time"
 
-	"github.com/go-seidon/local/internal/healthcheck"
-	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/repository"
+	"github.com/go-seidon/hippo/internal/healthcheck"
+	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/hippo/internal/repository"
 )
 
 func NewDefaultHealthCheck(logger logging.Logger, repo repository.Provider) (healthcheck.HealthCheck, error) {

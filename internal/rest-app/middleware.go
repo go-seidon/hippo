@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-seidon/local/internal/auth"
-	"github.com/go-seidon/local/internal/datetime"
-	"github.com/go-seidon/local/internal/logging"
-	"github.com/go-seidon/local/internal/serialization"
-	"github.com/go-seidon/local/internal/status"
+	"github.com/go-seidon/hippo/internal/auth"
+	"github.com/go-seidon/hippo/internal/datetime"
+	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/hippo/internal/serialization"
+	"github.com/go-seidon/hippo/internal/status"
 )
 
 type DefaultMiddlewareParam struct {

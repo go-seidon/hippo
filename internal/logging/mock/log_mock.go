@@ -9,7 +9,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	logging "github.com/go-seidon/local/internal/logging"
+	logging "github.com/go-seidon/hippo/internal/logging"
 	gomock "github.com/golang/mock/gomock"
 )
 

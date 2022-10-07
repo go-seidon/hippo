@@ -3,8 +3,8 @@ package grpc_app
 import (
 	"context"
 
-	"github.com/go-seidon/local/internal/auth"
-	grpc_auth "github.com/go-seidon/local/internal/grpc-auth"
+	"github.com/go-seidon/hippo/internal/auth"
+	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

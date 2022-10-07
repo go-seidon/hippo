@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/go-seidon/local/internal/filesystem"
+	"github.com/go-seidon/hippo/internal/filesystem"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

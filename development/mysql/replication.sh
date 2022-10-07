@@ -10,7 +10,7 @@ r1_db_host='localhost'
 r1_db_port='3311'
 r1_db_root_username='root'
 r1_db_root_password='toor'
-r1_db_username='goseidon-r1'
+r1_db_username='hippo-r1'
 r1_db_password='123456'
 
 r2_ct_name='mysql-db-r2'
@@ -18,7 +18,7 @@ r2_db_host='localhost'
 r2_db_port='3312'
 r2_db_root_username='root'
 r2_db_root_password='toor'
-r2_db_username='goseidon-r2'
+r2_db_username='hippo-r2'
 r2_db_password='123456'
 
 r3_ct_name='mysql-db-r3'
@@ -26,7 +26,7 @@ r3_db_host='localhost'
 r3_db_port='3313'
 r3_db_root_username='root'
 r3_db_root_password='toor'
-r3_db_username='goseidon-r3'
+r3_db_username='hippo-r3'
 r3_db_password='123456'
 
 # function definition
@@ -42,9 +42,9 @@ printf "[DONE]\n\n"
 
 # 2. remove mysql-db replica data volume (if any)
 echo "[2] removing $m1_ct_name data volume...  "
-docker volume rm goseidon-local_mysql-db-r1-data
-docker volume rm goseidon-local_mysql-db-r2-data
-docker volume rm goseidon-local_mysql-db-r3-data
+docker volume rm hippo_mysql-db-r1-data
+docker volume rm hippo_mysql-db-r2-data
+docker volume rm hippo_mysql-db-r3-data
 printf "[DONE]\n\n"
 
 # 3. rebuild and run docker-compose
@@ -114,7 +114,7 @@ printf "[DONE]\n\n"
 
 # 10. running db migration in r1
 echo "[10] running db migration in $r1_ct_name...  "
-r1_db_migration='mysql://'$r1_db_root_username':'$r1_db_root_password'@tcp('$r1_db_host':'$r1_db_port')/goseidon_local?x-tls-insecure-skip-verify=true'
+r1_db_migration='mysql://'$r1_db_root_username':'$r1_db_root_password'@tcp('$r1_db_host':'$r1_db_port')/hippo?x-tls-insecure-skip-verify=true'
 migrate -database "$r1_db_migration" -path ./migration/mysql up
 printf "[DONE]\n\n"
 
@@ -179,7 +179,7 @@ printf "[DONE]\n\n"
 
 # 16. running db migration in r2
 echo "[16] running db migration in $r2_ct_name...  "
-r2_db_migration='mysql://'$r2_db_root_username':'$r2_db_root_password'@tcp('$r2_db_host':'$r2_db_port')/goseidon_local?x-tls-insecure-skip-verify=true'
+r2_db_migration='mysql://'$r2_db_root_username':'$r2_db_root_password'@tcp('$r2_db_host':'$r2_db_port')/hippo?x-tls-insecure-skip-verify=true'
 migrate -database "$r2_db_migration" -path ./migration/mysql up
 printf "[DONE]\n\n"
 
@@ -212,7 +212,7 @@ printf "[DONE]\n\n"
 
 # 20. running db migration in r3
 echo "[20] running db migration in $r3_ct_name...  "
-r3_db_migration='mysql://'$r3_db_root_username':'$r3_db_root_password'@tcp('$r3_db_host':'$r3_db_port')/goseidon_local?x-tls-insecure-skip-verify=true'
+r3_db_migration='mysql://'$r3_db_root_username':'$r3_db_root_password'@tcp('$r3_db_host':'$r3_db_port')/hippo?x-tls-insecure-skip-verify=true'
 migrate -database "$r3_db_migration" -path ./migration/mysql up
 printf "[DONE]\n\n"
 

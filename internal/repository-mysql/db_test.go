@@ -12,7 +12,7 @@ import (
 
 func OpenDb(dsn string) (*sql.DB, error) {
 	if dsn == "" {
-		dsn = "admin:123456@tcp(127.0.0.1:3307)/goseidon_local_test?parseTime=true"
+		dsn = "admin:123456@tcp(127.0.0.1:3307)/hippo_test?parseTime=true"
 	}
 	client, err := sql.Open("mysql", dsn)
 	if err != nil {

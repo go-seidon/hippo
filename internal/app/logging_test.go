@@ -3,7 +3,7 @@ package app_test
 import (
 	"fmt"
 
-	"github.com/go-seidon/local/internal/app"
+	"github.com/go-seidon/hippo/internal/app"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

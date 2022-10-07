@@ -1,7 +1,7 @@
 package validation_test
 
 import (
-	"github.com/go-seidon/local/internal/validation"
+	"github.com/go-seidon/hippo/internal/validation"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -9,9 +9,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	mock_db_mysql "github.com/go-seidon/local/internal/db-mysql/mock"
-	"github.com/go-seidon/local/internal/repository"
-	repository_mysql "github.com/go-seidon/local/internal/repository-mysql"
+	mock_db_mysql "github.com/go-seidon/hippo/internal/db-mysql/mock"
+	"github.com/go-seidon/hippo/internal/repository"
+	repository_mysql "github.com/go-seidon/hippo/internal/repository-mysql"
 )
 
 var _ = Describe("Repository Provider", func() {

@@ -11,14 +11,14 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/go-seidon/local/internal/app"
-	mock_healthcheck "github.com/go-seidon/local/internal/healthcheck/mock"
-	mock_logging "github.com/go-seidon/local/internal/logging/mock"
-	mock_restapp "github.com/go-seidon/local/internal/rest-app/mock"
+	"github.com/go-seidon/hippo/internal/app"
+	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
+	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
+	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
 
-	"github.com/go-seidon/local/internal/repository"
-	mock_repository "github.com/go-seidon/local/internal/repository/mock"
-	rest_app "github.com/go-seidon/local/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/repository"
+	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
+	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 )
 
 func TestRestApp(t *testing.T) {

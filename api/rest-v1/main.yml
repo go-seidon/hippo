@@ -1,8 +1,8 @@
 openapi: "3.0.0"
 info:
-  title: Go-Seidon Bucket Specification
+  title: Hippo Specification
   version: 0.0.1-$REVISION
-  description: Bucket server for goseidon
+  description: Hippo server for goseidon
   contact:
     name: Support
     url: https://github.com/go-seidon/

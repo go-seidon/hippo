@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	filesystem "github.com/go-seidon/local/internal/filesystem"
+	filesystem "github.com/go-seidon/hippo/internal/filesystem"
 	gomock "github.com/golang/mock/gomock"
 )
 

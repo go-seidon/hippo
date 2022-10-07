@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/go-seidon/local/internal/filesystem"
-	"github.com/go-seidon/local/internal/repository"
-	"github.com/go-seidon/local/internal/validation"
+	"github.com/go-seidon/hippo/internal/filesystem"
+	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/hippo/internal/validation"
 )
 
 func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, error) {
