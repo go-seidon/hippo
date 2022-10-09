@@ -132,12 +132,12 @@ func NewRequestLogMiddleware(p RequestLogMiddlewareParam) (func(h http.Handler) 
 	}
 
 	header := map[string]string{}
-	header["User-Agent"] = "userAgent"
-	header["Referer"] = "referer"
-	header["X-Forwarded-For"] = "forwardedFor"
 	if p.Header != nil {
 		header = p.Header
 	}
+	header["User-Agent"] = "userAgent"
+	header["Referer"] = "referer"
+	header["X-Forwarded-For"] = "forwardedFor"
 
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
