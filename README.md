@@ -193,5 +193,5 @@ C:\Windows\System32\drivers\etc\hosts
 
 ## Issue
 1. Verify script EOL
-If you're using window make sure to change the bash script from CRLF to LF
-Issue: https://stackoverflow.com/questions/29140377/sh-file-not-found
+If you're using window make sure to change the bash script from CRLF to LF (https://stackoverflow.com/questions/29140377/sh-file-not-found)
+
