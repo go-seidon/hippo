@@ -78,10 +78,18 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		return nil, fmt.Errorf("invalid config")
 	}
 
+	config := &RestAppConfig{
+		AppName:        fmt.Sprintf("%s-rest", p.Config.AppName),
+		AppVersion:     p.Config.AppVersion,
+		AppHost:        p.Config.RESTAppHost,
+		AppPort:        p.Config.RESTAppPort,
+		UploadFormSize: p.Config.UploadFormSize,
+	}
+
 	var err error
 	logger := p.Logger
 	if logger == nil {
-		logger, err = app.NewDefaultLog(p.Config)
+		logger, err = app.NewDefaultLog(p.Config, config.AppName)
 		if err != nil {
 			return nil, err
 		}
@@ -125,13 +133,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		return nil, err
 	}
 
-	raCfg := &RestAppConfig{
-		AppName:        fmt.Sprintf("%s-rest", p.Config.AppName),
-		AppVersion:     p.Config.AppVersion,
-		AppHost:        p.Config.RESTAppHost,
-		AppPort:        p.Config.RESTAppPort,
-		UploadFormSize: p.Config.UploadFormSize,
-	}
 	serializer := serialization.NewJsonSerializer()
 	encoder := encoding.NewBase64Encoder()
 	hasher := hashing.NewBcryptHasher()
@@ -139,7 +140,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	basicHandler := NewBasicHandler(BasicHandlerParam{
 		Logger:     p.Logger,
 		Serializer: serializer,
-		Config:     raCfg,
+		Config:     config,
 	})
 	healthHandler := NewHealthHandler(HealthHandlerParam{
 		Logger:        p.Logger,
@@ -149,7 +150,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	fileHandler := NewFileHandler(FileHandlerParam{
 		Logger:      p.Logger,
 		Serializer:  serializer,
-		Config:      raCfg,
+		Config:      config,
 		FileService: fileService,
 	})
 
@@ -199,7 +200,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	server := p.Server
 	if p.Server == nil {
 		server = &http.Server{
-			Addr:     raCfg.GetAddress(),
+			Addr:     config.GetAddress(),
 			Handler:  router,
 			ErrorLog: log.New(logger.WriterLevel("error"), "", 0),
 		}
@@ -207,7 +208,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 
 	app := &restApp{
 		server:        server,
-		config:        raCfg,
+		config:        config,
 		logger:        logger,
 		healthService: healthService,
 		repository:    repo,

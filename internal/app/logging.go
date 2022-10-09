@@ -6,14 +6,17 @@ import (
 	"github.com/go-seidon/hippo/internal/logging"
 )
 
-func NewDefaultLog(config *Config) (logging.Logger, error) {
+func NewDefaultLog(config *Config, appName string) (logging.Logger, error) {
 	if config == nil {
 		return nil, fmt.Errorf("invalid config")
+	}
+	if appName == "" {
+		return nil, fmt.Errorf("invalid app name")
 	}
 
 	opts := []logging.LogOption{}
 
-	appOpt := logging.WithAppContext(config.AppName, config.AppVersion)
+	appOpt := logging.WithAppContext(appName, config.AppVersion)
 	opts = append(opts, appOpt)
 
 	if config.AppDebug {

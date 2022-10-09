@@ -72,10 +72,18 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		return nil, fmt.Errorf("invalid config")
 	}
 
+	config := &GrpcAppConfig{
+		AppName:        fmt.Sprintf("%s-grpc", p.Config.AppName),
+		AppVersion:     p.Config.AppVersion,
+		AppHost:        p.Config.RPCAppHost,
+		AppPort:        p.Config.RPCAppPort,
+		UploadFormSize: p.Config.UploadFormSize,
+	}
+
 	var err error
 	logger := p.Logger
 	if logger == nil {
-		logger, err = app.NewDefaultLog(p.Config)
+		logger, err = app.NewDefaultLog(p.Config, config.AppName)
 		if err != nil {
 			return nil, err
 		}
@@ -129,14 +137,6 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	})
 	if err != nil {
 		return nil, err
-	}
-
-	config := &GrpcAppConfig{
-		AppName:        fmt.Sprintf("%s-grpc", p.Config.AppName),
-		AppVersion:     p.Config.AppVersion,
-		AppHost:        p.Config.RPCAppHost,
-		AppPort:        p.Config.RPCAppPort,
-		UploadFormSize: p.Config.UploadFormSize,
 	}
 
 	grpcLogOpt := []grpc_log.LogInterceptorOption{
