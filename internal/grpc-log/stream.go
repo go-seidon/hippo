@@ -21,7 +21,7 @@ func (ss *logServerStream) SendMsg(m interface{}) error {
 		}
 
 		logger := ss.logger.WithFields(map[string]interface{}{
-			"stream": stream,
+			"grpcStream": stream,
 		})
 		logger.Info("send stream")
 	}
@@ -38,7 +38,7 @@ func (ss *logServerStream) RecvMsg(m interface{}) error {
 		}
 
 		logger := ss.logger.WithFields(map[string]interface{}{
-			"stream": stream,
+			"grpcStream": stream,
 		})
 		logger.Info("receive stream")
 	}

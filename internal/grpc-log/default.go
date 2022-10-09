@@ -110,7 +110,7 @@ var DefaultSendLog = func(ctx context.Context, p SendLogParam) error {
 		"protocol":       p.LogInfo.Protocol,
 	}
 	if len(p.LogInfo.Metadata) > 0 {
-		grpcRequest["metadata"] = p.LogInfo.Metadata
+		grpcRequest["meta"] = p.LogInfo.Metadata
 	}
 	if p.DeadlineAt != nil {
 		grpcRequest["deadlineAt"] = p.DeadlineAt.UTC().Format(time.RFC3339)
