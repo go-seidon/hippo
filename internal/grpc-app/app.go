@@ -75,8 +75,8 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	config := &GrpcAppConfig{
 		AppName:        fmt.Sprintf("%s-grpc", p.Config.AppName),
 		AppVersion:     p.Config.AppVersion,
-		AppHost:        p.Config.RPCAppHost,
-		AppPort:        p.Config.RPCAppPort,
+		AppHost:        p.Config.GRPCAppHost,
+		AppPort:        p.Config.GRPCAppPort,
 		UploadFormSize: p.Config.UploadFormSize,
 	}
 

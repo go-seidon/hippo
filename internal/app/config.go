@@ -9,8 +9,8 @@ type Config struct {
 	RESTAppHost string `env:"REST_APP_HOST"`
 	RESTAppPort int    `env:"REST_APP_PORT"`
 
-	RPCAppHost string `env:"RPC_APP_HOST"`
-	RPCAppPort int    `env:"RPC_APP_PORT"`
+	GRPCAppHost string `env:"GRPC_APP_HOST"`
+	GRPCAppPort int    `env:"GRPC_APP_PORT"`
 
 	DBProvider string `env:"DB_PROVIDER"`
 

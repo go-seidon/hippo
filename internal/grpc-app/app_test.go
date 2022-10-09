@@ -152,12 +152,12 @@ var _ = Describe("App Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			cfg := &app.Config{
-				AppDebug:   true,
-				AppEnv:     "local",
-				AppName:    "mock-name",
-				AppVersion: "mock-version",
-				RPCAppHost: "localhost",
-				RPCAppPort: 4949,
+				AppDebug:    true,
+				AppEnv:      "local",
+				AppName:     "mock-name",
+				AppVersion:  "mock-version",
+				GRPCAppHost: "localhost",
+				GRPCAppPort: 4949,
 			}
 
 			logger = mock_logging.NewMockLogger(ctrl)
@@ -309,12 +309,12 @@ var _ = Describe("App Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			cfg := &app.Config{
-				AppDebug:   true,
-				AppEnv:     "local",
-				AppName:    "mock-name",
-				AppVersion: "mock-version",
-				RPCAppHost: "localhost",
-				RPCAppPort: 4949,
+				AppDebug:    true,
+				AppEnv:      "local",
+				AppName:     "mock-name",
+				AppVersion:  "mock-version",
+				GRPCAppHost: "localhost",
+				GRPCAppPort: 4949,
 			}
 
 			logger = mock_logging.NewMockLogger(ctrl)
