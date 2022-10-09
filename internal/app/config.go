@@ -12,7 +12,7 @@ type Config struct {
 	GRPCAppHost string `env:"GRPC_APP_HOST"`
 	GRPCAppPort int    `env:"GRPC_APP_PORT"`
 
-	DBProvider string `env:"DB_PROVIDER"`
+	RepositoryProvider string `env:"REPOSITORY_PROVIDER"`
 
 	MySQLMasterHost     string `env:"MYSQL_MASTER_HOST"`
 	MySQLMasterPort     int    `env:"MYSQL_MASTER_PORT"`

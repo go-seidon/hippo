@@ -36,9 +36,9 @@ var _ = Describe("App Package", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			cfg = &app.Config{
-				AppDebug:   true,
-				AppEnv:     "local",
-				DBProvider: "mongo",
+				AppDebug:           true,
+				AppEnv:             "local",
+				RepositoryProvider: "mongo",
 			}
 			logger = mock_logging.NewMockLogger(ctrl)
 			repository = mock_repository.NewMockProvider(ctrl)

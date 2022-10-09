@@ -54,7 +54,7 @@ var _ = Describe("App Package", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithConfig(&app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
+						RepositoryProvider: repository.PROVIDER_MYSQL,
 					}),
 				)
 
@@ -67,8 +67,8 @@ var _ = Describe("App Package", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithConfig(&app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
-						AppDebug:   true,
+						RepositoryProvider: repository.PROVIDER_MYSQL,
+						AppDebug:           true,
 					}),
 				)
 
@@ -81,9 +81,9 @@ var _ = Describe("App Package", func() {
 			It("should return result", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithConfig(&app.Config{
-						DBProvider: repository.DB_PROVIDER_MYSQL,
-						AppDebug:   true,
-						AppEnv:     "local",
+						RepositoryProvider: repository.PROVIDER_MYSQL,
+						AppDebug:           true,
+						AppEnv:             "local",
 					}),
 				)
 
@@ -102,10 +102,10 @@ var _ = Describe("App Package", func() {
 				res, err := rest_app.NewRestApp(
 					rest_app.WithLogger(log),
 					rest_app.WithConfig(&app.Config{
-						DBProvider:    repository.DB_PROVIDER_MONGO,
-						AppEnv:        "local",
-						MongoMode:     "standalone",
-						MongoAuthMode: "basic",
+						RepositoryProvider: repository.PROVIDER_MONGO,
+						AppEnv:             "local",
+						MongoMode:          "standalone",
+						MongoAuthMode:      "basic",
 					}),
 				)
 
@@ -178,11 +178,11 @@ var _ = Describe("App Package", func() {
 
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(&app.Config{
-					AppName:     "mock-name",
-					AppVersion:  "mock-version",
-					RESTAppHost: "localhost",
-					RESTAppPort: 4949,
-					DBProvider:  "mysql",
+					AppName:            "mock-name",
+					AppVersion:         "mock-version",
+					RESTAppHost:        "localhost",
+					RESTAppPort:        4949,
+					RepositoryProvider: "mysql",
 				}),
 				rest_app.WithLogger(logger),
 				rest_app.WithServer(server),
@@ -327,11 +327,11 @@ var _ = Describe("App Package", func() {
 			server = mock_restapp.NewMockServer(ctrl)
 			ra, _ = rest_app.NewRestApp(
 				rest_app.WithConfig(&app.Config{
-					AppName:     "mock-name",
-					AppVersion:  "mock-version",
-					RESTAppHost: "localhost",
-					RESTAppPort: 4949,
-					DBProvider:  "mysql",
+					AppName:            "mock-name",
+					AppVersion:         "mock-version",
+					RESTAppHost:        "localhost",
+					RESTAppPort:        4949,
+					RepositoryProvider: "mysql",
 				}),
 				rest_app.WithLogger(logger),
 				rest_app.WithServer(server),
