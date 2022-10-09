@@ -83,12 +83,12 @@ This command should run all the test available on this project.
   $ docker container create --name hippo-app ^
     -e REST_APP_HOST="0.0.0.0" ^
     -e REST_APP_PORT=3000 ^
-    -e RPC_APP_HOST="0.0.0.0" ^
-    -e RPC_APP_PORT=5000 ^
+    -e GRPC_APP_HOST="0.0.0.0" ^
+    -e GRPC_APP_PORT=5000 ^
     -e MYSQL_MASTER_HOST="host.docker.internal" ^
     -e MYSQL_REPLICA_HOST="host.docker.internal" ^
     -p 3000:3000 -p 5000:5000 ^
-    -v D:\startup\goseidon\hippo\storage:/storage ^
+    -v storage:/storage ^
     hippo
 ```
 
@@ -193,5 +193,5 @@ C:\Windows\System32\drivers\etc\hosts
 
 ## Issue
 1. Verify script EOL
-If you're using window make sure to change the bash script from CRLF to LF
-Issue: https://stackoverflow.com/questions/29140377/sh-file-not-found
+If you're using window make sure to change the bash script from CRLF to LF (https://stackoverflow.com/questions/29140377/sh-file-not-found)
+

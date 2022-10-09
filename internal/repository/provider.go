@@ -3,8 +3,8 @@ package repository
 import "context"
 
 const (
-	DB_PROVIDER_MYSQL = "mysql"
-	DB_PROVIDER_MONGO = "mongo"
+	PROVIDER_MYSQL = "mysql"
+	PROVIDER_MONGO = "mongo"
 )
 
 type Provider interface {

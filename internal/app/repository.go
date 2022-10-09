@@ -15,13 +15,13 @@ func NewDefaultRepository(config *Config) (repository.Provider, error) {
 		return nil, fmt.Errorf("invalid config")
 	}
 
-	if config.DBProvider != repository.DB_PROVIDER_MYSQL &&
-		config.DBProvider != repository.DB_PROVIDER_MONGO {
+	if config.RepositoryProvider != repository.PROVIDER_MYSQL &&
+		config.RepositoryProvider != repository.PROVIDER_MONGO {
 		return nil, fmt.Errorf("invalid repository provider")
 	}
 
 	var repo repository.Provider
-	if config.DBProvider == repository.DB_PROVIDER_MYSQL {
+	if config.RepositoryProvider == repository.PROVIDER_MYSQL {
 		dbMaster, err := db_mysql.NewClient(
 			db_mysql.WithAuth(config.MySQLMasterUser, config.MySQLMasterPassword),
 			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLMasterDBName}),
@@ -49,7 +49,7 @@ func NewDefaultRepository(config *Config) (repository.Provider, error) {
 		if err != nil {
 			return nil, err
 		}
-	} else if config.DBProvider == repository.DB_PROVIDER_MONGO {
+	} else if config.RepositoryProvider == repository.PROVIDER_MONGO {
 		opts := []db_mongo.ClientOption{}
 		if config.MongoAuthMode == db_mongo.AUTH_BASIC {
 			opts = append(opts, db_mongo.WithBasicAuth(

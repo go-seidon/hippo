@@ -5,10 +5,10 @@ APP_DEBUG = true
 
 REST_APP_HOST = "localhost"
 REST_APP_PORT = 3000
-RPC_APP_HOST = "localhost"
-RPC_APP_PORT = 5000
+GRPC_APP_HOST = "localhost"
+GRPC_APP_PORT = 5000
 
-DB_PROVIDER = "mysql"
+REPOSITORY_PROVIDER = "mysql"
 
 MYSQL_MASTER_HOST = "localhost"
 MYSQL_MASTER_PORT = 3300

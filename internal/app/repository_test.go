@@ -23,7 +23,7 @@ var _ = Describe("Repository Package", func() {
 		When("db provider is not valid", func() {
 			It("should return error", func() {
 				res, err := app.NewDefaultRepository(&app.Config{
-					DBProvider: "invalid",
+					RepositoryProvider: "invalid",
 				})
 
 				Expect(res).To(BeNil())
@@ -35,7 +35,7 @@ var _ = Describe("Repository Package", func() {
 			When("success create repository", func() {
 				It("should return result", func() {
 					res, err := app.NewDefaultRepository(&app.Config{
-						DBProvider: "mysql",
+						RepositoryProvider: "mysql",
 					})
 
 					Expect(res).ToNot(BeNil())
@@ -48,8 +48,8 @@ var _ = Describe("Repository Package", func() {
 			When("db mode is not valid", func() {
 				It("should return error", func() {
 					res, err := app.NewDefaultRepository(&app.Config{
-						DBProvider: "mongo",
-						MongoMode:  "invalid",
+						RepositoryProvider: "mongo",
+						MongoMode:          "invalid",
 					})
 
 					Expect(res).To(BeNil())
@@ -60,8 +60,8 @@ var _ = Describe("Repository Package", func() {
 			When("auth is not valid", func() {
 				It("should return error", func() {
 					res, err := app.NewDefaultRepository(&app.Config{
-						DBProvider: "mongo",
-						MongoMode:  "standalone",
+						RepositoryProvider: "mongo",
+						MongoMode:          "standalone",
 					})
 
 					Expect(res).To(BeNil())
@@ -72,9 +72,9 @@ var _ = Describe("Repository Package", func() {
 			When("success create using standalone", func() {
 				It("should return error", func() {
 					res, err := app.NewDefaultRepository(&app.Config{
-						DBProvider:    "mongo",
-						MongoMode:     "standalone",
-						MongoAuthMode: "basic",
+						RepositoryProvider: "mongo",
+						MongoMode:          "standalone",
+						MongoAuthMode:      "basic",
 					})
 
 					Expect(res).ToNot(BeNil())
@@ -85,9 +85,9 @@ var _ = Describe("Repository Package", func() {
 			When("success create using replication", func() {
 				It("should return error", func() {
 					res, err := app.NewDefaultRepository(&app.Config{
-						DBProvider:    "mongo",
-						MongoMode:     "replication",
-						MongoAuthMode: "basic",
+						RepositoryProvider: "mongo",
+						MongoMode:          "replication",
+						MongoAuthMode:      "basic",
 					})
 
 					Expect(res).ToNot(BeNil())

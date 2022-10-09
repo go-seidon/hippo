@@ -24,16 +24,25 @@ var _ = Describe("Logging Package", func() {
 
 		When("config is not specified", func() {
 			It("should return error", func() {
-				res, err := app.NewDefaultLog(nil)
+				res, err := app.NewDefaultLog(nil, "app-name")
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("invalid config")))
 			})
 		})
 
+		When("app name is not specified", func() {
+			It("should return error", func() {
+				res, err := app.NewDefaultLog(config, "")
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("invalid app name")))
+			})
+		})
+
 		When("success create default log", func() {
 			It("should return result", func() {
-				res, err := app.NewDefaultLog(config)
+				res, err := app.NewDefaultLog(config, "app-name")
 
 				Expect(res).ToNot(BeNil())
 				Expect(err).To(BeNil())
