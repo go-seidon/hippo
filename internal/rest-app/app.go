@@ -111,11 +111,11 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		}
 	}
 
+	validator := validation.NewGoValidator()
+	identifier := text.NewKsuid()
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
-	identifier := text.NewKsuid()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
-	validator := validation.NewGoValidator()
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
