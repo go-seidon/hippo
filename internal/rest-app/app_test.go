@@ -197,7 +197,7 @@ var _ = Describe("App Package", func() {
 			It("should return error", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name-rest"), gomock.Eq("mock-version")).
 					Times(1)
 
 				healthService.
@@ -216,7 +216,7 @@ var _ = Describe("App Package", func() {
 			It("should return error", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name-rest"), gomock.Eq("mock-version")).
 					Times(1)
 
 				healthService.
@@ -241,7 +241,7 @@ var _ = Describe("App Package", func() {
 			It("should return error", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name-rest"), gomock.Eq("mock-version")).
 					Times(1)
 
 				healthService.
@@ -277,7 +277,7 @@ var _ = Describe("App Package", func() {
 			It("should return result", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name"), gomock.Eq("mock-version")).
+					Infof(gomock.Eq("Running %s:%s"), gomock.Eq("mock-name-rest"), gomock.Eq("mock-version")).
 					Times(1)
 
 				healthService.
@@ -344,7 +344,7 @@ var _ = Describe("App Package", func() {
 			It("should return error", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
+					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name-rest"), gomock.Eq("localhost:4949")).
 					Times(1)
 
 				healthService.
@@ -369,7 +369,7 @@ var _ = Describe("App Package", func() {
 			It("should return result", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
+					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name-rest"), gomock.Eq("localhost:4949")).
 					Times(1)
 
 				healthService.
@@ -394,7 +394,7 @@ var _ = Describe("App Package", func() {
 			It("should log the error", func() {
 				logger.
 					EXPECT().
-					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name"), gomock.Eq("localhost:4949")).
+					Infof(gomock.Eq("Stopping %s on: %s"), gomock.Eq("mock-name-rest"), gomock.Eq("localhost:4949")).
 					Times(1)
 
 				healthService.

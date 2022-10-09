@@ -126,7 +126,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	raCfg := &RestAppConfig{
-		AppName:        p.Config.AppName,
+		AppName:        fmt.Sprintf("%s-rest", p.Config.AppName),
 		AppVersion:     p.Config.AppVersion,
 		AppHost:        p.Config.RESTAppHost,
 		AppPort:        p.Config.RESTAppPort,

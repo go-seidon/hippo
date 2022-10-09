@@ -132,7 +132,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	}
 
 	config := &GrpcAppConfig{
-		AppName:        p.Config.AppName,
+		AppName:        fmt.Sprintf("%s-grpc", p.Config.AppName),
 		AppVersion:     p.Config.AppVersion,
 		AppHost:        p.Config.RPCAppHost,
 		AppPort:        p.Config.RPCAppPort,
