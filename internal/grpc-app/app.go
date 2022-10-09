@@ -81,28 +81,24 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	}
 
 	var err error
+
 	logger := p.Logger
 	if logger == nil {
 		logger, err = app.NewDefaultLog(p.Config, config.AppName)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	repo := p.Repository
 	if repo == nil {
 		repo, err = app.NewDefaultRepository(p.Config)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	healthService := p.HealthService
 	if healthService == nil {
 		healthService, err = app.NewDefaultHealthCheck(logger, repo)
-		if err != nil {
-			return nil, err
-		}
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	fileManager := filesystem.NewFileManager()
