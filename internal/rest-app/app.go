@@ -87,7 +87,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	var err error
-
 	logger := p.Logger
 	if logger == nil {
 		logger, err = app.NewDefaultLog(p.Config, config.AppName)
