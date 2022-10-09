@@ -88,7 +88,7 @@ This command should run all the test available on this project.
     -e MYSQL_MASTER_HOST="host.docker.internal" ^
     -e MYSQL_REPLICA_HOST="host.docker.internal" ^
     -p 3000:3000 -p 5000:5000 ^
-    -v D:\startup\goseidon\hippo\storage:/storage ^
+    -v storage:/storage ^
     hippo
 ```
 
