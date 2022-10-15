@@ -85,7 +85,7 @@ var _ = Describe("File Handler", func() {
 
 				w.
 					EXPECT().
-					WriteHeader(gomock.Eq(400)).
+					WriteHeader(gomock.Eq(500)).
 					Times(1)
 
 				w.
@@ -268,7 +268,7 @@ var _ = Describe("File Handler", func() {
 
 				w.
 					EXPECT().
-					WriteHeader(gomock.Eq(400)).
+					WriteHeader(gomock.Eq(500)).
 					Times(1)
 
 				w.
@@ -389,7 +389,7 @@ var _ = Describe("File Handler", func() {
 
 				w.
 					EXPECT().
-					WriteHeader(gomock.Eq(400)).
+					WriteHeader(gomock.Eq(500)).
 					Times(1)
 
 				w.
@@ -568,7 +568,7 @@ var _ = Describe("File Handler", func() {
 				resBody := rest_app.ResponseBody{}
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
-				Expect(w.Code).To(Equal(400))
+				Expect(w.Code).To(Equal(500))
 				Expect(resBody.Code).To(Equal(int32(1001)))
 				Expect(resBody.Message).To(Equal("disk error"))
 				Expect(resBody.Data).To(BeNil())

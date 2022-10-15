@@ -61,7 +61,7 @@ func (h *fileHandler) UploadFile(w http.ResponseWriter, req *http.Request) {
 	)
 	if err != nil {
 		code := status.ACTION_FAILED
-		httpCode := http.StatusBadRequest
+		httpCode := http.StatusInternalServerError
 		message := err.Error()
 
 		switch e := err.(type) {
@@ -104,7 +104,7 @@ func (h *fileHandler) RetrieveFileById(w http.ResponseWriter, req *http.Request)
 	})
 	if err != nil {
 		code := status.ACTION_FAILED
-		httpCode := http.StatusBadRequest
+		httpCode := http.StatusInternalServerError
 		message := err.Error()
 
 		switch e := err.(type) {
@@ -137,7 +137,7 @@ func (h *fileHandler) RetrieveFileById(w http.ResponseWriter, req *http.Request)
 			WithWriterSerializer(w, h.serializer),
 			WithCode(status.ACTION_FAILED),
 			WithMessage(err.Error()),
-			WithHttpCode(http.StatusBadRequest),
+			WithHttpCode(http.StatusInternalServerError),
 		)
 		return
 	}
@@ -163,7 +163,7 @@ func (h *fileHandler) DeleteFileById(w http.ResponseWriter, req *http.Request) {
 	})
 	if err != nil {
 		code := status.ACTION_FAILED
-		httpCode := http.StatusBadRequest
+		httpCode := http.StatusInternalServerError
 		message := err.Error()
 
 		if errors.Is(err, file.ErrorNotFound) {
