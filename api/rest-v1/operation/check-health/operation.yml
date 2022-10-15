@@ -20,7 +20,7 @@ responses:
             $ref: "./example_some_failed.yml"
           'All Failed':
             $ref: "./example_all_failed.yml"
-  '400':
-    $ref: "./../../response/bad_request.yml"
+  '500':
+    $ref: "./../../main.yml#/components/responses/ServerError"
 security:
   - basicAuth: []
