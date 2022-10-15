@@ -10,4 +10,4 @@ properties:
   message:
     type: string
   data:
-    $ref: "./schema_data.yml"
+    $ref: "./response_data.yml"
