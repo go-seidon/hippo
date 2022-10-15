@@ -5,7 +5,7 @@ description: check service health
 tags:
   - healthcheck
 parameters:
-  - $ref: "./../../parameter/correlation_id.yml"
+  - $ref: "./../../main.yml#/components/parameters/CorrelationId"
 responses:
   '200':
     description: success check service health

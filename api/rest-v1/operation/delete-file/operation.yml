@@ -5,8 +5,8 @@ description: delete file object
 tags:
   - file
 parameters:
-  - $ref: "./../../parameter/correlation_id.yml"
-  - $ref: "./../../parameter/object_id.yml"
+  - $ref: "./../../main.yml#/components/parameters/CorrelationId"
+  - $ref: "./../../main.yml#/components/parameters/ObjectId"
 responses:
   '200':
     description: success delete file

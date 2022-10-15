@@ -5,7 +5,7 @@ description: upload file
 tags:
   - file
 parameters:
-  - $ref: "./../../parameter/correlation_id.yml"
+  - $ref: "./../../main.yml#/components/parameters/CorrelationId"
 requestBody:
   description: file to be uploaded
   required: true

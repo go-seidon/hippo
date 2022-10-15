@@ -24,9 +24,9 @@ paths:
     $ref: "./path/file_id.yml"
 components:
   parameters:
-    objectId: 
+    ObjectId: 
       $ref: "./parameter/object_id.yml"
-    correlationId: 
+    CorrelationId: 
       $ref: "./parameter/correlation_id.yml"
   schemas:
     ResponseBodyInfo:

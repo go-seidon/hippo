@@ -88,10 +88,10 @@ type UploadFileResponse struct {
 	Message string         `json:"message"`
 }
 
-// CorrelationId defines model for correlationId.
+// CorrelationId defines model for CorrelationId.
 type CorrelationId = string
 
-// ObjectId defines model for objectId.
+// ObjectId defines model for ObjectId.
 type ObjectId = string
 
 // BadRequest defines model for BadRequest.
