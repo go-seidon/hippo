@@ -13,7 +13,7 @@ responses:
     content: 
       application/octet-stream:
         schema:
-          $ref: "./schema_response.yml"
+          $ref: "./response_body.yml"
     headers:
       X-File-Name:
         schema:

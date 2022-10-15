@@ -8,4 +8,4 @@ properties:
   details:
     type: object
     additionalProperties:
-      $ref: "./schema_detail.yml"
+      $ref: "./response_detail.yml"
