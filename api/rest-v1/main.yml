@@ -24,9 +24,9 @@ paths:
     $ref: "./path/file_id.yml"
 components:
   parameters:
-    objectId: 
+    ObjectId: 
       $ref: "./parameter/object_id.yml"
-    correlationId: 
+    CorrelationId: 
       $ref: "./parameter/correlation_id.yml"
   schemas:
     ResponseBodyInfo:
@@ -58,6 +58,17 @@ components:
       $ref: "./operation/upload-file/response_body.yml"
     UploadFileData:
       $ref: "./operation/upload-file/response_data.yml"
+
+  responses:
+    BadRequest:
+      $ref: "./response/bad_request.yml"
+    UnauthenticatedAccess:
+      $ref: "./response/unauthenticated_access.yml"
+    NotFound:
+      $ref: "./response/not_found.yml"
+    ServerError:
+      $ref: "./response/server_error.yml"
+
   securitySchemes:
     basicAuth:
       $ref: "./security/basic.yml"

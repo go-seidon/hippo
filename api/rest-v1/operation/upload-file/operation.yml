@@ -1,11 +1,11 @@
 
 operationId: UploadFile
-summary: upload file object
-description: upload file object
+summary: upload file
+description: upload file
 tags:
   - file
 parameters:
-  - $ref: "./../../parameter/correlation_id.yml"
+  - $ref: "./../../main.yml#/components/parameters/CorrelationId"
 requestBody:
   description: file to be uploaded
   required: true
@@ -13,10 +13,6 @@ requestBody:
     multipart/form-data:
       schema:
         $ref: "./request_body.yml"
-      examples:
-        file:
-          summary: file object
-          externalValue: https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png
 responses:
   '200':
     description: success upload file
@@ -28,15 +24,10 @@ responses:
           'Success':
             $ref: "./example_success.yml"
   '400':
-    description: failed upload file
-    content: 
-      application/json:
-        schema:
-          $ref: "./../../schema/response_body_info.yml"
-        examples:
-          'General Error':
-            $ref: "./../../response/example_general_error.yml"
-          'Invalid Param':
-            $ref: "./../../response/example_invalid_param.yml"
+    $ref: "./../../main.yml#/components/responses/BadRequest"
+  '401':
+    $ref: "./../../main.yml#/components/responses/UnauthenticatedAccess"
+  '500':
+    $ref: "./../../main.yml#/components/responses/ServerError"
 security:
   - basicAuth: []

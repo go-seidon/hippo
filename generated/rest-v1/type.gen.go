@@ -78,7 +78,7 @@ type UploadFileData struct {
 
 // UploadFileRequest defines model for UploadFileRequest.
 type UploadFileRequest struct {
-	File *openapi_types.File `json:"file,omitempty"`
+	File openapi_types.File `json:"file"`
 }
 
 // UploadFileResponse defines model for UploadFileResponse.
@@ -88,11 +88,23 @@ type UploadFileResponse struct {
 	Message string         `json:"message"`
 }
 
-// CorrelationId defines model for correlationId.
+// CorrelationId defines model for CorrelationId.
 type CorrelationId = string
 
-// ObjectId defines model for objectId.
+// ObjectId defines model for ObjectId.
 type ObjectId = string
+
+// BadRequest defines model for BadRequest.
+type BadRequest = ResponseBodyInfo
+
+// NotFound defines model for NotFound.
+type NotFound = ResponseBodyInfo
+
+// ServerError defines model for ServerError.
+type ServerError = ResponseBodyInfo
+
+// UnauthenticatedAccess defines model for UnauthenticatedAccess.
+type UnauthenticatedAccess = ResponseBodyInfo
 
 // GetAppInfoParams defines parameters for GetAppInfo.
 type GetAppInfoParams struct {

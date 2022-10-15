@@ -5,8 +5,8 @@ description: retrieve file object
 tags:
   - file
 parameters:
-  - $ref: "./../../parameter/correlation_id.yml"
-  - $ref: "./../../parameter/object_id.yml"
+  - $ref: "./../../main.yml#/components/parameters/CorrelationId"
+  - $ref: "./../../main.yml#/components/parameters/ObjectId"
 responses:
   '200':
     description: success retrieve file
@@ -37,33 +37,12 @@ responses:
           description: file size
           example: 18934
   '400':
-    description: failed retrieve file
-    content: 
-      application/json:
-        schema:
-          $ref: "./../../schema/response_body_info.yml"
-        examples:
-          'General Error':
-            $ref: "./../../response/example_general_error.yml"
-          'Invalid Param':
-            $ref: "./../../response/example_invalid_param.yml"
+    $ref: "./../../main.yml#/components/responses/BadRequest"
+  '401':
+    $ref: "./../../main.yml#/components/responses/UnauthenticatedAccess"
   '404':
-    description: resource not found
-    content: 
-      application/json:
-        schema:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: integer
-              format: int32
-            message:
-              type: string
-        examples:
-          'Not Found':
-            $ref: "./../../response/example_not_found.yml"
+    $ref: "./../../main.yml#/components/responses/NotFound"
+  '500':
+    $ref: "./../../main.yml#/components/responses/ServerError"
 security:
   - basicAuth: []

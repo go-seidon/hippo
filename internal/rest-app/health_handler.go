@@ -24,7 +24,7 @@ func (h *healthHandler) CheckHealth(w http.ResponseWriter, req *http.Request) {
 			WithWriterSerializer(w, h.serializer),
 			WithCode(status.ACTION_FAILED),
 			WithMessage(err.Error()),
-			WithHttpCode(http.StatusBadRequest),
+			WithHttpCode(http.StatusInternalServerError),
 		)
 		return
 	}

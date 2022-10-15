@@ -71,7 +71,7 @@ var _ = Describe("Health Handler", func() {
 
 				w.
 					EXPECT().
-					WriteHeader(gomock.Eq(400)).
+					WriteHeader(gomock.Eq(500)).
 					Times(1)
 
 				w.
