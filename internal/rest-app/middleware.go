@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/internal/auth"
-	"github.com/go-seidon/hippo/internal/serialization"
 	"github.com/go-seidon/hippo/internal/status"
 	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/serialization"
 )
 
 type DefaultMiddlewareParam struct {

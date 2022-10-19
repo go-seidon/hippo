@@ -6,8 +6,8 @@ import (
 	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
-	mock_serialization "github.com/go-seidon/hippo/internal/serialization/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
+	mock_serialization "github.com/go-seidon/provider/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 )
