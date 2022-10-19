@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-seidon/hippo/internal/hashing"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding"
+	"github.com/go-seidon/provider/hashing"
 )
 
 type BasicAuth interface {

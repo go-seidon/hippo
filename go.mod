@@ -18,7 +18,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.mongodb.org/mongo-driver v1.7.0
-	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 )
 

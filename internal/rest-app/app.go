@@ -10,7 +10,6 @@ import (
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
-	"github.com/go-seidon/hippo/internal/hashing"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/repository"
@@ -18,6 +17,7 @@ import (
 	"github.com/go-seidon/hippo/internal/text"
 	"github.com/go-seidon/hippo/internal/validation"
 	"github.com/go-seidon/provider/encoding"
+	"github.com/go-seidon/provider/hashing"
 
 	"github.com/gorilla/mux"
 )

@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/hippo/internal/auth"
-	mock_hashing "github.com/go-seidon/hippo/internal/hashing/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	mock_encoding "github.com/go-seidon/provider/encoding/mock"
+	mock_hashing "github.com/go-seidon/provider/hashing/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
