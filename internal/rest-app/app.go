@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/auth"
-	"github.com/go-seidon/hippo/internal/encoding"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/hashing"
@@ -18,6 +17,7 @@ import (
 	"github.com/go-seidon/hippo/internal/serialization"
 	"github.com/go-seidon/hippo/internal/text"
 	"github.com/go-seidon/hippo/internal/validation"
+	"github.com/go-seidon/provider/encoding"
 
 	"github.com/gorilla/mux"
 )
