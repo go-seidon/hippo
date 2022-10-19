@@ -8,7 +8,6 @@ import (
 
 	grpc_v1 "github.com/go-seidon/hippo/generated/grpc-v1"
 	mock_grpcv1 "github.com/go-seidon/hippo/generated/grpc-v1/mock"
-	mock_context "github.com/go-seidon/hippo/internal/context/mock"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
@@ -17,6 +16,7 @@ import (
 	mock_io "github.com/go-seidon/hippo/internal/io/mock"
 	"github.com/go-seidon/hippo/internal/status"
 	"github.com/go-seidon/hippo/internal/validation"
+	mock_context "github.com/go-seidon/provider/context/mock"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 
