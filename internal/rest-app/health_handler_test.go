@@ -9,10 +9,10 @@ import (
 	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
-	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
 	mock_serialization "github.com/go-seidon/hippo/internal/serialization/mock"
+	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 )

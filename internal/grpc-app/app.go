@@ -12,12 +12,12 @@ import (
 	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/hippo/internal/text"
 	"github.com/go-seidon/hippo/internal/validation"
 	"github.com/go-seidon/provider/encoding"
 	"github.com/go-seidon/provider/hashing"
+	"github.com/go-seidon/provider/logging"
 	"google.golang.org/grpc"
 )
 

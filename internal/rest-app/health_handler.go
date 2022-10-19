@@ -5,9 +5,9 @@ import (
 
 	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/serialization"
 	"github.com/go-seidon/hippo/internal/status"
+	"github.com/go-seidon/provider/logging"
 )
 
 type healthHandler struct {

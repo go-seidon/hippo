@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	gLog "github.com/InVisionApp/go-logger"
-	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/provider/logging"
 )
 
 type GoHealthLog struct {

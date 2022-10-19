@@ -9,11 +9,11 @@ import (
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	"github.com/go-seidon/hippo/internal/filesystem"
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
-	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	mock_text "github.com/go-seidon/hippo/internal/text/mock"
 	mock_validation "github.com/go-seidon/hippo/internal/validation/mock"
+	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo/v2"

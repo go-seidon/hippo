@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/logging"
 )
 
 func NewDefaultHealthCheck(logger logging.Logger, repo repository.Provider) (healthcheck.HealthCheck, error) {

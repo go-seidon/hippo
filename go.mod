@@ -7,7 +7,6 @@ require (
 	github.com/InVisionApp/go-health v2.1.0+incompatible
 	github.com/InVisionApp/go-logger v1.0.1
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/go-stack/stack v1.8.1
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.0
@@ -15,7 +14,6 @@ require (
 	github.com/onsi/gomega v1.22.1
 	github.com/segmentio/ksuid v1.0.4
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
-	github.com/sirupsen/logrus v1.9.0
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.mongodb.org/mongo-driver v1.7.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
