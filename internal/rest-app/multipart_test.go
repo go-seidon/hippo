@@ -5,8 +5,8 @@ import (
 	"io"
 	"mime/multipart"
 
-	mock_io "github.com/go-seidon/hippo/internal/io/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

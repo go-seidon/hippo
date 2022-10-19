@@ -13,10 +13,10 @@ import (
 	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
-	mock_io "github.com/go-seidon/hippo/internal/io/mock"
 	"github.com/go-seidon/hippo/internal/status"
 	"github.com/go-seidon/hippo/internal/validation"
 	mock_context "github.com/go-seidon/provider/context/mock"
+	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 
