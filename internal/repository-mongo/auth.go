@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-seidon/hippo/internal/datetime"
 	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/datetime"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

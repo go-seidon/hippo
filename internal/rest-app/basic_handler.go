@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
-	"github.com/go-seidon/hippo/internal/logging"
-	"github.com/go-seidon/hippo/internal/serialization"
-	"github.com/go-seidon/hippo/internal/status"
+	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/serialization"
+	"github.com/go-seidon/provider/status"
 )
 
 type basicHandler struct {

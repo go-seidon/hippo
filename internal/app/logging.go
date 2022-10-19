@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 
-	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/provider/logging"
 )
 
 func NewDefaultLog(config *Config, appName string) (logging.Logger, error) {
@@ -30,7 +30,7 @@ func NewDefaultLog(config *Config, appName string) (logging.Logger, error) {
 	}
 
 	skipApp := logging.AddStackSkip("github.com/go-seidon/hippo/internal/app")
-	skipLog := logging.AddStackSkip("github.com/go-seidon/hippo/internal/logging")
+	skipLog := logging.AddStackSkip("github.com/go-seidon/provider/logging")
 	opts = append(opts, skipApp)
 	opts = append(opts, skipLog)
 

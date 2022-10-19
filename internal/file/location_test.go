@@ -3,8 +3,8 @@ package file_test
 import (
 	"time"
 
-	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
 	"github.com/go-seidon/hippo/internal/file"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

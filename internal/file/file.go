@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/internal/filesystem"
-	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/hippo/internal/text"
-	"github.com/go-seidon/hippo/internal/validation"
+	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/validation"
 )
 
 type File interface {

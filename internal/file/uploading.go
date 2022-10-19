@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/hippo/internal/validation"
+	"github.com/go-seidon/provider/validation"
 )
 
 func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, error) {

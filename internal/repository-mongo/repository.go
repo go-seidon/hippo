@@ -3,8 +3,8 @@ package repository_mongo
 import (
 	"fmt"
 
-	"github.com/go-seidon/hippo/internal/datetime"
 	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
+	"github.com/go-seidon/provider/datetime"
 )
 
 type RepositoryParam struct {

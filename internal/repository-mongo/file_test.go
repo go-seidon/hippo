@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson"

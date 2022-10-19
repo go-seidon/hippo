@@ -7,9 +7,9 @@ import (
 	"regexp"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	repository_mysql "github.com/go-seidon/hippo/internal/repository-mysql"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

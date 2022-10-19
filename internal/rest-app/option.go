@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	"github.com/go-seidon/hippo/internal/logging"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/logging"
 )
 
 type RestAppConfig struct {

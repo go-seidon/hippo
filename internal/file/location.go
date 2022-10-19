@@ -3,7 +3,7 @@ package file
 import (
 	"fmt"
 
-	"github.com/go-seidon/hippo/internal/datetime"
+	"github.com/go-seidon/provider/datetime"
 )
 
 type UploadLocation interface {

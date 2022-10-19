@@ -2,42 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/go-seidon/hippo/internal/app"
-	"github.com/go-seidon/hippo/internal/config"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 )
 
 func main() {
-	appEnv := os.Getenv("APP_ENV")
-	if appEnv == "" {
-		appEnv = "local"
-	}
-
-	appConfig := &app.Config{AppEnv: appEnv}
-
-	cfgFileName := fmt.Sprintf("config/%s.toml", appConfig.AppEnv)
-	tomlConfig, err := config.NewViperConfig(
-		config.WithFileName(cfgFileName),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	err = tomlConfig.LoadConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	err = tomlConfig.ParseConfig(appConfig)
+	config, err := app.NewDefaultConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	app, err := rest_app.NewRestApp(
-		rest_app.WithConfig(appConfig),
+		rest_app.WithConfig(config),
 	)
 	if err != nil {
 		panic(err)
