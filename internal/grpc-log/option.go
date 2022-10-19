@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-seidon/hippo/internal/datetime"
 	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/provider/datetime"
 )
 
 type LogInterceptorConfig struct {

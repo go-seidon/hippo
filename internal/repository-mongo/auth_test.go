@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 

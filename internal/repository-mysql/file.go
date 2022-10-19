@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-seidon/hippo/internal/datetime"
 	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/datetime"
 )
 
 type fileRepository struct {

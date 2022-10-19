@@ -8,11 +8,11 @@ import (
 
 	"github.com/go-seidon/hippo/internal/auth"
 	mock_auth "github.com/go-seidon/hippo/internal/auth/mock"
-	mock_datetime "github.com/go-seidon/hippo/internal/datetime/mock"
 	mock_logging "github.com/go-seidon/hippo/internal/logging/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
 	mock_serialization "github.com/go-seidon/hippo/internal/serialization/mock"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

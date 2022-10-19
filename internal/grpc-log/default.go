@@ -5,8 +5,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/go-seidon/hippo/internal/datetime"
 	"github.com/go-seidon/hippo/internal/logging"
+	"github.com/go-seidon/provider/datetime"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
