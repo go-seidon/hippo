@@ -21,9 +21,6 @@ require (
 
 require (
 	github.com/deepmap/oapi-codegen v1.11.1-0.20221003111356-96482c12b2bc
-	github.com/go-playground/locales v0.14.0
-	github.com/go-playground/universal-translator v0.18.0
-	github.com/go-playground/validator/v10 v10.11.1
 	github.com/go-seidon/provider v0.0.2-alpha
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1

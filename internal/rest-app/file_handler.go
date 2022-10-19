@@ -9,10 +9,10 @@ import (
 
 	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
 	"github.com/go-seidon/hippo/internal/file"
-	"github.com/go-seidon/hippo/internal/validation"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
 	"github.com/go-seidon/provider/status"
+	"github.com/go-seidon/provider/validation"
 	"github.com/gorilla/mux"
 )
 
