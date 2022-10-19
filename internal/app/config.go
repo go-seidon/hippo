@@ -1,5 +1,12 @@
 package app
 
+import (
+	"fmt"
+	"os"
+
+	"github.com/go-seidon/provider/config"
+)
+
 type Config struct {
 	AppName    string `env:"APP_NAME"`
 	AppEnv     string `env:"APP_ENV"`
@@ -39,4 +46,31 @@ type Config struct {
 
 	UploadFormSize  int64  `env:"UPLOAD_FORM_SIZE"`
 	UploadDirectory string `env:"UPLOAD_DIRECTORY"`
+}
+
+func NewDefaultConfig() (*Config, error) {
+	appEnv := os.Getenv("APP_ENV")
+	if appEnv == "" {
+		appEnv = ENV_LOCAL
+	}
+	cfg := &Config{AppEnv: appEnv}
+
+	cfgFileName := fmt.Sprintf("config/%s.toml", cfg.AppEnv)
+	tomlConfig, err := config.NewViperConfig(
+		config.WithFileName(cfgFileName),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tomlConfig.LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	err = tomlConfig.ParseConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
