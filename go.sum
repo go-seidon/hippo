@@ -501,8 +501,8 @@ github.com/go-playground/validator/v10 v10.4.1/go.mod h1:nlOn6nFhuKACm19sB/8EGNn
 github.com/go-playground/validator/v10 v10.11.0/go.mod h1:i+3WkQ1FvaUjjxh1kSvIA4dMGDBiPU55YFDl0WbKdWU=
 github.com/go-playground/validator/v10 v10.11.1 h1:prmOlTVv+YjZjmRmNSF3VmspqJIxJWXmqUsHwfTRRkQ=
 github.com/go-playground/validator/v10 v10.11.1/go.mod h1:i+3WkQ1FvaUjjxh1kSvIA4dMGDBiPU55YFDl0WbKdWU=
-github.com/go-seidon/provider v0.0.2-alpha h1:JkKXxnPzM7a04q5JjtNvKnlaG5k08nHgyWA9R7MbWxY=
-github.com/go-seidon/provider v0.0.2-alpha/go.mod h1:YU48h1X+UPmnpH23WqJHA9/hvbZeOVgif9PqB2A8oaM=
+github.com/go-seidon/provider v0.0.4-alpha h1:EgkalsAckMCE2TpNqm1J11j0xG1UeBoQIAIwH/ja58s=
+github.com/go-seidon/provider v0.0.4-alpha/go.mod h1:UD5jMJ6raQmCT5+PqSlCTGy19F7vmog8nhODRcHI0DM=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=

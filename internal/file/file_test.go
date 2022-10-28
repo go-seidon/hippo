@@ -8,7 +8,7 @@ import (
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
-	mock_text "github.com/go-seidon/hippo/internal/text/mock"
+	mock_identifier "github.com/go-seidon/provider/identifier/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
@@ -29,7 +29,7 @@ var _ = Describe("File", func() {
 			fileManager *mock_filesystem.MockFileManager
 			dirManager  *mock_filesystem.MockDirectoryManager
 			logger      *mock_logging.MockLogger
-			identifier  *mock_text.MockIdentifier
+			identifier  *mock_identifier.MockIdentifier
 			locator     file.UploadLocation
 			validator   *mock_validation.MockValidator
 			config      *file.FileConfig
@@ -43,7 +43,7 @@ var _ = Describe("File", func() {
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
-			identifier = mock_text.NewMockIdentifier(ctrl)
+			identifier = mock_identifier.NewMockIdentifier(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
 			config = &file.FileConfig{

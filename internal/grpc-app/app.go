@@ -13,9 +13,9 @@ import (
 	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/hippo/internal/text"
 	"github.com/go-seidon/provider/encoding"
 	"github.com/go-seidon/provider/hashing"
+	"github.com/go-seidon/provider/identifier"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/validation"
 	"google.golang.org/grpc"
@@ -107,7 +107,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
-	identifier := text.NewKsuid()
+	identifier := identifier.NewKsuid()
 	validator := validation.NewGoValidator()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 

@@ -12,9 +12,9 @@ import (
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/hippo/internal/text"
 	"github.com/go-seidon/provider/encoding"
 	"github.com/go-seidon/provider/hashing"
+	"github.com/go-seidon/provider/identifier"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
 	"github.com/go-seidon/provider/validation"
@@ -112,7 +112,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	validator := validation.NewGoValidator()
-	identifier := text.NewKsuid()
+	identifier := identifier.NewKsuid()
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})

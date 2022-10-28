@@ -56,31 +56,21 @@ test-watch-integration:
 generate-mock:
 	mockgen -package=mock_grpcv1 -source generated/grpc-v1/file_grpc.pb.go -destination=generated/grpc-v1/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
-	mockgen -package=mock_config -source internal/config/config.go -destination=internal/config/mock/config_mock.go
-	mockgen -package=mock_context -source internal/context/context.go -destination=internal/context/mock/context_mock.go
-	mockgen -package=mock_datetime -source internal/datetime/clock.go -destination=internal/datetime/mock/clock_mock.go
 	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
-	mockgen -package=mock_encoding -source internal/encoding/encoder.go -destination=internal/encoding/mock/encoder_mock.go
 	mockgen -package=mock_file -source internal/file/file.go -destination=internal/file/mock/file_mock.go
 	mockgen -package=mock_file -source internal/file/location.go -destination=internal/file/mock/location_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_grpc -source internal/grpc/stream.go -destination=internal/grpc/mock/stream_mock.go
 	mockgen -package=mock_grpcapp -source internal/grpc-app/server.go -destination=internal/grpc-app/mock/server_mock.go
-	mockgen -package=mock_hashing -source internal/hashing/hasher.go -destination=internal/hashing/mock/hasher_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/checker.go -destination=internal/healthcheck/mock/checker_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/go_health.go -destination=internal/healthcheck/mock/go_health_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
-	mockgen -package=mock_io -source internal/io/io.go -destination=internal/io/mock/io_mock.go
-	mockgen -package=mock_logging -source internal/logging/log.go -destination=internal/logging/mock/log_mock.go
 	mockgen -package=mock_repository -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 	mockgen -package=mock_repository -source internal/repository/file.go -destination=internal/repository/mock/file_mock.go
 	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
 	mockgen -package=mock_restapp -source internal/rest-app/server.go -destination=internal/rest-app/mock/server_mock.go
-	mockgen -package=mock_serialization -source internal/serialization/serializer.go -destination=internal/serialization/mock/serializer_mock.go
-	mockgen -package=mock_text -source internal/text/id.go -destination=internal/text/mock/id_mock.go
-	mockgen -package=mock_validation -source internal/validation/validator.go -destination=internal/validation/mock/validator_mock.go
 
 .PHONY: generate-proto
 generate-proto:
