@@ -2,7 +2,6 @@ version: '3'
 services:
   mysql-db:
     image: "mariadb:10.4"
-    container_name: mysql-db
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -18,7 +17,6 @@ services:
         ipv4_address: 172.20.0.11
   mysql-db-r1:
     image: "mariadb:10.4"
-    container_name: mysql-db-r1
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -36,7 +34,6 @@ services:
         ipv4_address: 172.20.0.21
   mysql-db-r2:
     image: "mariadb:10.4"
-    container_name: mysql-db-r2
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -54,7 +51,6 @@ services:
         ipv4_address: 172.20.0.22
   mysql-db-r3:
     image: "mariadb:10.4"
-    container_name: mysql-db-r3
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -72,7 +68,6 @@ services:
         ipv4_address: 172.20.0.23
   mysql-db-test:
     image: "mariadb:10.4"
-    container_name: mysql-db-test
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -85,7 +80,6 @@ services:
         ipv4_address: 172.20.0.99
   phpmyadmin:
     image: "phpmyadmin:5.2"
-    container_name: phpmyadmin
     restart: always
     ports:
       - 8010:80
@@ -102,7 +96,6 @@ services:
         ipv4_address: 172.20.0.101
   mongo-db-1:
     image: "mongo:4.4"
-    container_name: mongo-db-1
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=toor
@@ -129,7 +122,6 @@ services:
         ipv4_address: 172.30.0.11
   mongo-db-2:
     image: "mongo:4.4"
-    container_name: mongo-db-2
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=toor
@@ -155,7 +147,6 @@ services:
         ipv4_address: 172.30.0.12
   mongo-db-3:
     image: "mongo:4.4"
-    container_name: mongo-db-3
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=toor
@@ -181,7 +172,6 @@ services:
         ipv4_address: 172.30.0.13
   mongo-test-db:
     image: "mongo:4.4"
-    container_name: mongo-test-db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=toor
@@ -197,7 +187,6 @@ services:
         ipv4_address: 172.30.0.99
   proxy:
     image: "haproxy:2.6"
-    container_name: "haproxy"
     restart: always
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
