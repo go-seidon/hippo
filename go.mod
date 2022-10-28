@@ -12,7 +12,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/onsi/ginkgo/v2 v2.3.1
 	github.com/onsi/gomega v1.22.1
-	github.com/segmentio/ksuid v1.0.4
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.mongodb.org/mongo-driver v1.7.0
@@ -21,7 +20,7 @@ require (
 
 require (
 	github.com/deepmap/oapi-codegen v1.11.1-0.20221003111356-96482c12b2bc
-	github.com/go-seidon/provider v0.0.2-alpha
+	github.com/go-seidon/provider v0.0.4-alpha
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
 )
