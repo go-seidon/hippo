@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/hippo/internal/text"
+	"github.com/go-seidon/provider/identifier"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/validation"
 )
@@ -81,7 +81,7 @@ type file struct {
 	fileRepo    repository.FileRepository
 	fileManager filesystem.FileManager
 	dirManager  filesystem.DirectoryManager
-	identifier  text.Identifier
+	identifier  identifier.Identifier
 	log         logging.Logger
 	locator     UploadLocation
 	validator   validation.Validator
@@ -97,7 +97,7 @@ type NewFileParam struct {
 	FileManager filesystem.FileManager
 	DirManager  filesystem.DirectoryManager
 	Logger      logging.Logger
-	Identifier  text.Identifier
+	Identifier  identifier.Identifier
 	Locator     UploadLocation
 	Validator   validation.Validator
 	Config      *FileConfig

@@ -12,7 +12,7 @@ import (
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
-	mock_text "github.com/go-seidon/hippo/internal/text/mock"
+	mock_identifier "github.com/go-seidon/provider/identifier/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/validation"
@@ -33,7 +33,7 @@ var _ = Describe("Uploader", func() {
 			dirManager       *mock_filesystem.MockDirectoryManager
 			logger           *mock_logging.MockLogger
 			reader           *mock_io.MockReader
-			identifier       *mock_text.MockIdentifier
+			identifier       *mock_identifier.MockIdentifier
 			locator          *mock_file.MockUploadLocation
 			validator        *mock_validation.MockValidator
 			s                file.File
@@ -52,7 +52,7 @@ var _ = Describe("Uploader", func() {
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
-			identifier = mock_text.NewMockIdentifier(ctrl)
+			identifier = mock_identifier.NewMockIdentifier(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
