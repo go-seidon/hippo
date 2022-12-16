@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	restapp "github.com/go-seidon/hippo/generated/restapp"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
@@ -80,7 +80,7 @@ func (h *fileHandler) UploadFile(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	d := &rest_v1.UploadFileData{
+	d := &restapp.UploadFileData{
 		Id:         uploadRes.UniqueId,
 		Name:       uploadRes.Name,
 		Mimetype:   uploadRes.Mimetype,
@@ -188,7 +188,7 @@ func (h *fileHandler) DeleteFileById(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	d := &rest_v1.DeleteFileData{
+	d := &restapp.DeleteFileData{
 		DeletedAt: r.DeletedAt.UnixMilli(),
 	}
 

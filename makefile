@@ -78,12 +78,12 @@ generate-proto:
 
 .PHONY: verify-swagger
 verify-swagger:
-	swagger-cli bundle api/rest-v1/main.yml --type json > generated/rest-v1/main.all.json
-	swagger-cli validate generated/rest-v1/main.all.json 
+	swagger-cli bundle api/restapp/main.yml --type json > generated/restapp/main.all.json
+	swagger-cli validate generated/restapp/main.all.json 
 
 .PHONY: generate-swagger
 generate-swagger:
-	swagger-cli bundle api/rest-v1/main.yml --type yaml > generated/rest-v1/main.all.yml
+	swagger-cli bundle api/restapp/main.yml --type yaml > generated/restapp/main.all.yml
 
 .PHONY: generate-oapi
 generate-oapi:
@@ -92,7 +92,7 @@ generate-oapi:
 
 .PHONY: generate-oapi-type
 generate-oapi-type:
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/type.gen.yaml generated/rest-v1/main.all.yml
+	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml generated/restapp/main.all.yml
 
 .PHONY: run-grpc-app
 run-grpc-app:

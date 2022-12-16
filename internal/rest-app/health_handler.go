@@ -3,7 +3,7 @@ package rest_app
 import (
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	restapp "github.com/go-seidon/hippo/generated/restapp"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
@@ -29,16 +29,16 @@ func (h *healthHandler) CheckHealth(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	details := map[string]rest_v1.CheckHealthDetail{}
+	details := map[string]restapp.CheckHealthDetail{}
 	for checkName, item := range r.Items {
-		details[checkName] = rest_v1.CheckHealthDetail{
+		details[checkName] = restapp.CheckHealthDetail{
 			Name:      item.Name,
 			Status:    item.Status,
 			Error:     item.Error,
 			CheckedAt: item.CheckedAt.UnixMilli(),
 		}
 	}
-	d := &rest_v1.CheckHealthData{
+	d := &restapp.CheckHealthData{
 		Status:  r.Status,
 		Details: details,
 	}

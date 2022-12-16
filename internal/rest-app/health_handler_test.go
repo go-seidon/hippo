@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	restapp "github.com/go-seidon/hippo/generated/restapp"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
@@ -105,7 +105,7 @@ var _ = Describe("Health Handler", func() {
 					},
 				}
 
-				details := map[string]rest_v1.CheckHealthDetail{
+				details := map[string]restapp.CheckHealthDetail{
 					"app-disk": {
 						Name:      "app-disk",
 						Status:    "FAILED",
@@ -122,7 +122,7 @@ var _ = Describe("Health Handler", func() {
 				b := rest_app.ResponseBody{
 					Code:    1000,
 					Message: "success check service health",
-					Data: &rest_v1.CheckHealthData{
+					Data: &restapp.CheckHealthData{
 						Status:  "WARNING",
 						Details: details,
 					},

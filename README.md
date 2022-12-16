@@ -166,12 +166,11 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. tidy db migrations
-2. handle record deleted
-3. rename -v1 (we're gonna version using go semantic versioning foldering)
-4. Use echo router
-5. Upload docker image to docker hub
-6. Add gracefull shutdown (rest & grpc app)
+1. rename -v1 (we're gonna version using go semantic versioning foldering)
+2. handle record deleted as not found
+3. Use echo router
+4. Upload docker image to docker hub
+5. Add gracefull shutdown (rest & grpc app)
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
@@ -179,13 +178,13 @@ C:\Windows\System32\drivers\etc\hosts
 ## Nice to have
 1. Simplify factory function interface not returning error
 2. Upload location strategy
-3. Add repo: `repository-postgre`
+3. Add repo: `postgre`
 4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
 5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
 6. Separate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
-1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
+1. Separate findFile query in DeleteFile and RetrieveFile repository/mysql
 2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
 3. Change NewDailyRotate using optional param
 

@@ -3,7 +3,7 @@ package rest_app_test
 import (
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	"github.com/go-seidon/hippo/generated/restapp"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
@@ -166,7 +166,7 @@ var _ = Describe("Basic Handler", func() {
 				b := rest_app.ResponseBody{
 					Code:    1000,
 					Message: "success",
-					Data: &rest_v1.GetAppInfoData{
+					Data: &restapp.GetAppInfoData{
 						AppName:    "mock-name",
 						AppVersion: "mock-version",
 					},

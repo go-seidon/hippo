@@ -3,7 +3,7 @@ package rest_app
 import (
 	"net/http"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	restapp "github.com/go-seidon/hippo/generated/restapp"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
 	"github.com/go-seidon/provider/status"
@@ -16,7 +16,7 @@ type basicHandler struct {
 }
 
 func (h *basicHandler) GetAppInfo(w http.ResponseWriter, req *http.Request) {
-	d := &rest_v1.GetAppInfoData{
+	d := &restapp.GetAppInfoData{
 		AppName:    h.config.AppName,
 		AppVersion: h.config.AppVersion,
 	}

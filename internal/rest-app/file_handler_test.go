@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	rest_v1 "github.com/go-seidon/hippo/generated/rest-v1"
+	restapp "github.com/go-seidon/hippo/generated/restapp"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
@@ -178,7 +178,7 @@ var _ = Describe("File Handler", func() {
 				b := rest_app.ResponseBody{
 					Code:    1000,
 					Message: "success delete file",
-					Data: &rest_v1.DeleteFileData{
+					Data: &restapp.DeleteFileData{
 						DeletedAt: res.DeletedAt.UnixMilli(),
 					},
 				}
