@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # variable definition
-m1_ct_name='mysql-db'
+m1_ct_name='hippo_mysql-db_1'
 m1_db_root_username='root'
 m1_db_root_password='toor'
 
-r1_ct_name='mysql-db-r1'
+r1_ct_name='hippo_mysql-db-r1_1'
 r1_db_host='localhost'
 r1_db_port='3311'
 r1_db_root_username='root'
@@ -13,7 +13,7 @@ r1_db_root_password='toor'
 r1_db_username='hippo-r1'
 r1_db_password='123456'
 
-r2_ct_name='mysql-db-r2'
+r2_ct_name='hippo_mysql-db-r2_1'
 r2_db_host='localhost'
 r2_db_port='3312'
 r2_db_root_username='root'
@@ -21,7 +21,7 @@ r2_db_root_password='toor'
 r2_db_username='hippo-r2'
 r2_db_password='123456'
 
-r3_ct_name='mysql-db-r3'
+r3_ct_name='hippo_mysql-db-r3_1'
 r3_db_host='localhost'
 r3_db_port='3313'
 r3_db_root_username='root'
