@@ -49,22 +49,22 @@ This command should run all the test available on this project.
 1. REST App
 
 ```
-  $ make run-rest-app
-  $ make build-rest-app
+  $ make run-restapp
+  $ make build-restapp
 ```
 
 2. GRPC App
 
 ```
-  $ make run-grpc-app
-  $ make build-grpc-app
+  $ make run-grpcapp
+  $ make build-grpcapp
 ```
 
 3. Hybrid App
 
 ```
-  $ make run-hybrid-app
-  $ make build-hybrid-app
+  $ make run-hybridapp
+  $ make build-hybridapp
 ```
 
 ### Docker

@@ -94,29 +94,29 @@ generate-oapi:
 generate-oapi-type:
 	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml api/restapp/main.all.yml
 
-.PHONY: run-grpc-app
-run-grpc-app:
-	go run cmd/grpc-app/main.go
+.PHONY: run-grpcapp
+run-grpcapp:
+	go run cmd/grpcapp/main.go
 
-.PHONY: run-rest-app
-run-rest-app:
-	go run cmd/rest-app/main.go
+.PHONY: run-restapp
+run-restapp:
+	go run cmd/restapp/main.go
 
-.PHONY: run-hybrid-app
-run-hybrid-app:
-	go run cmd/hybrid-app/main.go
+.PHONY: run-hybridapp
+run-hybridapp:
+	go run cmd/hybridapp/main.go
 
-.PHONY: build-grpc-app
-build-grpc-app:
-	go build -o ./build/grpc-app/ ./cmd/grpc-app/main.go
+.PHONY: build-grpcapp
+build-grpcapp:
+	go build -o ./build/grpcapp/ ./cmd/grpcapp/main.go
 
-.PHONY: build-rest-app
-build-rest-app:
-	go build -o ./build/rest-app/ ./cmd/rest-app/main.go
+.PHONY: build-restapp
+build-restapp:
+	go build -o ./build/restapp/ ./cmd/restapp/main.go
 
-.PHONY: build-hybrid-app
-build-hybrid-app:
-	go build -o ./build/hybrid-app/ ./cmd/hybrid-app/main.go
+.PHONY: build-hybridapp
+build-hybridapp:
+	go build -o ./build/hybridapp/ ./cmd/hybridapp/main.go
 
 ifeq (migrate-mysql,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "migrate-mysql"
