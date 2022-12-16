@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
+	net_http "net/http"
 
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/auth"
@@ -14,6 +14,7 @@ import (
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/http"
 	"github.com/go-seidon/provider/identifier/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization/json"
@@ -28,7 +29,7 @@ const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
 type restApp struct {
 	config     *RestAppConfig
-	server     Server
+	server     http.Server
 	logger     logging.Logger
 	repository repository.Provider
 
@@ -50,7 +51,7 @@ func (a *restApp) Run(ctx context.Context) error {
 
 	a.logger.Infof("Listening on: %s", a.config.GetAddress())
 	err = a.server.ListenAndServe()
-	if err != http.ErrServerClosed {
+	if err != net_http.ErrServerClosed {
 		return err
 	}
 	return nil
@@ -176,13 +177,13 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		CorrelationIdCtxKey:    CorrelationIdCtxKey,
 	}))
 	router.HandleFunc("/", basicHandler.GetAppInfo)
-	router.NotFoundHandler = http.HandlerFunc(basicHandler.NotFound)
-	router.MethodNotAllowedHandler = http.HandlerFunc(basicHandler.MethodNotAllowed)
+	router.NotFoundHandler = net_http.HandlerFunc(basicHandler.NotFound)
+	router.MethodNotAllowedHandler = net_http.HandlerFunc(basicHandler.MethodNotAllowed)
 
-	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(http.MethodGet)
-	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.DeleteFileById).Methods(http.MethodDelete)
-	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.RetrieveFileById).Methods(http.MethodGet)
-	fileRouter.HandleFunc("/v1/file", fileHandler.UploadFile).Methods(http.MethodPost)
+	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(net_http.MethodGet)
+	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.DeleteFileById).Methods(net_http.MethodDelete)
+	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.RetrieveFileById).Methods(net_http.MethodGet)
+	fileRouter.HandleFunc("/v1/file", fileHandler.UploadFile).Methods(net_http.MethodPost)
 
 	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
 		Encoder:  base64Encoder,
@@ -198,7 +199,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 
 	server := p.Server
 	if p.Server == nil {
-		server = &http.Server{
+		server = &net_http.Server{
 			Addr:     config.GetAddress(),
 			Handler:  router,
 			ErrorLog: log.New(logger.WriterLevel("error"), "", 0),
