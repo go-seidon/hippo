@@ -88,7 +88,7 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 		ClientId: client.ClientId,
 	})
 	if err != nil {
-		if errors.Is(err, repository.ErrorRecordNotFound) {
+		if errors.Is(err, repository.ErrNotFound) {
 			return res, nil
 		}
 		return nil, err

@@ -46,7 +46,7 @@ func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFile
 			return nil, txErr
 		}
 
-		return nil, repository.ErrorRecordDeleted
+		return nil, repository.ErrDeleted
 	}
 
 	deleteQuery := `
@@ -108,7 +108,7 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 	}
 
 	if file.DeletedAt != nil {
-		return nil, repository.ErrorRecordDeleted
+		return nil, repository.ErrDeleted
 	}
 
 	res := &repository.RetrieveFileResult{
@@ -224,7 +224,7 @@ func (r *fileRepository) findFile(ctx context.Context, p findFileParam) (*findFi
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, repository.ErrorRecordNotFound
+		return nil, repository.ErrNotFound
 	}
 	return nil, err
 }

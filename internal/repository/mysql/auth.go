@@ -36,7 +36,7 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, repository.ErrorRecordNotFound
+		return nil, repository.ErrNotFound
 	}
 	return nil, err
 }

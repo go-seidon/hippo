@@ -268,7 +268,7 @@ var _ = Describe("Basic Auth Package", func() {
 				authRepo.
 					EXPECT().
 					FindClient(gomock.Eq(ctx), gomock.Eq(findParam)).
-					Return(nil, repository.ErrorRecordNotFound).
+					Return(nil, repository.ErrNotFound).
 					Times(1)
 
 				res, err := basicAuth.CheckCredential(ctx, p)

@@ -21,7 +21,9 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 		UniqueId: p.FileId,
 	})
 	if err != nil {
-		if errors.Is(err, repository.ErrorRecordNotFound) {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, ErrorNotFound
+		} else if errors.Is(err, repository.ErrDeleted) {
 			return nil, ErrorNotFound
 		}
 		return nil, err

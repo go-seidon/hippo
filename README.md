@@ -166,10 +166,9 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. handle record deleted as not found
-2. Use echo router
-3. Upload docker image to docker hub
-4. Add gracefull shutdown (rest & grpc app)
+1. Use echo router
+2. Upload docker image to docker hub
+3. Add gracefull shutdown (rest & grpc app)
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released

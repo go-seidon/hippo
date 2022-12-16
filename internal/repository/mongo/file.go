@@ -33,7 +33,7 @@ func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFile
 	err := cl.FindOne(ctx, findFilter).Decode(&file)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, repository.ErrorRecordNotFound
+			return nil, repository.ErrNotFound
 		}
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.Retrieve
 	err := cl.FindOne(ctx, findFilter).Decode(&file)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, repository.ErrorRecordNotFound
+			return nil, repository.ErrNotFound
 		}
 		return nil, err
 	}
