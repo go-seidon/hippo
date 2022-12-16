@@ -1,4 +1,4 @@
-package grpc_meta
+package grpcmeta
 
 import (
 	"context"

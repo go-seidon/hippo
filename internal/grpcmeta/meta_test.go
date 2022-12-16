@@ -1,10 +1,10 @@
-package grpc_meta_test
+package grpcmeta_test
 
 import (
 	"context"
 	"testing"
 
-	grpc_meta "github.com/go-seidon/hippo/internal/grpc-meta"
+	"github.com/go-seidon/hippo/internal/grpcmeta"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/grpc/metadata"
@@ -21,7 +21,7 @@ var _ = Describe("Metadata Package", func() {
 		Context("Get function", Label("unit"), func() {
 			When("key exists", func() {
 				It("should return result", func() {
-					md := grpc_meta.Metadata{
+					md := grpcmeta.Metadata{
 						"key": []string{"value"},
 					}
 					res := md.Get("key")
@@ -32,7 +32,7 @@ var _ = Describe("Metadata Package", func() {
 
 			When("key is not exists", func() {
 				It("should return empty", func() {
-					md := grpc_meta.Metadata{}
+					md := grpcmeta.Metadata{}
 					res := md.Get("key")
 
 					Expect(res).To(Equal(""))
@@ -41,7 +41,7 @@ var _ = Describe("Metadata Package", func() {
 
 			When("key exists with empty value", func() {
 				It("should return empty", func() {
-					md := grpc_meta.Metadata{
+					md := grpcmeta.Metadata{
 						"key": []string{},
 					}
 					res := md.Get("key")
@@ -60,9 +60,9 @@ var _ = Describe("Metadata Package", func() {
 				}
 				ctx := metadata.NewIncomingContext(context.Background(), md)
 
-				res := grpc_meta.ExtractIncoming(ctx)
+				res := grpcmeta.ExtractIncoming(ctx)
 
-				expectRes := grpc_meta.Metadata{
+				expectRes := grpcmeta.Metadata{
 					"key": []string{"value"},
 				}
 				Expect(res).To(Equal(expectRes))
@@ -71,10 +71,10 @@ var _ = Describe("Metadata Package", func() {
 
 		When("metadata are not available", func() {
 			It("should return result", func() {
-				md := grpc_meta.Metadata(metadata.Pairs())
+				md := grpcmeta.Metadata(metadata.Pairs())
 				ctx := context.Background()
 
-				res := grpc_meta.ExtractIncoming(ctx)
+				res := grpcmeta.ExtractIncoming(ctx)
 
 				Expect(res).To(Equal(md))
 			})
@@ -89,9 +89,9 @@ var _ = Describe("Metadata Package", func() {
 				}
 				ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-				res := grpc_meta.ExtractOutgoing(ctx)
+				res := grpcmeta.ExtractOutgoing(ctx)
 
-				expectRes := grpc_meta.Metadata{
+				expectRes := grpcmeta.Metadata{
 					"key": []string{"value"},
 				}
 				Expect(res).To(Equal(expectRes))
@@ -100,10 +100,10 @@ var _ = Describe("Metadata Package", func() {
 
 		When("metadata are not available", func() {
 			It("should return result", func() {
-				md := grpc_meta.Metadata(metadata.Pairs())
+				md := grpcmeta.Metadata(metadata.Pairs())
 				ctx := context.Background()
 
-				res := grpc_meta.ExtractOutgoing(ctx)
+				res := grpcmeta.ExtractOutgoing(ctx)
 
 				Expect(res).To(Equal(md))
 			})

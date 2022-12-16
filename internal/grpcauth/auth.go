@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	grpc_meta "github.com/go-seidon/hippo/internal/grpc-meta"
+	"github.com/go-seidon/hippo/internal/grpcmeta"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 )
 
 func AuthFromMD(ctx context.Context, scheme string) (string, error) {
-	val := grpc_meta.ExtractIncoming(ctx).Get(AuthKey)
+	val := grpcmeta.ExtractIncoming(ctx).Get(AuthKey)
 	if val == "" {
 		return "", fmt.Errorf("request unauthenticated with %s", scheme)
 	}
