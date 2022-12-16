@@ -54,23 +54,20 @@ test-watch-integration:
 
 .PHONY: generate-mock
 generate-mock:
-	mockgen -package=mock_grpcv1 -source generated/grpc-v1/file_grpc.pb.go -destination=generated/grpc-v1/mock/file_grpc_mock.go
+	mockgen -package=mock_grpcapp -source api/grpcapp/file_grpc.pb.go -destination=api/grpcapp/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
-	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
-	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
 	mockgen -package=mock_file -source internal/file/file.go -destination=internal/file/mock/file_mock.go
 	mockgen -package=mock_file -source internal/file/location.go -destination=internal/file/mock/location_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/directory.go -destination=internal/filesystem/mock/directory_mock.go
 	mockgen -package=mock_grpc -source internal/grpc/stream.go -destination=internal/grpc/mock/stream_mock.go
-	mockgen -package=mock_grpcapp -source internal/grpc-app/server.go -destination=internal/grpc-app/mock/server_mock.go
+	mockgen -package=mock_grpcapp -source internal/grpcapp/server.go -destination=internal/grpcapp/mock/server_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/checker.go -destination=internal/healthcheck/mock/checker_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/go_health.go -destination=internal/healthcheck/mock/go_health_mock.go
 	mockgen -package=mock_healthcheck -source internal/healthcheck/health.go -destination=internal/healthcheck/mock/health_mock.go
 	mockgen -package=mock_repository -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 	mockgen -package=mock_repository -source internal/repository/file.go -destination=internal/repository/mock/file_mock.go
 	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
-	mockgen -package=mock_restapp -source internal/rest-app/server.go -destination=internal/rest-app/mock/server_mock.go
 
 .PHONY: generate-proto
 generate-proto:
@@ -78,12 +75,12 @@ generate-proto:
 
 .PHONY: verify-swagger
 verify-swagger:
-	swagger-cli bundle api/rest-v1/main.yml --type json > generated/rest-v1/main.all.json
-	swagger-cli validate generated/rest-v1/main.all.json 
+	swagger-cli bundle api/restapp/main.yml --type json > api/restapp/main.all.json
+	swagger-cli validate api/restapp/main.all.json 
 
 .PHONY: generate-swagger
 generate-swagger:
-	swagger-cli bundle api/rest-v1/main.yml --type yaml > generated/rest-v1/main.all.yml
+	swagger-cli bundle api/restapp/main.yml --type yaml > api/restapp/main.all.yml
 
 .PHONY: generate-oapi
 generate-oapi:
@@ -92,31 +89,31 @@ generate-oapi:
 
 .PHONY: generate-oapi-type
 generate-oapi-type:
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/rest-v1/type.gen.yaml generated/rest-v1/main.all.yml
+	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml api/restapp/main.all.yml
 
-.PHONY: run-grpc-app
-run-grpc-app:
-	go run cmd/grpc-app/main.go
+.PHONY: run-grpcapp
+run-grpcapp:
+	go run cmd/grpcapp/main.go
 
-.PHONY: run-rest-app
-run-rest-app:
-	go run cmd/rest-app/main.go
+.PHONY: run-restapp
+run-restapp:
+	go run cmd/restapp/main.go
 
-.PHONY: run-hybrid-app
-run-hybrid-app:
-	go run cmd/hybrid-app/main.go
+.PHONY: run-hybridapp
+run-hybridapp:
+	go run cmd/hybridapp/main.go
 
-.PHONY: build-grpc-app
-build-grpc-app:
-	go build -o ./build/grpc-app/ ./cmd/grpc-app/main.go
+.PHONY: build-grpcapp
+build-grpcapp:
+	go build -o ./build/grpcapp/ ./cmd/grpcapp/main.go
 
-.PHONY: build-rest-app
-build-rest-app:
-	go build -o ./build/rest-app/ ./cmd/rest-app/main.go
+.PHONY: build-restapp
+build-restapp:
+	go build -o ./build/restapp/ ./cmd/restapp/main.go
 
-.PHONY: build-hybrid-app
-build-hybrid-app:
-	go build -o ./build/hybrid-app/ ./cmd/hybrid-app/main.go
+.PHONY: build-hybridapp
+build-hybridapp:
+	go build -o ./build/hybridapp/ ./cmd/hybridapp/main.go
 
 ifeq (migrate-mysql,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "migrate-mysql"

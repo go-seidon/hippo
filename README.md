@@ -49,22 +49,22 @@ This command should run all the test available on this project.
 1. REST App
 
 ```
-  $ make run-rest-app
-  $ make build-rest-app
+  $ make run-restapp
+  $ make build-restapp
 ```
 
 2. GRPC App
 
 ```
-  $ make run-grpc-app
-  $ make build-grpc-app
+  $ make run-grpcapp
+  $ make build-grpcapp
 ```
 
 3. Hybrid App
 
 ```
-  $ make run-hybrid-app
-  $ make build-hybrid-app
+  $ make run-hybridapp
+  $ make build-hybridapp
 ```
 
 ### Docker
@@ -166,12 +166,10 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. tidy db migrations
-2. handle record deleted
-3. rename -v1 (we're gonna version using go semantic versioning foldering)
-4. Use echo router
-5. Upload docker image to docker hub
-6. Add gracefull shutdown (rest & grpc app)
+1. handle record deleted as not found
+2. Use echo router
+3. Upload docker image to docker hub
+4. Add gracefull shutdown (rest & grpc app)
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
@@ -179,13 +177,13 @@ C:\Windows\System32\drivers\etc\hosts
 ## Nice to have
 1. Simplify factory function interface not returning error
 2. Upload location strategy
-3. Add repo: `repository-postgre`
+3. Add repo: `postgre`
 4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
 5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
 6. Separate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
-1. Separate findFile query in DeleteFile and RetrieveFile repository-mysql
+1. Separate findFile query in DeleteFile and RetrieveFile repository/mysql
 2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
 3. Change NewDailyRotate using optional param
 
