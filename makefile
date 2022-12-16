@@ -29,7 +29,7 @@ install:
 
 .PHONY: test
 test:
-	go test ./... -coverprofile coverage.out
+	go test ./.../ -p 1 -race -coverprofile coverage.out
 	go tool cover -func coverage.out | grep ^total:
 
 .PHONY: test-coverage
