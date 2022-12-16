@@ -1,4 +1,4 @@
-package repository_mysql_test
+package mysql_test
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-seidon/hippo/internal/repository"
-	repository_mysql "github.com/go-seidon/hippo/internal/repository-mysql"
+	repository_mysql "github.com/go-seidon/hippo/internal/repository/mysql"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	"github.com/golang/mock/gomock"
 

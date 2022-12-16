@@ -1,11 +1,11 @@
-package repository_mongo_test
+package mongo_test
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/go-seidon/hippo/internal/repository"
-	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository/mongo"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
