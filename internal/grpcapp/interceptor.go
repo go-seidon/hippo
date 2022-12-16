@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/go-seidon/hippo/internal/auth"
-	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
+	"github.com/go-seidon/hippo/internal/grpcauth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func BasicAuth(basicAuth auth.BasicAuth) grpc_auth.CheckCredential {
+func BasicAuth(basicAuth auth.BasicAuth) grpcauth.CheckCredential {
 	return func(ctx context.Context) error {
-		token, err := grpc_auth.AuthFromMD(ctx, grpc_auth.BasicKey)
+		token, err := grpcauth.AuthFromMD(ctx, grpcauth.BasicKey)
 		if err != nil {
 			return status.Errorf(codes.Unauthenticated, err.Error())
 		}
@@ -24,7 +24,7 @@ func BasicAuth(basicAuth auth.BasicAuth) grpc_auth.CheckCredential {
 		}
 
 		if !res.IsValid() {
-			return status.Errorf(codes.Unauthenticated, grpc_auth.ErrorInvalidCredential.Error())
+			return status.Errorf(codes.Unauthenticated, grpcauth.ErrorInvalidCredential.Error())
 		}
 		return nil
 	}

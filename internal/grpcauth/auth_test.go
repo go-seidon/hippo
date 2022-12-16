@@ -1,11 +1,11 @@
-package grpc_auth_test
+package grpcauth_test
 
 import (
 	"context"
 	"fmt"
 	"testing"
 
-	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
+	grpc_auth "github.com/go-seidon/hippo/internal/grpcauth"
 	"google.golang.org/grpc/metadata"
 
 	. "github.com/onsi/ginkgo/v2"

@@ -1,10 +1,10 @@
-package grpc_auth_test
+package grpcauth_test
 
 import (
 	"context"
 
-	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
+	"github.com/go-seidon/hippo/internal/grpcauth"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,12 +33,12 @@ var _ = Describe("Auth Package", func() {
 
 		When("credential is not valid", func() {
 			It("should return error", func() {
-				expectErr := grpc_auth.ErrorInvalidCredential
+				expectErr := grpcauth.ErrorInvalidCredential
 				cc := func(ctx context.Context) error {
 					return expectErr
 				}
-				interceptor := grpc_auth.UnaryServerInterceptor(
-					grpc_auth.WithAuth(cc),
+				interceptor := grpcauth.UnaryServerInterceptor(
+					grpcauth.WithAuth(cc),
 				)
 
 				res, err := interceptor(ctx, req, info, handler)
@@ -53,8 +53,8 @@ var _ = Describe("Auth Package", func() {
 				cc := func(ctx context.Context) error {
 					return nil
 				}
-				interceptor := grpc_auth.UnaryServerInterceptor(
-					grpc_auth.WithAuth(cc),
+				interceptor := grpcauth.UnaryServerInterceptor(
+					grpcauth.WithAuth(cc),
 				)
 
 				res, err := interceptor(ctx, req, info, handler)
@@ -91,12 +91,12 @@ var _ = Describe("Auth Package", func() {
 
 		When("credential is not valid", func() {
 			It("should return error", func() {
-				expectErr := grpc_auth.ErrorInvalidCredential
+				expectErr := grpcauth.ErrorInvalidCredential
 				cc := func(ctx context.Context) error {
 					return expectErr
 				}
-				interceptor := grpc_auth.StreamServerInterceptor(
-					grpc_auth.WithAuth(cc),
+				interceptor := grpcauth.StreamServerInterceptor(
+					grpcauth.WithAuth(cc),
 				)
 
 				err := interceptor(srv, ss, info, handler)
@@ -110,8 +110,8 @@ var _ = Describe("Auth Package", func() {
 				cc := func(ctx context.Context) error {
 					return nil
 				}
-				interceptor := grpc_auth.StreamServerInterceptor(
-					grpc_auth.WithAuth(cc),
+				interceptor := grpcauth.StreamServerInterceptor(
+					grpcauth.WithAuth(cc),
 				)
 
 				err := interceptor(srv, ss, info, handler)

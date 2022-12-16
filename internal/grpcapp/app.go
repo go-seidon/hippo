@@ -9,8 +9,8 @@ import (
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
-	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
+	"github.com/go-seidon/hippo/internal/grpcauth"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding/base64"
@@ -148,15 +148,15 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			"X-Correlation-Id",
 		}),
 	}
-	grpcBasicAuth := grpc_auth.WithAuth(BasicAuth(basicAuth))
+	grpcBasicAuth := grpcauth.WithAuth(BasicAuth(basicAuth))
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			grpc_log.UnaryServerInterceptor(grpcLogOpt...),
-			grpc_auth.UnaryServerInterceptor(grpcBasicAuth),
+			grpcauth.UnaryServerInterceptor(grpcBasicAuth),
 		),
 		grpc.ChainStreamInterceptor(
 			grpc_log.StreamServerInterceptor(grpcLogOpt...),
-			grpc_auth.StreamServerInterceptor(grpcBasicAuth),
+			grpcauth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)
 	healthCheckHandler := NewHealthHandler(healthService)

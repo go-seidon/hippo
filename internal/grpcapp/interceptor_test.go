@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-seidon/hippo/internal/auth"
 	mock_auth "github.com/go-seidon/hippo/internal/auth/mock"
-	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
 	"github.com/go-seidon/hippo/internal/grpcapp"
+	"github.com/go-seidon/hippo/internal/grpcauth"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -29,7 +29,7 @@ var _ = Describe("Interceptor Package", func() {
 
 		BeforeEach(func() {
 			ctx = metadata.NewIncomingContext(context.Background(), metadata.MD{
-				grpc_auth.AuthKey: []string{grpc_auth.BasicKey + " token"},
+				grpcauth.AuthKey: []string{grpcauth.BasicKey + " token"},
 			})
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
@@ -90,7 +90,7 @@ var _ = Describe("Interceptor Package", func() {
 
 				err := cc(ctx)
 
-				expectErr := status.Errorf(codes.Unauthenticated, grpc_auth.ErrorInvalidCredential.Error())
+				expectErr := status.Errorf(codes.Unauthenticated, grpcauth.ErrorInvalidCredential.Error())
 				Expect(err).To(Equal(expectErr))
 			})
 		})
