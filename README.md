@@ -167,8 +167,10 @@ C:\Windows\System32\drivers\etc\hosts
 
 ## Todo
 1. Use echo router
-2. Upload docker image to docker hub
-3. Add gracefull shutdown (rest & grpc app)
+2. Add gracefull shutdown (rest & grpc app)
+3. Replace auth by using chariout auth
+4. Revamp healthcheck & move to provider
+5. Upload docker image to docker hub
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
