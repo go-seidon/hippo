@@ -1,8 +1,8 @@
-package grpc_log_test
+package grpclog_test
 
 import (
-	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
+	"github.com/go-seidon/hippo/internal/grpclog"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -13,7 +13,7 @@ var _ = Describe("Message Package", func() {
 		When("success marshall message", func() {
 			It("should return result", func() {
 				data := &grpc_test.TestData{}
-				msg := grpc_log.NewMessage(data)
+				msg := grpclog.NewMessage(data)
 
 				res, err := msg.MarshalJSON()
 

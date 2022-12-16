@@ -1,13 +1,13 @@
-package grpc_log_test
+package grpclog_test
 
 import (
 	"context"
 	"net"
 	"time"
 
-	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
 	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
+	"github.com/go-seidon/hippo/internal/grpclog"
 	mock_context "github.com/go-seidon/provider/context/mock"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
@@ -66,10 +66,10 @@ var _ = Describe("Interceptor Package", func() {
 					Return(currentTs, false).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
-					grpc_log.IgnoredMethod([]string{
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
+					grpclog.IgnoredMethod([]string{
 						info.FullMethod,
 					}),
 				)
@@ -116,9 +116,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				res, err := interceptor(ctx, req, info, handler)
 
@@ -163,9 +163,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				res, err := interceptor(ctx, req, info, handler)
 
@@ -221,9 +221,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				res, err := interceptor(ctx, req, info, func(ctx context.Context, req interface{}) (interface{}, error) {
 					return nil, expectErr
@@ -281,9 +281,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				res, err := interceptor(ctx, req, info, func(ctx context.Context, req interface{}) (interface{}, error) {
 					return nil, expectErr
@@ -324,9 +324,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				res, err := interceptor(pctx, req, info, handler)
 
@@ -364,10 +364,10 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
-					grpc_log.AllowedMetadata([]string{
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
+					grpclog.AllowedMetadata([]string{
 						"X-Correlation-Id",
 					}),
 				)
@@ -414,9 +414,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				req := &grpc_test.TestData{
 					Key:   "key",
@@ -465,9 +465,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.UnaryServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.UnaryServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 
 				res, err := interceptor(ctx, req, info, func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -534,10 +534,10 @@ var _ = Describe("Interceptor Package", func() {
 					Return(currentTs, false).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
-					grpc_log.IgnoredMethod([]string{
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
+					grpclog.IgnoredMethod([]string{
 						info.FullMethod,
 					}),
 				)
@@ -589,9 +589,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				err := interceptor(srv, ss, info, handler)
 
@@ -641,9 +641,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				err := interceptor(srv, ss, info, handler)
 
@@ -704,9 +704,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				err := interceptor(srv, ss, info, func(srv interface{}, stream grpc.ServerStream) error {
 					return expectErr
@@ -769,9 +769,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				err := interceptor(srv, ss, info, func(srv interface{}, stream grpc.ServerStream) error {
 					return expectErr
@@ -817,9 +817,9 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
 				)
 				err := interceptor(srv, ss, info, handler)
 
@@ -862,10 +862,10 @@ var _ = Describe("Interceptor Package", func() {
 					).
 					Times(1)
 
-				interceptor = grpc_log.StreamServerInterceptor(
-					grpc_log.WithLogger(logger),
-					grpc_log.WithClock(clock),
-					grpc_log.AllowedMetadata([]string{
+				interceptor = grpclog.StreamServerInterceptor(
+					grpclog.WithLogger(logger),
+					grpclog.WithClock(clock),
+					grpclog.AllowedMetadata([]string{
 						"X-Correlation-Id",
 					}),
 				)

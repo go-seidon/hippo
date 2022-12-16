@@ -1,4 +1,4 @@
-package grpc_log
+package grpclog
 
 import (
 	"github.com/go-seidon/provider/logging"

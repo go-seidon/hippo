@@ -1,4 +1,4 @@
-package grpc_log_test
+package grpclog_test
 
 import (
 	"testing"

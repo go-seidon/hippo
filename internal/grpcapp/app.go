@@ -9,8 +9,8 @@ import (
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
-	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	"github.com/go-seidon/hippo/internal/grpcauth"
+	"github.com/go-seidon/hippo/internal/grpclog"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding/base64"
@@ -139,23 +139,23 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		return nil, err
 	}
 
-	grpcLogOpt := []grpc_log.LogInterceptorOption{
-		grpc_log.WithLogger(logger),
-		grpc_log.IgnoredMethod([]string{
+	grpcLogOpt := []grpclog.LogInterceptorOption{
+		grpclog.WithLogger(logger),
+		grpclog.IgnoredMethod([]string{
 			"/health.v1.HealthService/CheckHealth",
 		}),
-		grpc_log.AllowedMetadata([]string{
+		grpclog.AllowedMetadata([]string{
 			"X-Correlation-Id",
 		}),
 	}
 	grpcBasicAuth := grpcauth.WithAuth(BasicAuth(basicAuth))
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			grpc_log.UnaryServerInterceptor(grpcLogOpt...),
+			grpclog.UnaryServerInterceptor(grpcLogOpt...),
 			grpcauth.UnaryServerInterceptor(grpcBasicAuth),
 		),
 		grpc.ChainStreamInterceptor(
-			grpc_log.StreamServerInterceptor(grpcLogOpt...),
+			grpclog.StreamServerInterceptor(grpcLogOpt...),
 			grpcauth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)

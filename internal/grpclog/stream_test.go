@@ -1,12 +1,12 @@
-package grpc_log_test
+package grpclog_test
 
 import (
 	"fmt"
 
 	grpc "github.com/go-seidon/hippo/internal/grpc"
-	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
 	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
+	"github.com/go-seidon/hippo/internal/grpclog"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -28,7 +28,7 @@ var _ = Describe("Stream Package", func() {
 			ctrl := gomock.NewController(t)
 			ss = mock_grpc.NewMockServerStream(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
-			lss = grpc_log.NewLogServerStream(ss, logger)
+			lss = grpclog.NewLogServerStream(ss, logger)
 			msg = &grpc_test.TestData{}
 		})
 

@@ -1,4 +1,4 @@
-package grpc_log
+package grpclog
 
 import (
 	"google.golang.org/protobuf/encoding/protojson"
