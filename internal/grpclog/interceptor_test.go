@@ -5,12 +5,12 @@ import (
 	"net"
 	"time"
 
-	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
 	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
 	"github.com/go-seidon/hippo/internal/grpclog"
 	mock_context "github.com/go-seidon/provider/context/mock"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
+	"github.com/go-seidon/provider/testdata"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -418,9 +418,9 @@ var _ = Describe("Interceptor Package", func() {
 					grpclog.WithLogger(logger),
 					grpclog.WithClock(clock),
 				)
-				req := &grpc_test.TestData{
-					Key:   "key",
-					Value: grpc_test.Bool(true),
+				req := &testdata.SimpleMessage{
+					String_: "key",
+					Bool:    true,
 				}
 				res, err := interceptor(ctx, req, info, handler)
 
@@ -471,9 +471,9 @@ var _ = Describe("Interceptor Package", func() {
 				)
 
 				res, err := interceptor(ctx, req, info, func(ctx context.Context, req interface{}) (interface{}, error) {
-					res := &grpc_test.TestData{
-						Key:   "key",
-						Value: grpc_test.Bool(true),
+					res := &testdata.SimpleMessage{
+						String_: "key",
+						Bool:    true,
 					}
 					return res, nil
 				})

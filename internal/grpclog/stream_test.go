@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	grpc "github.com/go-seidon/hippo/internal/grpc"
-	grpc_test "github.com/go-seidon/hippo/internal/grpc-test"
 	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
 	"github.com/go-seidon/hippo/internal/grpclog"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
+	"github.com/go-seidon/provider/testdata"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,7 +20,7 @@ var _ = Describe("Stream Package", func() {
 			lss    grpc.ServerStream
 			ss     *mock_grpc.MockServerStream
 			logger *mock_logging.MockLogger
-			msg    *grpc_test.TestData
+			msg    *testdata.SimpleMessage
 		)
 
 		BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("Stream Package", func() {
 			ss = mock_grpc.NewMockServerStream(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			lss = grpclog.NewLogServerStream(ss, logger)
-			msg = &grpc_test.TestData{}
+			msg = &testdata.SimpleMessage{}
 		})
 
 		Context("SendMsg function", Label("unit"), func() {
