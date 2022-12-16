@@ -56,8 +56,6 @@ test-watch-integration:
 generate-mock:
 	mockgen -package=mock_grpcapp -source api/grpcapp/file_grpc.pb.go -destination=api/grpcapp/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
-	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
-	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
 	mockgen -package=mock_file -source internal/file/file.go -destination=internal/file/mock/file_mock.go
 	mockgen -package=mock_file -source internal/file/location.go -destination=internal/file/mock/location_mock.go
 	mockgen -package=mock_filesystem -source internal/filesystem/file.go -destination=internal/filesystem/mock/file_mock.go
