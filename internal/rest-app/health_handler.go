@@ -3,7 +3,7 @@ package rest_app
 import (
 	"net/http"
 
-	restapp "github.com/go-seidon/hippo/generated/restapp"
+	"github.com/go-seidon/hippo/api/restapp"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"

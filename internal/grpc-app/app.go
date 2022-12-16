@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
+	"github.com/go-seidon/hippo/api/grpcapp"
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"

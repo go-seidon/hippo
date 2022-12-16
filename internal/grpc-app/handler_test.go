@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
-	mock_grpcapp "github.com/go-seidon/hippo/generated/grpcapp/mock"
+	"github.com/go-seidon/hippo/api/grpcapp"
+	mock_grpcapp "github.com/go-seidon/hippo/api/grpcapp/mock"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"

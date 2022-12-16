@@ -54,7 +54,7 @@ test-watch-integration:
 
 .PHONY: generate-mock
 generate-mock:
-	mockgen -package=mock_grpcapp -source generated/grpcapp/file_grpc.pb.go -destination=generated/grpcapp/mock/file_grpc_mock.go
+	mockgen -package=mock_grpcapp -source api/grpcapp/file_grpc.pb.go -destination=api/grpcapp/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go
@@ -78,12 +78,12 @@ generate-proto:
 
 .PHONY: verify-swagger
 verify-swagger:
-	swagger-cli bundle api/restapp/main.yml --type json > generated/restapp/main.all.json
-	swagger-cli validate generated/restapp/main.all.json 
+	swagger-cli bundle api/restapp/main.yml --type json > api/restapp/main.all.json
+	swagger-cli validate api/restapp/main.all.json 
 
 .PHONY: generate-swagger
 generate-swagger:
-	swagger-cli bundle api/restapp/main.yml --type yaml > generated/restapp/main.all.yml
+	swagger-cli bundle api/restapp/main.yml --type yaml > api/restapp/main.all.yml
 
 .PHONY: generate-oapi
 generate-oapi:
@@ -92,7 +92,7 @@ generate-oapi:
 
 .PHONY: generate-oapi-type
 generate-oapi-type:
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml generated/restapp/main.all.yml
+	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml api/restapp/main.all.yml
 
 .PHONY: run-grpc-app
 run-grpc-app:

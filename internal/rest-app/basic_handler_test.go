@@ -3,7 +3,7 @@ package rest_app_test
 import (
 	"net/http"
 
-	"github.com/go-seidon/hippo/generated/restapp"
+	"github.com/go-seidon/hippo/api/restapp"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"

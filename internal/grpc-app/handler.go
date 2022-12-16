@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
+	"github.com/go-seidon/hippo/api/grpcapp"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/provider/status"

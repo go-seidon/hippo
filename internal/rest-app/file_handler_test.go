@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	restapp "github.com/go-seidon/hippo/generated/restapp"
+	"github.com/go-seidon/hippo/api/restapp"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
