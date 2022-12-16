@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-seidon/hippo/internal/app"
-	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
+	"github.com/go-seidon/hippo/internal/grpcapp"
 	rest_app "github.com/go-seidon/hippo/internal/rest-app"
 )
 
@@ -21,8 +21,8 @@ func main() {
 		panic(err)
 	}
 
-	grpcApp, err := grpc_app.NewGrpcApp(
-		grpc_app.WithConfig(config),
+	grpcApp, err := grpcapp.NewGrpcApp(
+		grpcapp.WithConfig(config),
 	)
 	if err != nil {
 		panic(err)

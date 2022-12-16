@@ -1,4 +1,4 @@
-package grpc_app_test
+package grpcapp_test
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-seidon/hippo/internal/auth"
 	mock_auth "github.com/go-seidon/hippo/internal/auth/mock"
-	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
 	grpc_auth "github.com/go-seidon/hippo/internal/grpc-auth"
+	"github.com/go-seidon/hippo/internal/grpcapp"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -46,7 +46,7 @@ var _ = Describe("Interceptor Package", func() {
 			It("should return error", func() {
 				ccErr := fmt.Errorf("request unauthenticated with basic")
 
-				cc := grpc_app.BasicAuth(ba)
+				cc := grpcapp.BasicAuth(ba)
 
 				ctx := context.Background()
 				err := cc(ctx)
@@ -66,7 +66,7 @@ var _ = Describe("Interceptor Package", func() {
 					Return(nil, ccErr).
 					Times(1)
 
-				cc := grpc_app.BasicAuth(ba)
+				cc := grpcapp.BasicAuth(ba)
 
 				err := cc(ctx)
 
@@ -86,7 +86,7 @@ var _ = Describe("Interceptor Package", func() {
 					Return(ccRes, nil).
 					Times(1)
 
-				cc := grpc_app.BasicAuth(ba)
+				cc := grpcapp.BasicAuth(ba)
 
 				err := cc(ctx)
 
@@ -103,7 +103,7 @@ var _ = Describe("Interceptor Package", func() {
 					Return(ccRes, nil).
 					Times(1)
 
-				cc := grpc_app.BasicAuth(ba)
+				cc := grpcapp.BasicAuth(ba)
 
 				err := cc(ctx)
 

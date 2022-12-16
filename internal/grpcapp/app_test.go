@@ -1,4 +1,4 @@
-package grpc_app_test
+package grpcapp_test
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/go-seidon/hippo/internal/app"
-	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
-	mock_grpcapp "github.com/go-seidon/hippo/internal/grpc-app/mock"
+	"github.com/go-seidon/hippo/internal/grpcapp"
+	mock_grpcapp "github.com/go-seidon/hippo/internal/grpcapp/mock"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
@@ -51,7 +51,7 @@ var _ = Describe("App Package", func() {
 
 		When("config is not specified", func() {
 			It("should return error", func() {
-				res, err := grpc_app.NewGrpcApp()
+				res, err := grpcapp.NewGrpcApp()
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("invalid config")))
@@ -60,10 +60,10 @@ var _ = Describe("App Package", func() {
 
 		When("logger is specified", func() {
 			It("should return result", func() {
-				res, err := grpc_app.NewGrpcApp(
-					grpc_app.WithConfig(cfg),
-					grpc_app.WithLogger(logger),
-					grpc_app.WithRepository(repository),
+				res, err := grpcapp.NewGrpcApp(
+					grpcapp.WithConfig(cfg),
+					grpcapp.WithLogger(logger),
+					grpcapp.WithRepository(repository),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -73,10 +73,10 @@ var _ = Describe("App Package", func() {
 
 		When("health service is specified", func() {
 			It("should return result", func() {
-				res, err := grpc_app.NewGrpcApp(
-					grpc_app.WithConfig(cfg),
-					grpc_app.WithService(healthService),
-					grpc_app.WithRepository(repository),
+				res, err := grpcapp.NewGrpcApp(
+					grpcapp.WithConfig(cfg),
+					grpcapp.WithService(healthService),
+					grpcapp.WithRepository(repository),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -86,11 +86,11 @@ var _ = Describe("App Package", func() {
 
 		When("all parameters are specified", func() {
 			It("should return result", func() {
-				res, err := grpc_app.NewGrpcApp(
-					grpc_app.WithConfig(cfg),
-					grpc_app.WithLogger(logger),
-					grpc_app.WithRepository(repository),
-					grpc_app.WithService(healthService),
+				res, err := grpcapp.NewGrpcApp(
+					grpcapp.WithConfig(cfg),
+					grpcapp.WithLogger(logger),
+					grpcapp.WithRepository(repository),
+					grpcapp.WithService(healthService),
 				)
 
 				Expect(res).ToNot(BeNil())
@@ -101,11 +101,11 @@ var _ = Describe("App Package", func() {
 
 	Context("GrpcAppConfig", Label("unit"), func() {
 		var (
-			cfg *grpc_app.GrpcAppConfig
+			cfg *grpcapp.GrpcAppConfig
 		)
 
 		BeforeEach(func() {
-			cfg = &grpc_app.GrpcAppConfig{
+			cfg = &grpcapp.GrpcAppConfig{
 				AppName:    "mock-name",
 				AppVersion: "mock-version",
 				AppHost:    "host",
@@ -169,12 +169,12 @@ var _ = Describe("App Package", func() {
 			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
-			grpcApp, _ = grpc_app.NewGrpcApp(
-				grpc_app.WithConfig(cfg),
-				grpc_app.WithLogger(logger),
-				grpc_app.WithService(healthService),
-				grpc_app.WithServer(server),
-				grpc_app.WithRepository(repository),
+			grpcApp, _ = grpcapp.NewGrpcApp(
+				grpcapp.WithConfig(cfg),
+				grpcapp.WithLogger(logger),
+				grpcapp.WithService(healthService),
+				grpcapp.WithServer(server),
+				grpcapp.WithRepository(repository),
 			)
 			ctx = context.Background()
 		})
@@ -326,12 +326,12 @@ var _ = Describe("App Package", func() {
 			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
-			grpcApp, _ = grpc_app.NewGrpcApp(
-				grpc_app.WithConfig(cfg),
-				grpc_app.WithLogger(logger),
-				grpc_app.WithService(healthService),
-				grpc_app.WithServer(server),
-				grpc_app.WithRepository(repository),
+			grpcApp, _ = grpcapp.NewGrpcApp(
+				grpcapp.WithConfig(cfg),
+				grpcapp.WithLogger(logger),
+				grpcapp.WithService(healthService),
+				grpcapp.WithServer(server),
+				grpcapp.WithRepository(repository),
 			)
 			ctx = context.Background()
 		})

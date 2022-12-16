@@ -1,4 +1,4 @@
-package grpc_app
+package grpcapp
 
 import (
 	"bytes"
