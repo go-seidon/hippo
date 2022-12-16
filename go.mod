@@ -14,13 +14,13 @@ require (
 	github.com/onsi/gomega v1.22.1
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.mongodb.org/mongo-driver v1.7.0
+	go.mongodb.org/mongo-driver v1.10.3
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 )
 
 require (
 	github.com/deepmap/oapi-codegen v1.11.1-0.20221003111356-96482c12b2bc
-	github.com/go-seidon/provider v0.0.4-alpha
+	github.com/go-seidon/provider v0.0.17-alpha
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
 )

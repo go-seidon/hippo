@@ -12,13 +12,12 @@ import (
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/encoding"
-	"github.com/go-seidon/provider/hashing"
-	"github.com/go-seidon/provider/identifier"
+	"github.com/go-seidon/provider/encoding/base64"
+	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/identifier/ksuid"
 	"github.com/go-seidon/provider/logging"
-	"github.com/go-seidon/provider/serialization"
-	"github.com/go-seidon/provider/validation"
-
+	"github.com/go-seidon/provider/serialization/json"
+	"github.com/go-seidon/provider/validation/govalidator"
 	"github.com/gorilla/mux"
 )
 
@@ -111,8 +110,8 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		}
 	}
 
-	validator := validation.NewGoValidator()
-	identifier := identifier.NewKsuid()
+	govalidator := govalidator.NewValidator()
+	ksuIdentifier := ksuid.NewIdentifier()
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
@@ -121,10 +120,10 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		FileRepo:    repo.GetFileRepo(),
 		FileManager: fileManager,
 		Logger:      logger,
-		Identifier:  identifier,
+		Identifier:  ksuIdentifier,
 		DirManager:  dirManager,
 		Locator:     locator,
-		Validator:   validator,
+		Validator:   govalidator,
 		Config: &file.FileConfig{
 			UploadDir: p.Config.UploadDirectory,
 		},
@@ -133,23 +132,23 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		return nil, err
 	}
 
-	serializer := serialization.NewJsonSerializer()
-	encoder := encoding.NewBase64Encoder()
-	hasher := hashing.NewBcryptHasher()
+	jsonSerializer := json.NewSerializer()
+	base64Encoder := base64.NewEncoder()
+	bcryptHasher := bcrypt.NewHasher()
 
 	basicHandler := NewBasicHandler(BasicHandlerParam{
 		Logger:     p.Logger,
-		Serializer: serializer,
+		Serializer: jsonSerializer,
 		Config:     config,
 	})
 	healthHandler := NewHealthHandler(HealthHandlerParam{
 		Logger:        p.Logger,
-		Serializer:    serializer,
+		Serializer:    jsonSerializer,
 		HealthService: healthService,
 	})
 	fileHandler := NewFileHandler(FileHandlerParam{
 		Logger:      p.Logger,
-		Serializer:  serializer,
+		Serializer:  jsonSerializer,
 		Config:      config,
 		FileService: fileService,
 	})
@@ -186,14 +185,14 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	fileRouter.HandleFunc("/v1/file", fileHandler.UploadFile).Methods(http.MethodPost)
 
 	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
-		Encoder:  encoder,
-		Hasher:   hasher,
+		Encoder:  base64Encoder,
+		Hasher:   bcryptHasher,
 		AuthRepo: repo.GetAuthRepo(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	BasicAuthMiddleware := NewBasicAuthMiddleware(basicAuth, serializer)
+	BasicAuthMiddleware := NewBasicAuthMiddleware(basicAuth, jsonSerializer)
 	generalRouter.Use(BasicAuthMiddleware)
 	fileRouter.Use(BasicAuthMiddleware)
 

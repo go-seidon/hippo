@@ -1,4 +1,4 @@
-package repository_mysql
+package mysql
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/datetime"
+	db_mysql "github.com/go-seidon/provider/mysql"
 )
 
 type authRepository struct {

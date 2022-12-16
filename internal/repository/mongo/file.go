@@ -1,12 +1,12 @@
-package repository_mongo
+package mongo
 
 import (
 	"context"
 	"fmt"
 
-	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/datetime"
+	db_mongo "github.com/go-seidon/provider/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

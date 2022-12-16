@@ -18,6 +18,7 @@ import (
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/serialization"
+	"github.com/go-seidon/provider/serialization/json"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
 	"github.com/go-seidon/provider/validation"
 	"github.com/golang/mock/gomock"
@@ -524,7 +525,7 @@ var _ = Describe("File Handler", func() {
 			r.Header.Add("Content-Type", writer.FormDataContentType())
 
 			log = mock_logging.NewMockLogger(ctrl)
-			serializer = serialization.NewJsonSerializer()
+			serializer = json.NewSerializer()
 			uploadService = mock_file.NewMockFile(ctrl)
 			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
 				Logger:      log,

@@ -1,4 +1,4 @@
-package repository_mongo_test
+package mongo_test
 
 import (
 	"context"
@@ -39,7 +39,7 @@ func RunDbMigration(dbClient *mongo.Client, p RunDbMigrationParam) error {
 	}
 
 	migration, err := migrate.NewWithDatabaseInstance(
-		"file://../../migration/mongo",
+		"file://../../../migration/mongo",
 		"mysql",
 		driver,
 	)

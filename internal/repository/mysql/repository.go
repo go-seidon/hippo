@@ -1,10 +1,10 @@
-package repository_mysql
+package mysql
 
 import (
 	"fmt"
 
-	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	"github.com/go-seidon/provider/datetime"
+	db_mysql "github.com/go-seidon/provider/mysql"
 )
 
 type RepositoryParam struct {

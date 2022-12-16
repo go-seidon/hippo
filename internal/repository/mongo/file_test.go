@@ -1,4 +1,4 @@
-package repository_mongo_test
+package mongo_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/internal/repository"
-	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository/mongo"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

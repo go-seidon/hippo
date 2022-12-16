@@ -1,10 +1,10 @@
-package repository_mongo
+package mongo
 
 import (
 	"fmt"
 
-	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
 	"github.com/go-seidon/provider/datetime"
+	db_mongo "github.com/go-seidon/provider/mongo"
 )
 
 type RepositoryParam struct {

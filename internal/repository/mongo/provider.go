@@ -1,25 +1,34 @@
-package repository_mysql
+package mongo
 
 import (
 	"context"
+	"errors"
 
-	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	"github.com/go-seidon/hippo/internal/repository"
+	db_mongo "github.com/go-seidon/provider/mongo"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 )
 
 type provider struct {
-	mClient  db_mysql.Client
-	rClient  db_mysql.Client
+	dbClient db_mongo.Client
 	authRepo *authRepository
 	fileRepo *fileRepository
 }
 
 func (p *provider) Init(ctx context.Context) error {
-	return nil
+	err := p.dbClient.Connect(ctx)
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, topology.ErrTopologyConnected) {
+		return nil
+	}
+	return err
 }
 
 func (p *provider) Ping(ctx context.Context) error {
-	return p.rClient.PingContext(ctx)
+	return p.dbClient.Ping(ctx, readpref.Secondary())
 }
 
 func (p *provider) GetAuthRepo() repository.AuthRepository {

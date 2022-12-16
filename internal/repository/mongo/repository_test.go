@@ -1,4 +1,4 @@
-package repository_mongo_test
+package mongo_test
 
 import (
 	"testing"
