@@ -126,7 +126,28 @@ var _ = Describe("Deleter", func() {
 				fileRepo.
 					EXPECT().
 					DeleteFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, repository.ErrorRecordNotFound).
+					Return(nil, repository.ErrNotFound).
+					Times(1)
+
+				res, err := s.DeleteFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(file.ErrorNotFound))
+			})
+		})
+
+		When("file is deleted", func() {
+			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
+				fileRepo.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Any()).
+					Return(nil, repository.ErrDeleted).
 					Times(1)
 
 				res, err := s.DeleteFile(ctx, p)

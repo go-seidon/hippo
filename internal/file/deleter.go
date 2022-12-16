@@ -29,7 +29,9 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 		return res, nil
 	}
 
-	if errors.Is(err, repository.ErrorRecordNotFound) {
+	if errors.Is(err, repository.ErrNotFound) {
+		return nil, ErrorNotFound
+	} else if errors.Is(err, repository.ErrDeleted) {
 		return nil, ErrorNotFound
 	}
 	return nil, err

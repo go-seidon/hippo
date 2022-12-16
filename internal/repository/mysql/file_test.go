@@ -183,7 +183,7 @@ var _ = Describe("File Repository", func() {
 				res, err := repo.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordNotFound))
+				Expect(err).To(Equal(repository.ErrNotFound))
 			})
 		})
 
@@ -270,7 +270,7 @@ var _ = Describe("File Repository", func() {
 				res, err := repo.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordDeleted))
+				Expect(err).To(Equal(repository.ErrDeleted))
 			})
 		})
 
@@ -493,7 +493,7 @@ var _ = Describe("File Repository", func() {
 				res, err := repo.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordNotFound))
+				Expect(err).To(Equal(repository.ErrNotFound))
 			})
 		})
 
@@ -605,7 +605,7 @@ var _ = Describe("File Repository", func() {
 				res, err := repo.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordNotFound))
+				Expect(err).To(Equal(repository.ErrNotFound))
 			})
 		})
 
@@ -644,7 +644,7 @@ var _ = Describe("File Repository", func() {
 				res, err := repo.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordDeleted))
+				Expect(err).To(Equal(repository.ErrDeleted))
 			})
 		})
 

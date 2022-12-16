@@ -51,7 +51,7 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 	}
 
 	if err == mongo.ErrNoDocuments {
-		return nil, repository.ErrorRecordNotFound
+		return nil, repository.ErrNotFound
 	}
 	return nil, err
 }

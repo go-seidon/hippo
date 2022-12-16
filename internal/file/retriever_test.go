@@ -125,7 +125,28 @@ var _ = Describe("Retriever", func() {
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
-					Return(nil, repository.ErrorRecordNotFound).
+					Return(nil, repository.ErrNotFound).
+					Times(1)
+
+				res, err := s.RetrieveFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(file.ErrorNotFound))
+			})
+		})
+
+		When("file record is deleted", func() {
+			It("should return error", func() {
+				validator.
+					EXPECT().
+					Validate(gomock.Eq(p)).
+					Return(nil).
+					Times(1)
+
+				fileRepo.
+					EXPECT().
+					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
+					Return(nil, repository.ErrDeleted).
 					Times(1)
 
 				res, err := s.RetrieveFile(ctx, p)

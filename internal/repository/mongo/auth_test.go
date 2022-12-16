@@ -151,7 +151,7 @@ var _ = Describe("Auth Repository", func() {
 				res, err := repo.FindClient(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(repository.ErrorRecordNotFound))
+				Expect(err).To(Equal(repository.ErrNotFound))
 			})
 		})
 	})
