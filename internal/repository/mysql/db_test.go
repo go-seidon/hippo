@@ -24,7 +24,7 @@ func OpenDb(dsn string) (*sql.DB, error) {
 func RunDbMigration(db *sql.DB) error {
 	driver, _ := mysql.WithInstance(db, &mysql.Config{})
 	migration, _ := migrate.NewWithDatabaseInstance(
-		"file://../../migration/mysql",
+		"file://../../../migration/mysql",
 		"mysql",
 		driver,
 	)
