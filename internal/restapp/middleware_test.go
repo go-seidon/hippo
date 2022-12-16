@@ -1,4 +1,4 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-seidon/hippo/internal/auth"
 	mock_auth "github.com/go-seidon/hippo/internal/auth/mock"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	restapp "github.com/go-seidon/hippo/internal/restapp"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
@@ -35,9 +35,9 @@ var _ = Describe("Middleware Package", func() {
 			r = &http.Request{}
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			httpHandler = mock_restapp.NewMockHandler(ctrl)
-			fn := rest_app.NewDefaultMiddleware(rest_app.DefaultMiddlewareParam{
+			fn := restapp.NewDefaultMiddleware(restapp.DefaultMiddlewareParam{
 				CorrelationIdHeaderKey: "X-Correlation-Id",
-				CorrelationIdCtxKey:    rest_app.CorrelationIdCtxKey,
+				CorrelationIdCtxKey:    restapp.CorrelationIdCtxKey,
 			})
 			middleware = fn(httpHandler)
 		})
@@ -76,7 +76,7 @@ var _ = Describe("Middleware Package", func() {
 			a = mock_auth.NewMockBasicAuth(ctrl)
 			s = mock_serialization.NewMockSerializer(ctrl)
 			handler = mock_restapp.NewMockHandler(ctrl)
-			fn := rest_app.NewBasicAuthMiddleware(a, s)
+			fn := restapp.NewBasicAuthMiddleware(a, s)
 			m = fn(handler)
 
 			rw = mock_restapp.NewMockResponseWriter(ctrl)
@@ -90,7 +90,7 @@ var _ = Describe("Middleware Package", func() {
 			It("should return error", func() {
 				req.Header.Del("Authorization")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1003,
 					Message: "credential is not specified",
 				}
@@ -123,7 +123,7 @@ var _ = Describe("Middleware Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1003,
 					Message: "failed check credential",
 				}
@@ -159,7 +159,7 @@ var _ = Describe("Middleware Package", func() {
 					Return(checkRes, nil).
 					Times(1)
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1003,
 					Message: "credential is invalid",
 				}
@@ -223,7 +223,7 @@ var _ = Describe("Middleware Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
 			handler = mock_restapp.NewMockHandler(ctrl)
-			fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+			fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 				Logger: logger,
 				Clock:  clock,
 			})
@@ -243,7 +243,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("logger is not specified", func() {
 			It("should return error", func() {
-				fn, err := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, err := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: nil,
 					Clock:  clock,
 				})
@@ -256,7 +256,7 @@ var _ = Describe("Middleware Package", func() {
 		When("ignore uri is specified", func() {
 			It("should return result", func() {
 				req.RequestURI = "uri"
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
 					IgnoreURI: map[string]bool{
@@ -276,7 +276,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("ignore uri is not specified", func() {
 			It("should return result", func() {
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
 				})
@@ -310,7 +310,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("header is specified", func() {
 			It("should return result", func() {
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
 					Header: map[string]string{
@@ -347,7 +347,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("clock is not specified", func() {
 			It("should return result", func() {
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  nil,
 				})
@@ -389,7 +389,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("request is success", func() {
 			It("should return result", func() {
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
 				})
@@ -438,7 +438,7 @@ var _ = Describe("Middleware Package", func() {
 
 		When("client request error", func() {
 			It("should return result", func() {
-				fn, _ := rest_app.NewRequestLogMiddleware(rest_app.RequestLogMiddlewareParam{
+				fn, _ := restapp.NewRequestLogMiddleware(restapp.RequestLogMiddlewareParam{
 					Logger: logger,
 					Clock:  clock,
 				})

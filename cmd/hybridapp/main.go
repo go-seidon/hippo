@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/grpcapp"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/restapp"
 )
 
 func main() {
@@ -14,8 +14,8 @@ func main() {
 		panic(err)
 	}
 
-	restApp, err := rest_app.NewRestApp(
-		rest_app.WithConfig(config),
+	restApp, err := restapp.NewRestApp(
+		restapp.WithConfig(config),
 	)
 	if err != nil {
 		panic(err)

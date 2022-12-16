@@ -1,11 +1,11 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"net/http"
 
-	"github.com/go-seidon/hippo/api/restapp"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	api "github.com/go-seidon/hippo/api/restapp"
+	"github.com/go-seidon/hippo/internal/restapp"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
 	"github.com/golang/mock/gomock"
@@ -30,10 +30,10 @@ var _ = Describe("Basic Handler", func() {
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
-			basicHandler := rest_app.NewBasicHandler(rest_app.BasicHandlerParam{
+			basicHandler := restapp.NewBasicHandler(restapp.BasicHandlerParam{
 				Logger:     log,
 				Serializer: serializer,
-				Config:     &rest_app.RestAppConfig{},
+				Config:     &restapp.RestAppConfig{},
 			})
 			handler = http.HandlerFunc(basicHandler.NotFound)
 		})
@@ -41,7 +41,7 @@ var _ = Describe("Basic Handler", func() {
 		When("success call the function", func() {
 			It("should write response", func() {
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1004,
 					Message: "resource not found",
 				}
@@ -89,10 +89,10 @@ var _ = Describe("Basic Handler", func() {
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
-			basicHandler := rest_app.NewBasicHandler(rest_app.BasicHandlerParam{
+			basicHandler := restapp.NewBasicHandler(restapp.BasicHandlerParam{
 				Logger:     log,
 				Serializer: serializer,
-				Config:     &rest_app.RestAppConfig{},
+				Config:     &restapp.RestAppConfig{},
 			})
 			handler = http.HandlerFunc(basicHandler.MethodNotAllowed)
 		})
@@ -100,7 +100,7 @@ var _ = Describe("Basic Handler", func() {
 		When("success call the function", func() {
 			It("should write response", func() {
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1001,
 					Message: "method is not allowed",
 				}
@@ -132,7 +132,7 @@ var _ = Describe("Basic Handler", func() {
 		})
 	})
 
-	Context("GetAppInfi Handler", Label("unit"), func() {
+	Context("GetAppInfo Handler", Label("unit"), func() {
 		var (
 			handler    http.HandlerFunc
 			r          *http.Request
@@ -148,11 +148,11 @@ var _ = Describe("Basic Handler", func() {
 			w = mock_restapp.NewMockResponseWriter(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
-			cfg := &rest_app.RestAppConfig{
+			cfg := &restapp.RestAppConfig{
 				AppName:    "mock-name",
 				AppVersion: "mock-version",
 			}
-			basicHandler := rest_app.NewBasicHandler(rest_app.BasicHandlerParam{
+			basicHandler := restapp.NewBasicHandler(restapp.BasicHandlerParam{
 				Logger:     log,
 				Serializer: serializer,
 				Config:     cfg,
@@ -163,10 +163,10 @@ var _ = Describe("Basic Handler", func() {
 		When("success call the function", func() {
 			It("should write response", func() {
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1000,
 					Message: "success",
-					Data: &restapp.GetAppInfoData{
+					Data: &api.GetAppInfoData{
 						AppName:    "mock-name",
 						AppVersion: "mock-version",
 					},

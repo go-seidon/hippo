@@ -1,11 +1,11 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"fmt"
 	"io"
 	"mime/multipart"
 
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/restapp"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -27,7 +27,7 @@ var _ = Describe("Multipart Package", func() {
 		When("file name is empty", func() {
 			It("should return empty", func() {
 				fh.Filename = ""
-				res := rest_app.ParseFileName(fh)
+				res := restapp.ParseFileName(fh)
 
 				Expect(res).To(Equal(""))
 			})
@@ -35,7 +35,7 @@ var _ = Describe("Multipart Package", func() {
 
 		When("name contain extension", func() {
 			It("should return only name", func() {
-				res := rest_app.ParseFileName(fh)
+				res := restapp.ParseFileName(fh)
 
 				Expect(res).To(Equal("dolpin"))
 			})
@@ -44,7 +44,7 @@ var _ = Describe("Multipart Package", func() {
 		When("name not contain extension", func() {
 			It("should return only name", func() {
 				fh.Filename = "dolpin"
-				res := rest_app.ParseFileName(fh)
+				res := restapp.ParseFileName(fh)
 
 				Expect(res).To(Equal("dolpin"))
 			})
@@ -53,7 +53,7 @@ var _ = Describe("Multipart Package", func() {
 		When("name contain multiple dot", func() {
 			It("should return only name", func() {
 				fh.Filename = "dolpin.new.jpeg"
-				res := rest_app.ParseFileName(fh)
+				res := restapp.ParseFileName(fh)
 
 				Expect(res).To(Equal("dolpin"))
 			})
@@ -74,7 +74,7 @@ var _ = Describe("Multipart Package", func() {
 		When("file name is empty", func() {
 			It("should return empty", func() {
 				fh.Filename = ""
-				res := rest_app.ParseFileExtension(fh)
+				res := restapp.ParseFileExtension(fh)
 
 				Expect(res).To(Equal(""))
 			})
@@ -82,7 +82,7 @@ var _ = Describe("Multipart Package", func() {
 
 		When("name contain extension", func() {
 			It("should return extension", func() {
-				res := rest_app.ParseFileExtension(fh)
+				res := restapp.ParseFileExtension(fh)
 
 				Expect(res).To(Equal("jpeg"))
 			})
@@ -91,7 +91,7 @@ var _ = Describe("Multipart Package", func() {
 		When("name not contain extension", func() {
 			It("should return empty", func() {
 				fh.Filename = "dolpin"
-				res := rest_app.ParseFileExtension(fh)
+				res := restapp.ParseFileExtension(fh)
 
 				Expect(res).To(Equal(""))
 			})
@@ -100,7 +100,7 @@ var _ = Describe("Multipart Package", func() {
 		When("name contain multiple dot", func() {
 			It("should return only extension", func() {
 				fh.Filename = "dolpin.new.jpeg"
-				res := rest_app.ParseFileExtension(fh)
+				res := restapp.ParseFileExtension(fh)
 
 				Expect(res).To(Equal("jpeg"))
 			})
@@ -132,7 +132,7 @@ var _ = Describe("Multipart Package", func() {
 					Return(0, fmt.Errorf("disk error")).
 					Times(1)
 
-				res, err := rest_app.ParseMultipartFile(f, fh)
+				res, err := restapp.ParseMultipartFile(f, fh)
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("disk error")))
@@ -154,7 +154,7 @@ var _ = Describe("Multipart Package", func() {
 					Return(int64(0), fmt.Errorf("disk error")).
 					Times(1)
 
-				res, err := rest_app.ParseMultipartFile(f, fh)
+				res, err := restapp.ParseMultipartFile(f, fh)
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(fmt.Errorf("disk error")))
@@ -176,9 +176,9 @@ var _ = Describe("Multipart Package", func() {
 					Return(int64(1), nil).
 					Times(1)
 
-				res, err := rest_app.ParseMultipartFile(f, fh)
+				res, err := restapp.ParseMultipartFile(f, fh)
 
-				expectedRes := &rest_app.FileInfo{
+				expectedRes := &restapp.FileInfo{
 					Name:      "dolpin",
 					Extension: "jpeg",
 					Size:      200,
@@ -204,9 +204,9 @@ var _ = Describe("Multipart Package", func() {
 					Return(int64(1), nil).
 					Times(1)
 
-				res, err := rest_app.ParseMultipartFile(f, fh)
+				res, err := restapp.ParseMultipartFile(f, fh)
 
-				expectedRes := &rest_app.FileInfo{
+				expectedRes := &restapp.FileInfo{
 					Name:      "dolpin",
 					Extension: "jpeg",
 					Size:      200,

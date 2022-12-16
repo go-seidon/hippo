@@ -1,4 +1,4 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-seidon/hippo/api/restapp"
+	api "github.com/go-seidon/hippo/api/restapp"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	"github.com/go-seidon/hippo/internal/restapp"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
 	"github.com/golang/mock/gomock"
@@ -39,7 +39,7 @@ var _ = Describe("Health Handler", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
-			healthHandler := rest_app.NewHealthHandler(rest_app.HealthHandlerParam{
+			healthHandler := restapp.NewHealthHandler(restapp.HealthHandlerParam{
 				Logger:        log,
 				Serializer:    serializer,
 				HealthService: healthService,
@@ -52,7 +52,7 @@ var _ = Describe("Health Handler", func() {
 
 				err := fmt.Errorf("failed check health")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1001,
 					Message: err.Error(),
 				}
@@ -65,7 +65,7 @@ var _ = Describe("Health Handler", func() {
 
 				serializer.
 					EXPECT().
-					Marshal(b).
+					Marshal(gomock.Eq(b)).
 					Return([]byte{}, nil).
 					Times(1)
 
@@ -105,7 +105,13 @@ var _ = Describe("Health Handler", func() {
 					},
 				}
 
-				details := map[string]restapp.CheckHealthDetail{
+				healthService.
+					EXPECT().
+					Check(gomock.Eq(ctx)).
+					Return(res, nil).
+					Times(1)
+
+				details := map[string]api.CheckHealthDetail{
 					"app-disk": {
 						Name:      "app-disk",
 						Status:    "FAILED",
@@ -119,24 +125,17 @@ var _ = Describe("Health Handler", func() {
 						CheckedAt: currentTimestamp.UnixMilli(),
 					},
 				}
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1000,
 					Message: "success check service health",
-					Data: &restapp.CheckHealthData{
+					Data: &api.CheckHealthData{
 						Status:  "WARNING",
 						Details: details,
 					},
 				}
-
-				healthService.
-					EXPECT().
-					Check(gomock.Eq(ctx)).
-					Return(res, nil).
-					Times(1)
-
 				serializer.
 					EXPECT().
-					Marshal(b).
+					Marshal(gomock.Eq(b)).
 					Return([]byte{}, nil).
 					Times(1)
 

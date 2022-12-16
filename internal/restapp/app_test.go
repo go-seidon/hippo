@@ -1,4 +1,4 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"context"
@@ -13,12 +13,12 @@ import (
 
 	"github.com/go-seidon/hippo/internal/app"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
+	"github.com/go-seidon/hippo/internal/restapp"
 )
 
 func TestRestApp(t *testing.T) {
@@ -41,8 +41,8 @@ var _ = Describe("App Package", func() {
 
 		When("config is not specified", func() {
 			It("should return error", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithLogger(log),
+				res, err := restapp.NewRestApp(
+					restapp.WithLogger(log),
 				)
 
 				Expect(res).To(BeNil())
@@ -52,8 +52,8 @@ var _ = Describe("App Package", func() {
 
 		When("logger is not specified", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(&app.Config{
+				res, err := restapp.NewRestApp(
+					restapp.WithConfig(&app.Config{
 						RepositoryProvider: repository.PROVIDER_MYSQL,
 					}),
 				)
@@ -65,8 +65,8 @@ var _ = Describe("App Package", func() {
 
 		When("debug is enabled", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(&app.Config{
+				res, err := restapp.NewRestApp(
+					restapp.WithConfig(&app.Config{
 						RepositoryProvider: repository.PROVIDER_MYSQL,
 						AppDebug:           true,
 					}),
@@ -79,8 +79,8 @@ var _ = Describe("App Package", func() {
 
 		When("env is specified", func() {
 			It("should return result", func() {
-				res, err := rest_app.NewRestApp(
-					rest_app.WithConfig(&app.Config{
+				res, err := restapp.NewRestApp(
+					restapp.WithConfig(&app.Config{
 						RepositoryProvider: repository.PROVIDER_MYSQL,
 						AppDebug:           true,
 						AppEnv:             "local",
@@ -99,9 +99,9 @@ var _ = Describe("App Package", func() {
 					WriterLevel(gomock.Eq("error")).
 					Times(1)
 
-				res, err := rest_app.NewRestApp(
-					rest_app.WithLogger(log),
-					rest_app.WithConfig(&app.Config{
+				res, err := restapp.NewRestApp(
+					restapp.WithLogger(log),
+					restapp.WithConfig(&app.Config{
 						RepositoryProvider: repository.PROVIDER_MONGO,
 						AppEnv:             "local",
 						MongoMode:          "standalone",
@@ -117,11 +117,11 @@ var _ = Describe("App Package", func() {
 
 	Context("RestAppConfig", Label("unit"), func() {
 		var (
-			cfg *rest_app.RestAppConfig
+			cfg *restapp.RestAppConfig
 		)
 
 		BeforeEach(func() {
-			cfg = &rest_app.RestAppConfig{
+			cfg = &restapp.RestAppConfig{
 				AppName:    "mock-name",
 				AppVersion: "mock-version",
 				AppHost:    "host",
@@ -176,18 +176,18 @@ var _ = Describe("App Package", func() {
 			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
-			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(&app.Config{
+			ra, _ = restapp.NewRestApp(
+				restapp.WithConfig(&app.Config{
 					AppName:            "mock-name",
 					AppVersion:         "mock-version",
 					RESTAppHost:        "localhost",
 					RESTAppPort:        4949,
 					RepositoryProvider: "mysql",
 				}),
-				rest_app.WithLogger(logger),
-				rest_app.WithServer(server),
-				rest_app.WithService(healthService),
-				rest_app.WithRepository(repo),
+				restapp.WithLogger(logger),
+				restapp.WithServer(server),
+				restapp.WithService(healthService),
+				restapp.WithRepository(repo),
 			)
 
 			ctx = context.Background()
@@ -325,17 +325,17 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_restapp.NewMockServer(ctrl)
-			ra, _ = rest_app.NewRestApp(
-				rest_app.WithConfig(&app.Config{
+			ra, _ = restapp.NewRestApp(
+				restapp.WithConfig(&app.Config{
 					AppName:            "mock-name",
 					AppVersion:         "mock-version",
 					RESTAppHost:        "localhost",
 					RESTAppPort:        4949,
 					RepositoryProvider: "mysql",
 				}),
-				rest_app.WithLogger(logger),
-				rest_app.WithServer(server),
-				rest_app.WithService(healthService),
+				restapp.WithLogger(logger),
+				restapp.WithServer(server),
+				restapp.WithService(healthService),
 			)
 			ctx = context.Background()
 		})

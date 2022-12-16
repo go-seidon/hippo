@@ -1,4 +1,4 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"bytes"
@@ -10,11 +10,11 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/go-seidon/hippo/api/restapp"
+	api "github.com/go-seidon/hippo/api/restapp"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	"github.com/go-seidon/hippo/internal/restapp"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/serialization"
@@ -50,10 +50,10 @@ var _ = Describe("File Handler", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			fileService = mock_file.NewMockFile(ctrl)
-			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+			fileHandler := restapp.NewFileHandler(restapp.FileHandlerParam{
 				Logger:      log,
 				Serializer:  serializer,
-				Config:      &rest_app.RestAppConfig{},
+				Config:      &restapp.RestAppConfig{},
 				FileService: fileService,
 			})
 			handler = fileHandler.DeleteFileById
@@ -67,7 +67,7 @@ var _ = Describe("File Handler", func() {
 
 				err := fmt.Errorf("failed delete file")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1001,
 					Message: err.Error(),
 				}
@@ -103,7 +103,7 @@ var _ = Describe("File Handler", func() {
 
 				err := file.ErrorNotFound
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1004,
 					Message: err.Error(),
 				}
@@ -139,7 +139,7 @@ var _ = Describe("File Handler", func() {
 
 				err := validation.Error("invalid data")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1002,
 					Message: err.Error(),
 				}
@@ -175,10 +175,10 @@ var _ = Describe("File Handler", func() {
 				res := &file.DeleteFileResult{
 					DeletedAt: time.Now(),
 				}
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1000,
 					Message: "success delete file",
-					Data: &restapp.DeleteFileData{
+					Data: &api.DeleteFileData{
 						DeletedAt: res.DeletedAt.UnixMilli(),
 					},
 				}
@@ -233,10 +233,10 @@ var _ = Describe("File Handler", func() {
 			serializer = mock_serialization.NewMockSerializer(ctrl)
 			fileService = mock_file.NewMockFile(ctrl)
 			fileData = mock_io.NewMockReadCloser(ctrl)
-			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+			fileHandler := restapp.NewFileHandler(restapp.FileHandlerParam{
 				Logger:      log,
 				Serializer:  serializer,
-				Config:      &rest_app.RestAppConfig{},
+				Config:      &restapp.RestAppConfig{},
 				FileService: fileService,
 			})
 			handler = fileHandler.RetrieveFileById
@@ -250,7 +250,7 @@ var _ = Describe("File Handler", func() {
 
 				err := fmt.Errorf("failed retrieve file")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1001,
 					Message: err.Error(),
 				}
@@ -286,7 +286,7 @@ var _ = Describe("File Handler", func() {
 
 				err := file.ErrorNotFound
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1004,
 					Message: err.Error(),
 				}
@@ -322,7 +322,7 @@ var _ = Describe("File Handler", func() {
 
 				err := validation.Error("invalid data")
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1002,
 					Message: err.Error(),
 				}
@@ -371,7 +371,7 @@ var _ = Describe("File Handler", func() {
 					Data: fileData,
 				}
 
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1001,
 					Message: "read error",
 				}
@@ -527,10 +527,10 @@ var _ = Describe("File Handler", func() {
 			log = mock_logging.NewMockLogger(ctrl)
 			serializer = json.NewSerializer()
 			uploadService = mock_file.NewMockFile(ctrl)
-			fileHandler := rest_app.NewFileHandler(rest_app.FileHandlerParam{
+			fileHandler := restapp.NewFileHandler(restapp.FileHandlerParam{
 				Logger:      log,
 				Serializer:  serializer,
-				Config:      &rest_app.RestAppConfig{},
+				Config:      &restapp.RestAppConfig{},
 				FileService: uploadService,
 			})
 			handler = fileHandler.UploadFile
@@ -544,7 +544,7 @@ var _ = Describe("File Handler", func() {
 
 				handler.ServeHTTP(w, r)
 
-				resBody := rest_app.ResponseBody{}
+				resBody := restapp.ResponseBody{}
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
 				Expect(w.Code).To(Equal(400))
@@ -566,7 +566,7 @@ var _ = Describe("File Handler", func() {
 
 				handler.ServeHTTP(w, r)
 
-				resBody := rest_app.ResponseBody{}
+				resBody := restapp.ResponseBody{}
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
 				Expect(w.Code).To(Equal(500))
@@ -588,7 +588,7 @@ var _ = Describe("File Handler", func() {
 
 				handler.ServeHTTP(w, r)
 
-				resBody := rest_app.ResponseBody{}
+				resBody := restapp.ResponseBody{}
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 
 				Expect(w.Code).To(Equal(400))
@@ -619,7 +619,7 @@ var _ = Describe("File Handler", func() {
 
 				handler.ServeHTTP(w, r)
 
-				resBody := rest_app.ResponseBody{}
+				resBody := restapp.ResponseBody{}
 				serializer.Unmarshal(w.Body.Bytes(), &resBody)
 				data := map[string]interface{}{
 					"id":          uploadRes.UniqueId,

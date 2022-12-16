@@ -1,11 +1,11 @@
-package rest_app_test
+package restapp_test
 
 import (
 	"fmt"
 	"net/http"
 
-	rest_app "github.com/go-seidon/hippo/internal/rest-app"
-	mock_restapp "github.com/go-seidon/hippo/internal/rest-app/mock"
+	"github.com/go-seidon/hippo/internal/restapp"
+	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -29,8 +29,8 @@ var _ = Describe("Response Package", func() {
 
 		When("writer is not specified", func() {
 			It("should not set writer", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithWriterSerializer(nil, s)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithWriterSerializer(nil, s)
 
 				opt(&p)
 
@@ -41,8 +41,8 @@ var _ = Describe("Response Package", func() {
 
 		When("serializer is not specified", func() {
 			It("should not set serializer", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithWriterSerializer(w, nil)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithWriterSerializer(w, nil)
 
 				opt(&p)
 
@@ -53,8 +53,8 @@ var _ = Describe("Response Package", func() {
 
 		When("writer and serializer are specified", func() {
 			It("should set writer and serializer", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithWriterSerializer(w, s)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithWriterSerializer(w, s)
 
 				opt(&p)
 
@@ -75,8 +75,8 @@ var _ = Describe("Response Package", func() {
 
 		When("http code is specified", func() {
 			It("should set http code", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithHttpCode(code)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithHttpCode(code)
 
 				opt(&p)
 
@@ -96,8 +96,8 @@ var _ = Describe("Response Package", func() {
 
 		When("message is specified", func() {
 			It("should set http", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithMessage(message)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithMessage(message)
 
 				opt(&p)
 
@@ -117,8 +117,8 @@ var _ = Describe("Response Package", func() {
 
 		When("code is specified", func() {
 			It("should set http", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithCode(code)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithCode(code)
 
 				opt(&p)
 
@@ -138,8 +138,8 @@ var _ = Describe("Response Package", func() {
 
 		When("data is specified", func() {
 			It("should set http", func() {
-				p := rest_app.ResponseParam{}
-				opt := rest_app.WithData(data)
+				p := restapp.ResponseParam{}
+				opt := restapp.WithData(data)
 
 				opt(&p)
 
@@ -163,8 +163,8 @@ var _ = Describe("Response Package", func() {
 
 		When("writer is not specified", func() {
 			It("should return error", func() {
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(nil, s),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(nil, s),
 				)
 
 				Expect(err).To(Equal(fmt.Errorf("writer should be specified")))
@@ -173,8 +173,8 @@ var _ = Describe("Response Package", func() {
 
 		When("serializer is not specified", func() {
 			It("should return error", func() {
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(w, nil),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(w, nil),
 				)
 
 				Expect(err).To(Equal(fmt.Errorf("serializer should be specified")))
@@ -199,9 +199,9 @@ var _ = Describe("Response Package", func() {
 					Write(gomock.Eq([]byte("mock"))).
 					Times(1)
 
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(w, s),
-					rest_app.WithHttpCode(201),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(w, s),
+					restapp.WithHttpCode(201),
 				)
 
 				Expect(err).To(BeNil())
@@ -210,7 +210,7 @@ var _ = Describe("Response Package", func() {
 
 		When("message is specified", func() {
 			It("should return nil", func() {
-				b := rest_app.ResponseBody{
+				b := restapp.ResponseBody{
 					Code:    1000,
 					Message: "success do something",
 				}
@@ -230,9 +230,9 @@ var _ = Describe("Response Package", func() {
 					Write(gomock.Eq([]byte("mock"))).
 					Times(1)
 
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(w, s),
-					rest_app.WithMessage("success do something"),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(w, s),
+					restapp.WithMessage("success do something"),
 				)
 
 				Expect(err).To(BeNil())
@@ -247,8 +247,8 @@ var _ = Describe("Response Package", func() {
 					Return(nil, fmt.Errorf("failed encode")).
 					Times(1)
 
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(w, s),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(w, s),
 				)
 
 				Expect(err).To(Equal(fmt.Errorf("failed encode")))
@@ -273,8 +273,8 @@ var _ = Describe("Response Package", func() {
 					Write(gomock.Eq([]byte("mock"))).
 					Times(1)
 
-				err := rest_app.Response(
-					rest_app.WithWriterSerializer(w, s),
+				err := restapp.Response(
+					restapp.WithWriterSerializer(w, s),
 				)
 
 				Expect(err).To(BeNil())
