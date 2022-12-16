@@ -3,9 +3,9 @@ package grpclog_test
 import (
 	"fmt"
 
-	grpc "github.com/go-seidon/hippo/internal/grpc"
-	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
 	"github.com/go-seidon/hippo/internal/grpclog"
+	"github.com/go-seidon/provider/grpc"
+	mock_grpc "github.com/go-seidon/provider/grpc/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/testdata"
 	"github.com/golang/mock/gomock"

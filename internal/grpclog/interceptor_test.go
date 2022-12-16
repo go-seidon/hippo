@@ -5,10 +5,10 @@ import (
 	"net"
 	"time"
 
-	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
 	"github.com/go-seidon/hippo/internal/grpclog"
 	mock_context "github.com/go-seidon/provider/context/mock"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
+	mock_grpc "github.com/go-seidon/provider/grpc/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/testdata"
 	"github.com/golang/mock/gomock"

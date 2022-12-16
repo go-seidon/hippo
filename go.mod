@@ -20,7 +20,7 @@ require (
 
 require (
 	github.com/deepmap/oapi-codegen v1.11.1-0.20221003111356-96482c12b2bc
-	github.com/go-seidon/provider v0.0.17-alpha
+	github.com/go-seidon/provider v0.0.19-alpha
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
 )

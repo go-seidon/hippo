@@ -3,8 +3,8 @@ package grpcauth_test
 import (
 	"context"
 
-	mock_grpc "github.com/go-seidon/hippo/internal/grpc/mock"
 	"github.com/go-seidon/hippo/internal/grpcauth"
+	mock_grpc "github.com/go-seidon/provider/grpc/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

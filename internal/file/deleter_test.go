@@ -11,7 +11,7 @@ import (
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
-	mock_identifier "github.com/go-seidon/provider/identifier/mock"
+	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
