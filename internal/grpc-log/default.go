@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-seidon/provider/datetime"
-	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/logging/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
@@ -125,7 +125,7 @@ var DefaultSendLog = func(ctx context.Context, p SendLogParam) error {
 	logger := p.Logger
 	if p.Error != nil {
 		logger = logger.WithFields(map[string]interface{}{
-			logging.FIELD_ERROR: p.Error,
+			logrus.FIELD_ERROR: p.Error,
 		})
 	}
 	logger = logger.WithFields(map[string]interface{}{

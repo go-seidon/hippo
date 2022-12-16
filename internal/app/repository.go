@@ -3,11 +3,11 @@ package app
 import (
 	"fmt"
 
-	db_mongo "github.com/go-seidon/hippo/internal/db-mongo"
-	db_mysql "github.com/go-seidon/hippo/internal/db-mysql"
 	"github.com/go-seidon/hippo/internal/repository"
-	repository_mongo "github.com/go-seidon/hippo/internal/repository-mongo"
-	repository_mysql "github.com/go-seidon/hippo/internal/repository-mysql"
+	repository_mongo "github.com/go-seidon/hippo/internal/repository/mongo"
+	repository_mysql "github.com/go-seidon/hippo/internal/repository/mysql"
+	db_mongo "github.com/go-seidon/provider/mongo"
+	db_mysql "github.com/go-seidon/provider/mysql"
 )
 
 func NewDefaultRepository(config *Config) (repository.Provider, error) {

@@ -13,11 +13,11 @@ import (
 	grpc_log "github.com/go-seidon/hippo/internal/grpc-log"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/encoding"
-	"github.com/go-seidon/provider/hashing"
-	"github.com/go-seidon/provider/identifier"
+	"github.com/go-seidon/provider/encoding/base64"
+	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/identifier/ksuid"
 	"github.com/go-seidon/provider/logging"
-	"github.com/go-seidon/provider/validation"
+	"github.com/go-seidon/provider/validation/govalidator"
 	"google.golang.org/grpc"
 )
 
@@ -107,18 +107,18 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
-	identifier := identifier.NewKsuid()
-	validator := validation.NewGoValidator()
+	ksuIdentifier := ksuid.NewIdentifier()
+	govalidator := govalidator.NewValidator()
 	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
 
 	fileService, err := file.NewFile(file.NewFileParam{
 		FileRepo:    repo.GetFileRepo(),
 		FileManager: fileManager,
 		Logger:      logger,
-		Identifier:  identifier,
+		Identifier:  ksuIdentifier,
 		DirManager:  dirManager,
 		Locator:     locator,
-		Validator:   validator,
+		Validator:   govalidator,
 		Config: &file.FileConfig{
 			UploadDir: p.Config.UploadDirectory,
 		},
@@ -127,13 +127,13 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		return nil, err
 	}
 
-	encoder := encoding.NewBase64Encoder()
-	hasher := hashing.NewBcryptHasher()
+	base64Encoder := base64.NewEncoder()
+	bcryptHasher := bcrypt.NewHasher()
 
 	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
 		AuthRepo: repo.GetAuthRepo(),
-		Encoder:  encoder,
-		Hasher:   hasher,
+		Encoder:  base64Encoder,
+		Hasher:   bcryptHasher,
 	})
 	if err != nil {
 		return nil, err
