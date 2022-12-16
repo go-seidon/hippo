@@ -166,8 +166,12 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Upload docker image to docker hub
-2. Add gracefull shutdown (rest & grpc app)
+1. tidy db migrations
+2. handle record deleted
+3. rename -v1 (we're gonna version using go semantic versioning foldering)
+4. Use echo router
+5. Upload docker image to docker hub
+6. Add gracefull shutdown (rest & grpc app)
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
