@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	grpc_v1 "github.com/go-seidon/hippo/generated/grpc-v1"
-	mock_grpcv1 "github.com/go-seidon/hippo/generated/grpc-v1/mock"
+	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
+	mock_grpcapp "github.com/go-seidon/hippo/generated/grpcapp/mock"
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	grpc_app "github.com/go-seidon/hippo/internal/grpc-app"
@@ -31,10 +31,10 @@ var _ = Describe("Handler Package", func() {
 
 	Context("CheckHealth function", Label("unit"), func() {
 		var (
-			handler       grpc_v1.HealthServiceServer
+			handler       grpcapp.HealthServiceServer
 			healthService *mock_healthcheck.MockHealthCheck
 			ctx           context.Context
-			p             *grpc_v1.CheckHealthParam
+			p             *grpcapp.CheckHealthParam
 		)
 
 		BeforeEach(func() {
@@ -43,7 +43,7 @@ var _ = Describe("Handler Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			handler = grpc_app.NewHealthHandler(healthService)
 			ctx = context.Background()
-			p = &grpc_v1.CheckHealthParam{}
+			p = &grpcapp.CheckHealthParam{}
 		})
 
 		When("failed check service health", func() {
@@ -80,12 +80,12 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.CheckHealth(ctx, p)
 
-				expectedRes := &grpc_v1.CheckHealthResult{
+				expectedRes := &grpcapp.CheckHealthResult{
 					Code:    1000,
 					Message: "success check service health",
-					Data: &grpc_v1.CheckHealthData{
+					Data: &grpcapp.CheckHealthData{
 						Status:  "OK",
-						Details: map[string]*grpc_v1.CheckHealthDetail{},
+						Details: map[string]*grpcapp.CheckHealthDetail{},
 					},
 				}
 
@@ -126,12 +126,12 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.CheckHealth(ctx, p)
 
-				expectedRes := &grpc_v1.CheckHealthResult{
+				expectedRes := &grpcapp.CheckHealthResult{
 					Code:    1000,
 					Message: "success check service health",
-					Data: &grpc_v1.CheckHealthData{
+					Data: &grpcapp.CheckHealthData{
 						Status: "WARNING",
-						Details: map[string]*grpc_v1.CheckHealthDetail{
+						Details: map[string]*grpcapp.CheckHealthDetail{
 							"inet-conn": {
 								Name:      "inet-conn",
 								Status:    "OK",
@@ -156,11 +156,11 @@ var _ = Describe("Handler Package", func() {
 
 	Context("DeleteFile function", Label("unit"), func() {
 		var (
-			handler     grpc_v1.FileServiceServer
+			handler     grpcapp.FileServiceServer
 			fileService *mock_file.MockFile
 			ctx         context.Context
 			currentTs   time.Time
-			p           *grpc_v1.DeleteFileParam
+			p           *grpcapp.DeleteFileParam
 			delParam    file.DeleteFileParam
 			delRes      *file.DeleteFileResult
 		)
@@ -173,7 +173,7 @@ var _ = Describe("Handler Package", func() {
 			handler = grpc_app.NewFileHandler(fileService, config)
 			ctx = context.Background()
 			currentTs = time.Now()
-			p = &grpc_v1.DeleteFileParam{
+			p = &grpcapp.DeleteFileParam{
 				FileId: "file-id",
 			}
 			delParam = file.DeleteFileParam{
@@ -194,10 +194,10 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.DeleteFile(ctx, p)
 
-				expectRes := &grpc_v1.DeleteFileResult{
+				expectRes := &grpcapp.DeleteFileResult{
 					Code:    1000,
 					Message: "success delete file",
-					Data: &grpc_v1.DeleteFileData{
+					Data: &grpcapp.DeleteFileData{
 						DeletedAt: currentTs.UnixMilli(),
 					},
 				}
@@ -216,7 +216,7 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.DeleteFile(ctx, p)
 
-				expectRes := &grpc_v1.DeleteFileResult{
+				expectRes := &grpcapp.DeleteFileResult{
 					Code:    1004,
 					Message: "not found",
 				}
@@ -235,7 +235,7 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.DeleteFile(ctx, p)
 
-				expectRes := &grpc_v1.DeleteFileResult{
+				expectRes := &grpcapp.DeleteFileResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -254,7 +254,7 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.DeleteFile(ctx, p)
 
-				expectRes := &grpc_v1.DeleteFileResult{
+				expectRes := &grpcapp.DeleteFileResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -266,15 +266,15 @@ var _ = Describe("Handler Package", func() {
 
 	Context("RetrieveFile function", Label("unit"), func() {
 		var (
-			handler     grpc_v1.FileServiceServer
+			handler     grpcapp.FileServiceServer
 			fileService *mock_file.MockFile
 			ctx         *mock_context.MockContext
-			p           *grpc_v1.RetrieveFileParam
-			pendingRes  *grpc_v1.RetrieveFileResult
-			canceledRes *grpc_v1.RetrieveFileResult
-			failedRes   *grpc_v1.RetrieveFileResult
-			successRes  *grpc_v1.RetrieveFileResult
-			stream      *mock_grpcv1.MockFileService_RetrieveFileServer
+			p           *grpcapp.RetrieveFileParam
+			pendingRes  *grpcapp.RetrieveFileResult
+			canceledRes *grpcapp.RetrieveFileResult
+			failedRes   *grpcapp.RetrieveFileResult
+			successRes  *grpcapp.RetrieveFileResult
+			stream      *mock_grpcapp.MockFileService_RetrieveFileServer
 			retParam    file.RetrieveFileParam
 			retRes      *file.RetrieveFileResult
 			rc          *mock_io.MockReadCloser
@@ -287,26 +287,26 @@ var _ = Describe("Handler Package", func() {
 			config := &grpc_app.GrpcAppConfig{}
 			handler = grpc_app.NewFileHandler(fileService, config)
 			ctx = mock_context.NewMockContext(ctrl)
-			p = &grpc_v1.RetrieveFileParam{
+			p = &grpcapp.RetrieveFileParam{
 				FileId: "file-id",
 			}
-			pendingRes = &grpc_v1.RetrieveFileResult{
+			pendingRes = &grpcapp.RetrieveFileResult{
 				Code:    1005,
 				Message: "retrieving file",
 			}
-			canceledRes = &grpc_v1.RetrieveFileResult{
+			canceledRes = &grpcapp.RetrieveFileResult{
 				Code:    1001,
 				Message: context.Canceled.Error(),
 			}
-			failedRes = &grpc_v1.RetrieveFileResult{
+			failedRes = &grpcapp.RetrieveFileResult{
 				Code:    1001,
 				Message: "i/o error",
 			}
-			successRes = &grpc_v1.RetrieveFileResult{
+			successRes = &grpcapp.RetrieveFileResult{
 				Code:    1000,
 				Message: "success retrieve file",
 			}
-			stream = mock_grpcv1.NewMockFileService_RetrieveFileServer(ctrl)
+			stream = mock_grpcapp.NewMockFileService_RetrieveFileServer(ctrl)
 			retParam = file.RetrieveFileParam{
 				FileId: "file-id",
 			}
@@ -333,7 +333,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, file.ErrorNotFound).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1004,
 					Message: file.ErrorNotFound.Error(),
 				}
@@ -357,7 +357,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, file.ErrorNotFound).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1004,
 					Message: file.ErrorNotFound.Error(),
 				}
@@ -381,7 +381,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -405,7 +405,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -429,7 +429,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -453,7 +453,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				res := &grpc_v1.RetrieveFileResult{
+				res := &grpcapp.RetrieveFileResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -977,11 +977,11 @@ var _ = Describe("Handler Package", func() {
 
 	Context("UploadFile function", Label("unit"), func() {
 		var (
-			handler     grpc_v1.FileServiceServer
+			handler     grpcapp.FileServiceServer
 			fileService *mock_file.MockFile
 			ctx         *mock_context.MockContext
 			currentTs   time.Time
-			stream      *mock_grpcv1.MockFileService_UploadFileServer
+			stream      *mock_grpcapp.MockFileService_UploadFileServer
 		)
 
 		BeforeEach(func() {
@@ -994,7 +994,7 @@ var _ = Describe("Handler Package", func() {
 			handler = grpc_app.NewFileHandler(fileService, config)
 			ctx = mock_context.NewMockContext(ctrl)
 			currentTs = time.Now()
-			stream = mock_grpcv1.NewMockFileService_UploadFileServer(ctrl)
+			stream = mock_grpcapp.NewMockFileService_UploadFileServer(ctrl)
 		})
 
 		When("failed send stream during action cancelled by client", func() {
@@ -1011,7 +1011,7 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: context.Canceled.Error(),
 				}
@@ -1041,7 +1041,7 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: context.Canceled.Error(),
 				}
@@ -1077,7 +1077,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("client cancelled")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "client cancelled",
 				}
@@ -1113,7 +1113,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("client cancelled")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "client cancelled",
 				}
@@ -1148,8 +1148,8 @@ var _ = Describe("Handler Package", func() {
 				}
 				handler := grpc_app.NewFileHandler(fileService, config)
 
-				param := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				param := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1159,7 +1159,7 @@ var _ = Describe("Handler Package", func() {
 					Return(param, nil).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "file is too large",
 				}
@@ -1194,8 +1194,8 @@ var _ = Describe("Handler Package", func() {
 				}
 				handler := grpc_app.NewFileHandler(fileService, config)
 
-				param := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				param := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1205,7 +1205,7 @@ var _ = Describe("Handler Package", func() {
 					Return(param, nil).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "file is too large",
 				}
@@ -1235,9 +1235,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1250,8 +1250,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1279,7 +1279,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "db error",
 				}
@@ -1309,9 +1309,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1324,8 +1324,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1353,7 +1353,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_FAILED,
 					Message: "db error",
 				}
@@ -1383,9 +1383,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1398,8 +1398,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1427,7 +1427,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.INVALID_PARAM,
 					Message: "invalid data",
 				}
@@ -1457,9 +1457,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1472,8 +1472,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1501,7 +1501,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.INVALID_PARAM,
 					Message: "invalid data",
 				}
@@ -1531,9 +1531,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1546,8 +1546,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1584,10 +1584,10 @@ var _ = Describe("Handler Package", func() {
 					Return(uploadRes, nil).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_SUCCESS,
 					Message: "success upload file",
-					Data: &grpc_v1.UploadFileData{
+					Data: &grpcapp.UploadFileData{
 						Id:         uploadRes.UniqueId,
 						Name:       uploadRes.Name,
 						Path:       uploadRes.Path,
@@ -1623,9 +1623,9 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(3)
 
-				infoParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Info{
-						Info: &grpc_v1.UploadFileInfo{
+				infoParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Info{
+						Info: &grpcapp.UploadFileInfo{
 							Name:      "file-name",
 							Mimetype:  "file-mimetype",
 							Extension: "file-extension",
@@ -1638,8 +1638,8 @@ var _ = Describe("Handler Package", func() {
 					Return(infoParam, nil).
 					Times(1)
 
-				chunkParam := &grpc_v1.UploadFileParam{
-					Data: &grpc_v1.UploadFileParam_Chunks{
+				chunkParam := &grpcapp.UploadFileParam{
+					Data: &grpcapp.UploadFileParam_Chunks{
 						Chunks: []byte{1, 2, 3},
 					},
 				}
@@ -1676,10 +1676,10 @@ var _ = Describe("Handler Package", func() {
 					Return(uploadRes, nil).
 					Times(1)
 
-				failedRes := &grpc_v1.UploadFileResult{
+				failedRes := &grpcapp.UploadFileResult{
 					Code:    status.ACTION_SUCCESS,
 					Message: "success upload file",
-					Data: &grpc_v1.UploadFileData{
+					Data: &grpcapp.UploadFileData{
 						Id:         uploadRes.UniqueId,
 						Name:       uploadRes.Name,
 						Path:       uploadRes.Path,

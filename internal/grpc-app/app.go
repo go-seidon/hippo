@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	grpc_v1 "github.com/go-seidon/hippo/generated/grpc-v1"
+	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
@@ -161,8 +161,8 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	)
 	healthCheckHandler := NewHealthHandler(healthService)
 	fileHandler := NewFileHandler(fileService, config)
-	grpc_v1.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
-	grpc_v1.RegisterFileServiceServer(grpcServer, fileHandler)
+	grpcapp.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
+	grpcapp.RegisterFileServiceServer(grpcServer, fileHandler)
 
 	svr := p.Server
 	if svr == nil {

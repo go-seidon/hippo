@@ -54,7 +54,7 @@ test-watch-integration:
 
 .PHONY: generate-mock
 generate-mock:
-	mockgen -package=mock_grpcv1 -source generated/grpc-v1/file_grpc.pb.go -destination=generated/grpc-v1/mock/file_grpc_mock.go
+	mockgen -package=mock_grpcapp -source generated/grpcapp/file_grpc.pb.go -destination=generated/grpcapp/mock/file_grpc_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_dbmongo -source internal/db-mongo/client.go -destination=internal/db-mongo/mock/client_mock.go
 	mockgen -package=mock_dbmysql -source internal/db-mysql/client.go -destination=internal/db-mysql/mock/client_mock.go

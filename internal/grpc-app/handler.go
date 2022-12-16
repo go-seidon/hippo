@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	grpc_v1 "github.com/go-seidon/hippo/generated/grpc-v1"
+	grpcapp "github.com/go-seidon/hippo/generated/grpcapp"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/provider/status"
@@ -18,19 +18,19 @@ import (
 )
 
 type healthHandler struct {
-	grpc_v1.UnimplementedHealthServiceServer
+	grpcapp.UnimplementedHealthServiceServer
 	healthService healthcheck.HealthCheck
 }
 
-func (s *healthHandler) CheckHealth(ctx context.Context, p *grpc_v1.CheckHealthParam) (*grpc_v1.CheckHealthResult, error) {
+func (s *healthHandler) CheckHealth(ctx context.Context, p *grpcapp.CheckHealthParam) (*grpcapp.CheckHealthResult, error) {
 	checkRes, err := s.healthService.Check(ctx)
 	if err != nil {
 		return nil, grpc_status.Error(codes.Unknown, err.Error())
 	}
 
-	details := map[string]*grpc_v1.CheckHealthDetail{}
+	details := map[string]*grpcapp.CheckHealthDetail{}
 	for _, item := range checkRes.Items {
-		details[item.Name] = &grpc_v1.CheckHealthDetail{
+		details[item.Name] = &grpcapp.CheckHealthDetail{
 			Name:      item.Name,
 			Status:    item.Status,
 			CheckedAt: item.CheckedAt.UnixMilli(),
@@ -38,10 +38,10 @@ func (s *healthHandler) CheckHealth(ctx context.Context, p *grpc_v1.CheckHealthP
 		}
 	}
 
-	res := &grpc_v1.CheckHealthResult{
+	res := &grpcapp.CheckHealthResult{
 		Code:    status.ACTION_SUCCESS,
 		Message: "success check service health",
-		Data: &grpc_v1.CheckHealthData{
+		Data: &grpcapp.CheckHealthData{
 			Status:  checkRes.Status,
 			Details: details,
 		},
@@ -56,17 +56,17 @@ func NewHealthHandler(healthService healthcheck.HealthCheck) *healthHandler {
 }
 
 type fileHandler struct {
-	grpc_v1.UnimplementedFileServiceServer
+	grpcapp.UnimplementedFileServiceServer
 	fileService file.File
 	config      *GrpcAppConfig
 }
 
-func (h *fileHandler) DeleteFile(ctx context.Context, p *grpc_v1.DeleteFileParam) (*grpc_v1.DeleteFileResult, error) {
+func (h *fileHandler) DeleteFile(ctx context.Context, p *grpcapp.DeleteFileParam) (*grpcapp.DeleteFileResult, error) {
 	deletion, err := h.fileService.DeleteFile(ctx, file.DeleteFileParam{
 		FileId: p.FileId,
 	})
 	if err != nil {
-		res := &grpc_v1.DeleteFileResult{
+		res := &grpcapp.DeleteFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		}
@@ -85,22 +85,22 @@ func (h *fileHandler) DeleteFile(ctx context.Context, p *grpc_v1.DeleteFileParam
 		return res, nil
 	}
 
-	res := &grpc_v1.DeleteFileResult{
+	res := &grpcapp.DeleteFileResult{
 		Code:    status.ACTION_SUCCESS,
 		Message: "success delete file",
-		Data: &grpc_v1.DeleteFileData{
+		Data: &grpcapp.DeleteFileData{
 			DeletedAt: deletion.DeletedAt.UnixMilli(),
 		},
 	}
 	return res, nil
 }
 
-func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.FileService_RetrieveFileServer) error {
+func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.FileService_RetrieveFileServer) error {
 	retrieval, err := h.fileService.RetrieveFile(stream.Context(), file.RetrieveFileParam{
 		FileId: p.FileId,
 	})
 	if err != nil {
-		res := &grpc_v1.RetrieveFileResult{
+		res := &grpcapp.RetrieveFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		}
@@ -132,7 +132,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 		return err
 	}
 
-	err = stream.Send(&grpc_v1.RetrieveFileResult{
+	err = stream.Send(&grpcapp.RetrieveFileResult{
 		Code:    status.ACTION_PENDING,
 		Message: "retrieving file",
 	})
@@ -146,7 +146,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 	for {
 		err = stream.Context().Err()
 		if err != nil {
-			err = stream.Send(&grpc_v1.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileResult{
 				Code:    status.ACTION_FAILED,
 				Message: err.Error(),
 			})
@@ -159,7 +159,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 		chunks := make([]byte, chunkSize)
 		_, err := retrieval.Data.Read(chunks)
 		if err == nil {
-			err = stream.Send(&grpc_v1.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileResult{
 				Chunks: chunks,
 			})
 			if err != nil {
@@ -169,7 +169,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 		}
 
 		if errors.Is(err, io.EOF) {
-			err = stream.Send(&grpc_v1.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileResult{
 				Code:    status.ACTION_SUCCESS,
 				Message: "success retrieve file",
 			})
@@ -179,7 +179,7 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 			break
 		}
 
-		err = stream.Send(&grpc_v1.RetrieveFileResult{
+		err = stream.Send(&grpcapp.RetrieveFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		})
@@ -191,15 +191,15 @@ func (h *fileHandler) RetrieveFile(p *grpc_v1.RetrieveFileParam, stream grpc_v1.
 	return nil
 }
 
-func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) error {
+func (h *fileHandler) UploadFile(stream grpcapp.FileService_UploadFileServer) error {
 	fileSize := int64(0)
-	fileInfo := grpc_v1.UploadFileInfo{}
+	fileInfo := grpcapp.UploadFileInfo{}
 	fileReader := &bytes.Buffer{}
 
 	for {
 		err := stream.Context().Err()
 		if err != nil {
-			err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+			err = stream.SendAndClose(&grpcapp.UploadFileResult{
 				Code:    status.ACTION_FAILED,
 				Message: err.Error(),
 			})
@@ -213,7 +213,7 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 		if err == nil {
 			info := param.GetInfo()
 			if info != nil {
-				fileInfo = grpc_v1.UploadFileInfo{
+				fileInfo = grpcapp.UploadFileInfo{
 					Name:      info.GetName(),
 					Mimetype:  info.GetMimetype(),
 					Extension: info.GetExtension(),
@@ -225,7 +225,7 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 				fileSize += int64(len(chunks))
 
 				if fileSize > h.config.UploadFormSize {
-					err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+					err = stream.SendAndClose(&grpcapp.UploadFileResult{
 						Code:    status.ACTION_FAILED,
 						Message: "file is too large",
 					})
@@ -244,7 +244,7 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 			break
 		}
 
-		err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+		err = stream.SendAndClose(&grpcapp.UploadFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		})
@@ -265,7 +265,7 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 		file.WithReader(fileReader),
 	)
 	if err != nil {
-		res := &grpc_v1.UploadFileResult{
+		res := &grpcapp.UploadFileResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		}
@@ -283,10 +283,10 @@ func (h *fileHandler) UploadFile(stream grpc_v1.FileService_UploadFileServer) er
 		return nil
 	}
 
-	err = stream.SendAndClose(&grpc_v1.UploadFileResult{
+	err = stream.SendAndClose(&grpcapp.UploadFileResult{
 		Code:    status.ACTION_SUCCESS,
 		Message: "success upload file",
-		Data: &grpc_v1.UploadFileData{
+		Data: &grpcapp.UploadFileData{
 			Id:         upload.UniqueId,
 			Name:       upload.Name,
 			Path:       upload.Path,
