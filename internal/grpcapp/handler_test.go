@@ -34,6 +34,8 @@ var _ = Describe("Handler Package", func() {
 			healthService *mock_healthcheck.MockHealthCheck
 			ctx           context.Context
 			p             *api.CheckHealthParam
+			r             *api.CheckHealthResult
+			checkRes      *healthcheck.CheckResult
 		)
 
 		BeforeEach(func() {
@@ -42,35 +44,84 @@ var _ = Describe("Handler Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			handler = grpcapp.NewHealthHandler(healthService)
 			ctx = context.Background()
+			currentTs := time.Now().UTC()
 			p = &api.CheckHealthParam{}
+			r = &api.CheckHealthResult{
+				Code:    1000,
+				Message: "success check health",
+				Data: &api.CheckHealthData{
+					Status: "WARNING",
+					Details: map[string]*api.CheckHealthDetail{
+						"inet-conn": {
+							Name:      "inet-conn",
+							Status:    "OK",
+							Error:     "",
+							CheckedAt: currentTs.UnixMilli(),
+						},
+						"disk-check": {
+							Name:      "disk-check",
+							Status:    "FAILED",
+							Error:     "Critical: disk usage too high 61.93 percent",
+							CheckedAt: currentTs.UnixMilli(),
+						},
+					},
+				},
+			}
+			checkRes = &healthcheck.CheckResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success check health",
+				},
+				Status: "WARNING",
+				Items: map[string]healthcheck.CheckResultItem{
+					"inet-conn": {
+						Name:      "inet-conn",
+						Status:    "OK",
+						Error:     "",
+						Fatal:     false,
+						CheckedAt: currentTs,
+					},
+					"disk-check": {
+						Name:      "disk-check",
+						Status:    "FAILED",
+						Error:     "Critical: disk usage too high 61.93 percent",
+						Fatal:     false,
+						CheckedAt: currentTs,
+					},
+				},
+			}
 		})
 
 		When("failed check service health", func() {
 			It("should return error", func() {
-				expectedErr := fmt.Errorf("routine error")
-
 				healthService.
 					EXPECT().
 					Check(gomock.Eq(ctx)).
-					Return(nil, expectedErr).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "routine error",
+					}).
 					Times(1)
 
 				res, err := handler.CheckHealth(ctx, p)
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(
-					grpc_status.Error(codes.Unknown, expectedErr.Error()),
+					grpc_status.Error(codes.Unknown, "routine error"),
 				))
 			})
 		})
 
-		When("no health check states available", func() {
+		When("there is no states available", func() {
 			It("should return result", func() {
 				checkRes := &healthcheck.CheckResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success check health",
+					},
 					Status: "OK",
 					Items:  map[string]healthcheck.CheckResultItem{},
 				}
-
 				healthService.
 					EXPECT().
 					Check(gomock.Eq(ctx)).
@@ -79,44 +130,21 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.CheckHealth(ctx, p)
 
-				expectedRes := &api.CheckHealthResult{
+				r := &api.CheckHealthResult{
 					Code:    1000,
-					Message: "success check service health",
+					Message: "success check health",
 					Data: &api.CheckHealthData{
 						Status:  "OK",
 						Details: map[string]*api.CheckHealthDetail{},
 					},
 				}
-
-				Expect(res).To(Equal(expectedRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})
 
-		When("there are health check states", func() {
+		When("there are states available", func() {
 			It("should return result", func() {
-				currentTimestamp := time.Now()
-
-				checkRes := &healthcheck.CheckResult{
-					Status: "WARNING",
-					Items: map[string]healthcheck.CheckResultItem{
-						"inet-conn": {
-							Name:      "inet-conn",
-							Status:    "OK",
-							Error:     "",
-							Fatal:     false,
-							CheckedAt: currentTimestamp,
-						},
-						"disk-check": {
-							Name:      "disk-check",
-							Status:    "FAILED",
-							Error:     "Critical: disk usage too high 61.93 percent",
-							Fatal:     false,
-							CheckedAt: currentTimestamp,
-						},
-					},
-				}
-
 				healthService.
 					EXPECT().
 					Check(gomock.Eq(ctx)).
@@ -125,29 +153,7 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.CheckHealth(ctx, p)
 
-				expectedRes := &api.CheckHealthResult{
-					Code:    1000,
-					Message: "success check service health",
-					Data: &api.CheckHealthData{
-						Status: "WARNING",
-						Details: map[string]*api.CheckHealthDetail{
-							"inet-conn": {
-								Name:      "inet-conn",
-								Status:    "OK",
-								Error:     "",
-								CheckedAt: currentTimestamp.UnixMilli(),
-							},
-							"disk-check": {
-								Name:      "disk-check",
-								Status:    "FAILED",
-								Error:     "Critical: disk usage too high 61.93 percent",
-								CheckedAt: currentTimestamp.UnixMilli(),
-							},
-						},
-					},
-				}
-
-				Expect(res).To(Equal(expectedRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})

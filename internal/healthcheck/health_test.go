@@ -1,11 +1,15 @@
 package healthcheck_test
 
 import (
+	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	mock_logging "github.com/go-seidon/provider/logging/mock"
+	"github.com/go-seidon/provider/health"
+	mock_health "github.com/go-seidon/provider/health/mock"
+	"github.com/go-seidon/provider/system"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,113 +17,83 @@ import (
 
 func TestHealthCheck(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "HealthCheck Package")
+	RunSpecs(t, "Health Check Package")
 }
 
-var _ = Describe("Health Check Job", func() {
-
-	Context("WithLogger function", Label("unit"), func() {
+var _ = Describe("Health Check", func() {
+	Context("Check function", Label("unit"), func() {
 		var (
-			logger *mock_logging.MockLogger
+			hc           healthcheck.HealthCheck
+			healthClient *mock_health.MockHealthCheck
+			ctx          context.Context
+			currentTs    time.Time
 		)
 
 		BeforeEach(func() {
+			ctx = context.Background()
+			currentTs = time.Now().UTC()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			logger = mock_logging.NewMockLogger(ctrl)
-		})
-
-		When("logger is specified", func() {
-			It("should append logger", func() {
-				opt := healthcheck.WithLogger(logger)
-
-				var option healthcheck.HealthCheckParam
-				opt(&option)
-
-				Expect(option.Logger).To(Equal(logger))
-				Expect(option.Jobs).To(BeNil())
-			})
-		})
-	})
-
-	Context("AddJob function", Label("unit"), func() {
-		var (
-			job *healthcheck.HealthJob
-		)
-
-		BeforeEach(func() {
-			job = &healthcheck.HealthJob{
-				Name:     "mock-name",
-				Interval: 1 * time.Second,
-			}
-		})
-
-		When("jobs are empty", func() {
-			It("should append job", func() {
-				opt := healthcheck.AddJob(job)
-
-				var option healthcheck.HealthCheckParam
-				opt(&option)
-
-				Expect(option.Logger).To(BeNil())
-				Expect(len(option.Jobs)).To(Equal(1))
+			healthClient = mock_health.NewMockHealthCheck(ctrl)
+			hc = healthcheck.NewHealthCheck(healthcheck.HealthCheckParam{
+				HealthClient: healthClient,
 			})
 		})
 
-		When("jobs are not empty", func() {
-			It("should append job", func() {
-				opt := healthcheck.AddJob(job)
+		When("failed check health", func() {
+			It("should return error", func() {
+				healthClient.
+					EXPECT().
+					Check(gomock.Eq(ctx)).
+					Return(nil, fmt.Errorf("network error")).
+					Times(1)
 
-				var option healthcheck.HealthCheckParam
-				option.Jobs = append(option.Jobs, job)
-				opt(&option)
+				res, err := hc.Check(ctx)
 
-				Expect(option.Logger).To(BeNil())
-				Expect(len(option.Jobs)).To(Equal(2))
-			})
-		})
-	})
-
-	Context("WithJobs function", Label("unit"), func() {
-		var (
-			job  *healthcheck.HealthJob
-			jobs []*healthcheck.HealthJob
-		)
-
-		BeforeEach(func() {
-			job = &healthcheck.HealthJob{
-				Name:     "mock-name",
-				Interval: 1 * time.Second,
-			}
-			jobs = []*healthcheck.HealthJob{job, job}
-		})
-
-		When("jobs are empty", func() {
-			It("should add jobs", func() {
-				opt := healthcheck.WithJobs(jobs)
-
-				var option healthcheck.HealthCheckParam
-
-				opt(&option)
-
-				Expect(option.Logger).To(BeNil())
-				Expect(len(option.Jobs)).To(Equal(2))
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(&system.Error{
+					Code:    1001,
+					Message: "network error",
+				}))
 			})
 		})
 
-		When("jobs are not empty", func() {
-			It("should replace jobs", func() {
-				opt := healthcheck.WithJobs(jobs)
+		When("success check health", func() {
+			It("should return result", func() {
+				checkRes := &health.CheckResult{
+					Status: "OK",
+					Items: map[string]health.CheckResultItem{
+						"inet": {
+							Name:      "inet",
+							Status:    "OK",
+							Error:     "",
+							Fatal:     false,
+							CheckedAt: currentTs,
+						},
+					},
+				}
+				healthClient.
+					EXPECT().
+					Check(gomock.Eq(ctx)).
+					Return(checkRes, nil).
+					Times(1)
 
-				var option healthcheck.HealthCheckParam
-				option.Jobs = []*healthcheck.HealthJob{job}
+				res, err := hc.Check(ctx)
 
-				opt(&option)
-
-				Expect(option.Logger).To(BeNil())
-				Expect(len(option.Jobs)).To(Equal(2))
+				Expect(err).To(BeNil())
+				Expect(res.Success.Code).To(Equal(int32(1000)))
+				Expect(res.Success.Message).To(Equal("success check health"))
+				Expect(res.Status).To(Equal("OK"))
+				Expect(res.Items).To(Equal(map[string]healthcheck.CheckResultItem{
+					"inet": {
+						Name:      "inet",
+						Status:    "OK",
+						Error:     "",
+						Fatal:     false,
+						CheckedAt: currentTs,
+					},
+				}))
 			})
 		})
-
 	})
 })

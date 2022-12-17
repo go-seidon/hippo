@@ -2,7 +2,6 @@ package resthandler_test
 
 import (
 	encoding_json "encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	"github.com/go-seidon/hippo/internal/resthandler"
+	"github.com/go-seidon/provider/system"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo/v2"
@@ -49,7 +49,10 @@ var _ = Describe("Health Handler", func() {
 				healthClient.
 					EXPECT().
 					Check(gomock.Eq(ctx.Request().Context())).
-					Return(nil, fmt.Errorf("network error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
 				err := h(ctx)
@@ -67,6 +70,10 @@ var _ = Describe("Health Handler", func() {
 		When("success check health", func() {
 			It("should return result", func() {
 				checkRes := &healthcheck.CheckResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success check health",
+					},
 					Status: "OK",
 					Items: map[string]healthcheck.CheckResultItem{
 						"inet": {
@@ -112,6 +119,10 @@ var _ = Describe("Health Handler", func() {
 		When("success check health with no details", func() {
 			It("should return result", func() {
 				checkRes := &healthcheck.CheckResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success check health",
+					},
 					Status: "OK",
 					Items:  map[string]healthcheck.CheckResultItem{},
 				}

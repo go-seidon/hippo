@@ -4,24 +4,19 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-seidon/provider/logging"
-)
-
-const (
-	STATUS_OK      = "OK"
-	STATUS_WARNING = "WARNING"
-	STATUS_FAILED  = "FAILED"
+	"github.com/go-seidon/provider/health"
+	"github.com/go-seidon/provider/status"
+	"github.com/go-seidon/provider/system"
 )
 
 type HealthCheck interface {
-	Start(ctx context.Context) error
-	Stop(ctx context.Context) error
-	Check(ctx context.Context) (*CheckResult, error)
+	Check(ctx context.Context) (*CheckResult, *system.Error)
 }
 
 type CheckResult struct {
-	Status string
-	Items  map[string]CheckResultItem
+	Success system.Success
+	Status  string
+	Items   map[string]CheckResultItem
 }
 
 type CheckResultItem struct {
@@ -32,44 +27,47 @@ type CheckResultItem struct {
 	CheckedAt time.Time
 }
 
+type healthCheck struct {
+	healthClient health.HealthCheck
+}
+
+func (h *healthCheck) Check(ctx context.Context) (*CheckResult, *system.Error) {
+	checkRes, err := h.healthClient.Check(ctx)
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	items := map[string]CheckResultItem{}
+	for key, item := range checkRes.Items {
+		items[key] = CheckResultItem{
+			Name:      item.Name,
+			Status:    item.Status,
+			Error:     item.Error,
+			Fatal:     item.Fatal,
+			CheckedAt: item.CheckedAt,
+		}
+	}
+
+	res := &CheckResult{
+		Success: system.Success{
+			Code:    status.ACTION_SUCCESS,
+			Message: "success check health",
+		},
+		Status: checkRes.Status,
+		Items:  items,
+	}
+	return res, nil
+}
+
 type HealthCheckParam struct {
-	Jobs   []*HealthJob
-	Logger logging.Logger
-	Client HealthClient
+	HealthClient health.HealthCheck
 }
 
-type HealthJob struct {
-	Name     string
-	Checker  Checker
-	Interval time.Duration
-}
-
-type Checker interface {
-	Status() (interface{}, error)
-}
-
-type Option func(*HealthCheckParam)
-
-func WithLogger(logger logging.Logger) Option {
-	return func(p *HealthCheckParam) {
-		p.Logger = logger
-	}
-}
-
-func AddJob(job *HealthJob) Option {
-	return func(p *HealthCheckParam) {
-		p.Jobs = append(p.Jobs, job)
-	}
-}
-
-func WithJobs(jobs []*HealthJob) Option {
-	return func(p *HealthCheckParam) {
-		p.Jobs = jobs
-	}
-}
-
-func WithClient(client HealthClient) Option {
-	return func(p *HealthCheckParam) {
-		p.Client = client
+func NewHealthCheck(p HealthCheckParam) *healthCheck {
+	return &healthCheck{
+		healthClient: p.HealthClient,
 	}
 }

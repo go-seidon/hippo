@@ -15,6 +15,7 @@ import (
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/identity/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/validation/govalidator"
@@ -26,7 +27,7 @@ type grpcApp struct {
 	config       *GrpcAppConfig
 	logger       logging.Logger
 	repository   repository.Provider
-	healthClient healthcheck.HealthCheck
+	healthClient health.HealthCheck
 }
 
 func (a *grpcApp) Run(ctx context.Context) error {
@@ -153,7 +154,10 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			grpcauth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)
-	healthCheckHandler := NewHealthHandler(healthClient)
+	healthCheck := healthcheck.NewHealthCheck(healthcheck.HealthCheckParam{
+		HealthClient: healthClient,
+	})
+	healthCheckHandler := NewHealthHandler(healthCheck)
 	fileHandler := NewFileHandler(fileClient, config)
 	grpcapp.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
 	grpcapp.RegisterFileServiceServer(grpcServer, fileHandler)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-seidon/hippo/api/restapp"
 	"github.com/go-seidon/hippo/internal/healthcheck"
-	"github.com/go-seidon/provider/status"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,8 +16,8 @@ func (h *healthHandler) CheckHealth(ctx echo.Context) error {
 	health, err := h.healthClient.Check(ctx.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, &restapp.ResponseBodyInfo{
-			Code:    status.ACTION_FAILED,
-			Message: err.Error(),
+			Code:    err.Code,
+			Message: err.Message,
 		})
 	}
 
@@ -35,8 +34,8 @@ func (h *healthHandler) CheckHealth(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, &restapp.CheckHealthResponse{
-		Code:    status.ACTION_SUCCESS,
-		Message: "success check health",
+		Code:    health.Success.Code,
+		Message: health.Success.Message,
 		Data: restapp.CheckHealthData{
 			Details: details,
 			Status:  health.Status,

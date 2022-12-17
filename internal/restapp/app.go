@@ -16,6 +16,7 @@ import (
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/identity/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization/json"
@@ -30,7 +31,7 @@ type restApp struct {
 	logger     logging.Logger
 	repository repository.Provider
 
-	healthClient healthcheck.HealthCheck
+	healthClient health.HealthCheck
 }
 
 func (a *restApp) Run(ctx context.Context) error {
@@ -148,8 +149,11 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 				AppVersion: config.AppVersion,
 			},
 		})
-		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
+		healthCheck := healthcheck.NewHealthCheck(healthcheck.HealthCheckParam{
 			HealthClient: healthClient,
+		})
+		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
+			HealthClient: healthCheck,
 		})
 		fileHandler := resthandler.NewFile(resthandler.FileParam{
 			FileClient: fileClient,
