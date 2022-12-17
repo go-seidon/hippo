@@ -61,12 +61,12 @@ type fileHandler struct {
 	config      *GrpcAppConfig
 }
 
-func (h *fileHandler) DeleteFile(ctx context.Context, p *grpcapp.DeleteFileParam) (*grpcapp.DeleteFileResult, error) {
+func (h *fileHandler) DeleteFileById(ctx context.Context, p *grpcapp.DeleteFileByIdParam) (*grpcapp.DeleteFileByIdResult, error) {
 	deletion, err := h.fileService.DeleteFile(ctx, file.DeleteFileParam{
 		FileId: p.FileId,
 	})
 	if err != nil {
-		res := &grpcapp.DeleteFileResult{
+		res := &grpcapp.DeleteFileByIdResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		}
@@ -85,22 +85,22 @@ func (h *fileHandler) DeleteFile(ctx context.Context, p *grpcapp.DeleteFileParam
 		return res, nil
 	}
 
-	res := &grpcapp.DeleteFileResult{
+	res := &grpcapp.DeleteFileByIdResult{
 		Code:    status.ACTION_SUCCESS,
 		Message: "success delete file",
-		Data: &grpcapp.DeleteFileData{
+		Data: &grpcapp.DeleteFileByIdData{
 			DeletedAt: deletion.DeletedAt.UnixMilli(),
 		},
 	}
 	return res, nil
 }
 
-func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.FileService_RetrieveFileServer) error {
+func (h *fileHandler) RetrieveFileById(p *grpcapp.RetrieveFileByIdParam, stream grpcapp.FileService_RetrieveFileByIdServer) error {
 	retrieval, err := h.fileService.RetrieveFile(stream.Context(), file.RetrieveFileParam{
 		FileId: p.FileId,
 	})
 	if err != nil {
-		res := &grpcapp.RetrieveFileResult{
+		res := &grpcapp.RetrieveFileByIdResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		}
@@ -132,7 +132,7 @@ func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.
 		return err
 	}
 
-	err = stream.Send(&grpcapp.RetrieveFileResult{
+	err = stream.Send(&grpcapp.RetrieveFileByIdResult{
 		Code:    status.ACTION_PENDING,
 		Message: "retrieving file",
 	})
@@ -146,7 +146,7 @@ func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.
 	for {
 		err = stream.Context().Err()
 		if err != nil {
-			err = stream.Send(&grpcapp.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileByIdResult{
 				Code:    status.ACTION_FAILED,
 				Message: err.Error(),
 			})
@@ -159,7 +159,7 @@ func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.
 		chunks := make([]byte, chunkSize)
 		_, err := retrieval.Data.Read(chunks)
 		if err == nil {
-			err = stream.Send(&grpcapp.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileByIdResult{
 				Chunks: chunks,
 			})
 			if err != nil {
@@ -169,7 +169,7 @@ func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.
 		}
 
 		if errors.Is(err, io.EOF) {
-			err = stream.Send(&grpcapp.RetrieveFileResult{
+			err = stream.Send(&grpcapp.RetrieveFileByIdResult{
 				Code:    status.ACTION_SUCCESS,
 				Message: "success retrieve file",
 			})
@@ -179,7 +179,7 @@ func (h *fileHandler) RetrieveFile(p *grpcapp.RetrieveFileParam, stream grpcapp.
 			break
 		}
 
-		err = stream.Send(&grpcapp.RetrieveFileResult{
+		err = stream.Send(&grpcapp.RetrieveFileByIdResult{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
 		})

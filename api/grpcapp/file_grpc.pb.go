@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileServiceClient interface {
-	DeleteFile(ctx context.Context, in *DeleteFileParam, opts ...grpc.CallOption) (*DeleteFileResult, error)
-	RetrieveFile(ctx context.Context, in *RetrieveFileParam, opts ...grpc.CallOption) (FileService_RetrieveFileClient, error)
+	DeleteFileById(ctx context.Context, in *DeleteFileByIdParam, opts ...grpc.CallOption) (*DeleteFileByIdResult, error)
+	RetrieveFileById(ctx context.Context, in *RetrieveFileByIdParam, opts ...grpc.CallOption) (FileService_RetrieveFileByIdClient, error)
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadFileClient, error)
 }
 
@@ -35,21 +35,21 @@ func NewFileServiceClient(cc grpc.ClientConnInterface) FileServiceClient {
 	return &fileServiceClient{cc}
 }
 
-func (c *fileServiceClient) DeleteFile(ctx context.Context, in *DeleteFileParam, opts ...grpc.CallOption) (*DeleteFileResult, error) {
-	out := new(DeleteFileResult)
-	err := c.cc.Invoke(ctx, "/file.v1.FileService/DeleteFile", in, out, opts...)
+func (c *fileServiceClient) DeleteFileById(ctx context.Context, in *DeleteFileByIdParam, opts ...grpc.CallOption) (*DeleteFileByIdResult, error) {
+	out := new(DeleteFileByIdResult)
+	err := c.cc.Invoke(ctx, "/file.v1.FileService/DeleteFileById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *fileServiceClient) RetrieveFile(ctx context.Context, in *RetrieveFileParam, opts ...grpc.CallOption) (FileService_RetrieveFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[0], "/file.v1.FileService/RetrieveFile", opts...)
+func (c *fileServiceClient) RetrieveFileById(ctx context.Context, in *RetrieveFileByIdParam, opts ...grpc.CallOption) (FileService_RetrieveFileByIdClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[0], "/file.v1.FileService/RetrieveFileById", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &fileServiceRetrieveFileClient{stream}
+	x := &fileServiceRetrieveFileByIdClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -59,17 +59,17 @@ func (c *fileServiceClient) RetrieveFile(ctx context.Context, in *RetrieveFilePa
 	return x, nil
 }
 
-type FileService_RetrieveFileClient interface {
-	Recv() (*RetrieveFileResult, error)
+type FileService_RetrieveFileByIdClient interface {
+	Recv() (*RetrieveFileByIdResult, error)
 	grpc.ClientStream
 }
 
-type fileServiceRetrieveFileClient struct {
+type fileServiceRetrieveFileByIdClient struct {
 	grpc.ClientStream
 }
 
-func (x *fileServiceRetrieveFileClient) Recv() (*RetrieveFileResult, error) {
-	m := new(RetrieveFileResult)
+func (x *fileServiceRetrieveFileByIdClient) Recv() (*RetrieveFileByIdResult, error) {
+	m := new(RetrieveFileByIdResult)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -114,8 +114,8 @@ func (x *fileServiceUploadFileClient) CloseAndRecv() (*UploadFileResult, error) 
 // All implementations should embed UnimplementedFileServiceServer
 // for forward compatibility
 type FileServiceServer interface {
-	DeleteFile(context.Context, *DeleteFileParam) (*DeleteFileResult, error)
-	RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error
+	DeleteFileById(context.Context, *DeleteFileByIdParam) (*DeleteFileByIdResult, error)
+	RetrieveFileById(*RetrieveFileByIdParam, FileService_RetrieveFileByIdServer) error
 	UploadFile(FileService_UploadFileServer) error
 }
 
@@ -123,11 +123,11 @@ type FileServiceServer interface {
 type UnimplementedFileServiceServer struct {
 }
 
-func (UnimplementedFileServiceServer) DeleteFile(context.Context, *DeleteFileParam) (*DeleteFileResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
+func (UnimplementedFileServiceServer) DeleteFileById(context.Context, *DeleteFileByIdParam) (*DeleteFileByIdResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFileById not implemented")
 }
-func (UnimplementedFileServiceServer) RetrieveFile(*RetrieveFileParam, FileService_RetrieveFileServer) error {
-	return status.Errorf(codes.Unimplemented, "method RetrieveFile not implemented")
+func (UnimplementedFileServiceServer) RetrieveFileById(*RetrieveFileByIdParam, FileService_RetrieveFileByIdServer) error {
+	return status.Errorf(codes.Unimplemented, "method RetrieveFileById not implemented")
 }
 func (UnimplementedFileServiceServer) UploadFile(FileService_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -144,42 +144,42 @@ func RegisterFileServiceServer(s grpc.ServiceRegistrar, srv FileServiceServer) {
 	s.RegisterService(&FileService_ServiceDesc, srv)
 }
 
-func _FileService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteFileParam)
+func _FileService_DeleteFileById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFileByIdParam)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FileServiceServer).DeleteFile(ctx, in)
+		return srv.(FileServiceServer).DeleteFileById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/file.v1.FileService/DeleteFile",
+		FullMethod: "/file.v1.FileService/DeleteFileById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).DeleteFile(ctx, req.(*DeleteFileParam))
+		return srv.(FileServiceServer).DeleteFileById(ctx, req.(*DeleteFileByIdParam))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FileService_RetrieveFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(RetrieveFileParam)
+func _FileService_RetrieveFileById_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RetrieveFileByIdParam)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(FileServiceServer).RetrieveFile(m, &fileServiceRetrieveFileServer{stream})
+	return srv.(FileServiceServer).RetrieveFileById(m, &fileServiceRetrieveFileByIdServer{stream})
 }
 
-type FileService_RetrieveFileServer interface {
-	Send(*RetrieveFileResult) error
+type FileService_RetrieveFileByIdServer interface {
+	Send(*RetrieveFileByIdResult) error
 	grpc.ServerStream
 }
 
-type fileServiceRetrieveFileServer struct {
+type fileServiceRetrieveFileByIdServer struct {
 	grpc.ServerStream
 }
 
-func (x *fileServiceRetrieveFileServer) Send(m *RetrieveFileResult) error {
+func (x *fileServiceRetrieveFileByIdServer) Send(m *RetrieveFileByIdResult) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -217,14 +217,14 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*FileServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "DeleteFile",
-			Handler:    _FileService_DeleteFile_Handler,
+			MethodName: "DeleteFileById",
+			Handler:    _FileService_DeleteFileById_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "RetrieveFile",
-			Handler:       _FileService_RetrieveFile_Handler,
+			StreamName:    "RetrieveFileById",
+			Handler:       _FileService_RetrieveFileById_Handler,
 			ServerStreams: true,
 		},
 		{
