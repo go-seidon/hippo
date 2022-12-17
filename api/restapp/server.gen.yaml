@@ -1,4 +1,4 @@
 package: restapp
 generate:
-  - gorilla
+  - server
 output: api/restapp/server.gen.go

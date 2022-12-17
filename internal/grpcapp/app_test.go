@@ -42,8 +42,8 @@ var _ = Describe("App Package", func() {
 			}
 			logger = mock_logging.NewMockLogger(ctrl)
 			repository = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock_repository.NewMockFileRepository(ctrl)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFile(ctrl)
+			authRepo := mock_repository.NewMockAuth(ctrl)
 			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
@@ -164,8 +164,8 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
 			repository = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock_repository.NewMockFileRepository(ctrl)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFile(ctrl)
+			authRepo := mock_repository.NewMockAuth(ctrl)
 			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
@@ -321,8 +321,8 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
 			repository := mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock_repository.NewMockFileRepository(ctrl)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFile(ctrl)
+			authRepo := mock_repository.NewMockAuth(ctrl)
 			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 

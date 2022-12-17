@@ -31,10 +31,10 @@ func (p *provider) Ping(ctx context.Context) error {
 	return p.dbClient.Ping(ctx, readpref.Secondary())
 }
 
-func (p *provider) GetAuthRepo() repository.AuthRepository {
+func (p *provider) GetAuthRepo() repository.Auth {
 	return p.authRepo
 }
 
-func (p *provider) GetFileRepo() repository.FileRepository {
+func (p *provider) GetFileRepo() repository.File {
 	return p.fileRepo
 }

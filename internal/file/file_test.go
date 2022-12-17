@@ -36,7 +36,7 @@ var _ = Describe("File", func() {
 			ctx           context.Context
 			p             file.RetrieveFileParam
 			r             *file.RetrieveFileResult
-			fileRepo      *mock_repository.MockFileRepository
+			fileRepo      *mock_repository.MockFile
 			fileManager   *mock_filesystem.MockFileManager
 			log           *mock_logging.MockLogger
 			validator     *mock_validation.MockValidator
@@ -54,7 +54,7 @@ var _ = Describe("File", func() {
 			}
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFile(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
 			identifier := mock_identifier.NewMockIdentifier(ctrl)
@@ -283,7 +283,7 @@ var _ = Describe("File", func() {
 		var (
 			ctx            context.Context
 			currentTs      time.Time
-			fileRepo       *mock_repository.MockFileRepository
+			fileRepo       *mock_repository.MockFile
 			fileManager    *mock_filesystem.MockFileManager
 			dirManager     *mock_filesystem.MockDirectoryManager
 			logger         *mock_logging.MockLogger
@@ -304,7 +304,7 @@ var _ = Describe("File", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFile(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
@@ -757,7 +757,7 @@ var _ = Describe("File", func() {
 		var (
 			ctx         context.Context
 			p           file.DeleteFileParam
-			fileRepo    *mock_repository.MockFileRepository
+			fileRepo    *mock_repository.MockFile
 			fileManager *mock_filesystem.MockFileManager
 			log         *mock_logging.MockLogger
 			validator   *mock_validation.MockValidator
@@ -774,7 +774,7 @@ var _ = Describe("File", func() {
 			}
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileRepo = mock_repository.NewMockFileRepository(ctrl)
+			fileRepo = mock_repository.NewMockFile(ctrl)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
 			identifier := mock_identifier.NewMockIdentifier(ctrl)

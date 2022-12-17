@@ -12,31 +12,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockFileRepository is a mock of FileRepository interface.
-type MockFileRepository struct {
+// MockFile is a mock of File interface.
+type MockFile struct {
 	ctrl     *gomock.Controller
-	recorder *MockFileRepositoryMockRecorder
+	recorder *MockFileMockRecorder
 }
 
-// MockFileRepositoryMockRecorder is the mock recorder for MockFileRepository.
-type MockFileRepositoryMockRecorder struct {
-	mock *MockFileRepository
+// MockFileMockRecorder is the mock recorder for MockFile.
+type MockFileMockRecorder struct {
+	mock *MockFile
 }
 
-// NewMockFileRepository creates a new mock instance.
-func NewMockFileRepository(ctrl *gomock.Controller) *MockFileRepository {
-	mock := &MockFileRepository{ctrl: ctrl}
-	mock.recorder = &MockFileRepositoryMockRecorder{mock}
+// NewMockFile creates a new mock instance.
+func NewMockFile(ctrl *gomock.Controller) *MockFile {
+	mock := &MockFile{ctrl: ctrl}
+	mock.recorder = &MockFileMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockFileRepository) EXPECT() *MockFileRepositoryMockRecorder {
+func (m *MockFile) EXPECT() *MockFileMockRecorder {
 	return m.recorder
 }
 
 // CreateFile mocks base method.
-func (m *MockFileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
+func (m *MockFile) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFile", ctx, p)
 	ret0, _ := ret[0].(*repository.CreateFileResult)
@@ -45,13 +45,13 @@ func (m *MockFileRepository) CreateFile(ctx context.Context, p repository.Create
 }
 
 // CreateFile indicates an expected call of CreateFile.
-func (mr *MockFileRepositoryMockRecorder) CreateFile(ctx, p interface{}) *gomock.Call {
+func (mr *MockFileMockRecorder) CreateFile(ctx, p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFile", reflect.TypeOf((*MockFileRepository)(nil).CreateFile), ctx, p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFile", reflect.TypeOf((*MockFile)(nil).CreateFile), ctx, p)
 }
 
 // DeleteFile mocks base method.
-func (m *MockFileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
+func (m *MockFile) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteFile", ctx, p)
 	ret0, _ := ret[0].(*repository.DeleteFileResult)
@@ -60,13 +60,13 @@ func (m *MockFileRepository) DeleteFile(ctx context.Context, p repository.Delete
 }
 
 // DeleteFile indicates an expected call of DeleteFile.
-func (mr *MockFileRepositoryMockRecorder) DeleteFile(ctx, p interface{}) *gomock.Call {
+func (mr *MockFileMockRecorder) DeleteFile(ctx, p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockFileRepository)(nil).DeleteFile), ctx, p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockFile)(nil).DeleteFile), ctx, p)
 }
 
 // RetrieveFile mocks base method.
-func (m *MockFileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
+func (m *MockFile) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RetrieveFile", ctx, p)
 	ret0, _ := ret[0].(*repository.RetrieveFileResult)
@@ -75,7 +75,7 @@ func (m *MockFileRepository) RetrieveFile(ctx context.Context, p repository.Retr
 }
 
 // RetrieveFile indicates an expected call of RetrieveFile.
-func (mr *MockFileRepositoryMockRecorder) RetrieveFile(ctx, p interface{}) *gomock.Call {
+func (mr *MockFileMockRecorder) RetrieveFile(ctx, p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveFile", reflect.TypeOf((*MockFileRepository)(nil).RetrieveFile), ctx, p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveFile", reflect.TypeOf((*MockFile)(nil).RetrieveFile), ctx, p)
 }

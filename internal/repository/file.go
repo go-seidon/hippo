@@ -10,7 +10,7 @@ type (
 	CreateFn func(ctx context.Context, p CreateFnParam) error
 )
 
-type FileRepository interface {
+type File interface {
 	DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, error)
 	RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, error)
 	CreateFile(ctx context.Context, p CreateFileParam) (*CreateFileResult, error)

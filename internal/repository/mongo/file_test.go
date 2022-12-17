@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-seidon/hippo/internal/repository"
 	repository_mongo "github.com/go-seidon/hippo/internal/repository/mongo"
-	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,60 +14,11 @@ import (
 )
 
 var _ = Describe("File Repository", func() {
-	Context("NewFileRepository function", Label("unit"), func() {
-		When("db client is not specified", func() {
-			It("should return error", func() {
-				res, err := repository_mongo.NewFileRepository()
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid db client specified")))
-			})
-		})
-
-		When("db config is not specified", func() {
-			It("should return error", func() {
-
-				mOpt := repository_mongo.WithDbClient(&mongo.Client{})
-				res, err := repository_mongo.NewFileRepository(mOpt)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid db config specified")))
-			})
-		})
-
-		When("required parameters are specified", func() {
-			It("should return result", func() {
-				mOpt := repository_mongo.WithDbClient(&mongo.Client{})
-				dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-					DbName: "db_name",
-				})
-				res, err := repository_mongo.NewFileRepository(mOpt, dbCfgOpt)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("clock is specified", func() {
-			It("should return result", func() {
-				clockOpt := repository_mongo.WithClock(&mock_datetime.MockClock{})
-				dbCfgOpt := repository_mongo.WithDbConfig(&repository_mongo.DbConfig{
-					DbName: "db_name",
-				})
-				mOpt := repository_mongo.WithDbClient(&mongo.Client{})
-				res, err := repository_mongo.NewFileRepository(clockOpt, mOpt, dbCfgOpt)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-	})
-
 	Context("DeleteFile function", Label("integration"), Ordered, func() {
 		var (
 			ctx    context.Context
 			client *mongo.Client
-			repo   repository.FileRepository
+			repo   repository.File
 			p      repository.DeleteFileParam
 		)
 
@@ -90,7 +40,7 @@ var _ = Describe("File Repository", func() {
 				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
-			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
+			repo = repository_mongo.NewFile(dbClientOpt, dbCfgOpt)
 		})
 
 		BeforeEach(func() {
@@ -174,7 +124,7 @@ var _ = Describe("File Repository", func() {
 		var (
 			ctx    context.Context
 			client *mongo.Client
-			repo   repository.FileRepository
+			repo   repository.File
 			p      repository.RetrieveFileParam
 		)
 
@@ -196,7 +146,7 @@ var _ = Describe("File Repository", func() {
 				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
-			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
+			repo = repository_mongo.NewFile(dbClientOpt, dbCfgOpt)
 		})
 
 		BeforeEach(func() {
@@ -265,7 +215,7 @@ var _ = Describe("File Repository", func() {
 		var (
 			ctx    context.Context
 			client *mongo.Client
-			repo   repository.FileRepository
+			repo   repository.File
 			p      repository.CreateFileParam
 		)
 
@@ -287,7 +237,7 @@ var _ = Describe("File Repository", func() {
 				DbName: "hippo_test",
 			})
 			dbClientOpt := repository_mongo.WithDbClient(client)
-			repo, _ = repository_mongo.NewFileRepository(dbClientOpt, dbCfgOpt)
+			repo = repository_mongo.NewFile(dbClientOpt, dbCfgOpt)
 		})
 
 		BeforeEach(func() {

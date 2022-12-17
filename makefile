@@ -67,6 +67,7 @@ generate-mock:
 	mockgen -package=mock_repository -source internal/repository/provider.go -destination=internal/repository/mock/provider_mock.go
 	mockgen -package=mock_repository -source internal/repository/file.go -destination=internal/repository/mock/file_mock.go
 	mockgen -package=mock_repository -source internal/repository/auth.go -destination=internal/repository/mock/auth_mock.go
+	mockgen -package=mock_restapp -source internal/restapp/server.go -destination=internal/restapp/mock/server_mock.go
 
 .PHONY: generate-proto
 generate-proto:
@@ -88,7 +89,7 @@ generate-oapi:
 
 .PHONY: generate-oapi-type
 generate-oapi-type:
-	D:\oapi-codegen\oapi-codegen.exe -old-config-style -config api/restapp/type.gen.yaml api/restapp/main.all.yml
+	oapi-codegen -old-config-style -config api/restapp/type.gen.yaml api/restapp/main.all.yml
 
 .PHONY: run-grpcapp
 run-grpcapp:

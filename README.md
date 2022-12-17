@@ -166,13 +166,11 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Use echo router
-2. Add gracefull shutdown rest
-
+1. Revamp healthcheck & move to provider
+2. Use gorm for mysql repository
 3. Replace auth by using chariout auth
-4. Revamp healthcheck & move to provider
-5. Add gracefull shutdown grpc
-6. Upload docker image to docker hub
+4. Add gracefull shutdown rest && grpc
+5. Upload docker image to docker hub
 
 ## Blocker
 1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released

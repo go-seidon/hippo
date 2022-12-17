@@ -12,31 +12,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAuthRepository is a mock of AuthRepository interface.
-type MockAuthRepository struct {
+// MockAuth is a mock of Auth interface.
+type MockAuth struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthRepositoryMockRecorder
+	recorder *MockAuthMockRecorder
 }
 
-// MockAuthRepositoryMockRecorder is the mock recorder for MockAuthRepository.
-type MockAuthRepositoryMockRecorder struct {
-	mock *MockAuthRepository
+// MockAuthMockRecorder is the mock recorder for MockAuth.
+type MockAuthMockRecorder struct {
+	mock *MockAuth
 }
 
-// NewMockAuthRepository creates a new mock instance.
-func NewMockAuthRepository(ctrl *gomock.Controller) *MockAuthRepository {
-	mock := &MockAuthRepository{ctrl: ctrl}
-	mock.recorder = &MockAuthRepositoryMockRecorder{mock}
+// NewMockAuth creates a new mock instance.
+func NewMockAuth(ctrl *gomock.Controller) *MockAuth {
+	mock := &MockAuth{ctrl: ctrl}
+	mock.recorder = &MockAuthMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAuthRepository) EXPECT() *MockAuthRepositoryMockRecorder {
+func (m *MockAuth) EXPECT() *MockAuthMockRecorder {
 	return m.recorder
 }
 
 // FindClient mocks base method.
-func (m *MockAuthRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
+func (m *MockAuth) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindClient", ctx, p)
 	ret0, _ := ret[0].(*repository.FindClientResult)
@@ -45,7 +45,7 @@ func (m *MockAuthRepository) FindClient(ctx context.Context, p repository.FindCl
 }
 
 // FindClient indicates an expected call of FindClient.
-func (mr *MockAuthRepositoryMockRecorder) FindClient(ctx, p interface{}) *gomock.Call {
+func (mr *MockAuthMockRecorder) FindClient(ctx, p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindClient", reflect.TypeOf((*MockAuthRepository)(nil).FindClient), ctx, p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindClient", reflect.TypeOf((*MockAuth)(nil).FindClient), ctx, p)
 }

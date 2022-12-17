@@ -9,7 +9,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-seidon/hippo/internal/repository"
 	repository_mysql "github.com/go-seidon/hippo/internal/repository/mysql"
-	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,55 +16,11 @@ import (
 
 var _ = Describe("Auth Repository", func() {
 
-	Context("NewAuthRepository function", Label("unit"), func() {
-		When("master db client is not specified", func() {
-			It("should return error", func() {
-				res, err := repository_mysql.NewAuthRepository()
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid db client specified")))
-			})
-		})
-
-		When("replica db client is not specified", func() {
-			It("should return error", func() {
-				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
-				res, err := repository_mysql.NewAuthRepository(mOpt)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid db client specified")))
-			})
-		})
-
-		When("required parameter is specified", func() {
-			It("should return result", func() {
-				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
-				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
-				res, err := repository_mysql.NewAuthRepository(mOpt, rOpt)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("clock is specified", func() {
-			It("should return result", func() {
-				clockOpt := repository_mysql.WithClock(&mock_datetime.MockClock{})
-				mOpt := repository_mysql.WithDbMaster(&sql.DB{})
-				rOpt := repository_mysql.WithDbReplica(&sql.DB{})
-				res, err := repository_mysql.NewAuthRepository(clockOpt, mOpt, rOpt)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-	})
-
 	Context("FindClient function", Label("unit"), func() {
 		var (
 			ctx             context.Context
 			dbClient        sqlmock.Sqlmock
-			repo            repository.AuthRepository
+			repo            repository.Auth
 			p               repository.FindClientParam
 			findClientQuery string
 		)
@@ -81,7 +36,7 @@ var _ = Describe("Auth Repository", func() {
 
 			dbMOpt := repository_mysql.WithDbMaster(db)
 			dbROpt := repository_mysql.WithDbReplica(db)
-			repo, _ = repository_mysql.NewAuthRepository(dbMOpt, dbROpt)
+			repo = repository_mysql.NewAuth(dbMOpt, dbROpt)
 			p = repository.FindClientParam{
 				ClientId: "client_id",
 			}
