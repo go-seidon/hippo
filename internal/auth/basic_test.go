@@ -15,68 +15,10 @@ import (
 )
 
 var _ = Describe("Basic Auth Package", func() {
-	Context("NewBasicAuth function", Label("unit"), func() {
-		var (
-			p auth.NewBasicAuthParam
-		)
-
-		BeforeEach(func() {
-			t := GinkgoT()
-			ctrl := gomock.NewController(t)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
-			encoder := mock_encoding.NewMockEncoder(ctrl)
-			hasher := mock_hashing.NewMockHasher(ctrl)
-			p = auth.NewBasicAuthParam{
-				AuthRepo: authRepo,
-				Encoder:  encoder,
-				Hasher:   hasher,
-			}
-		})
-
-		When("auth repo is not specified", func() {
-			It("should return error", func() {
-				p.AuthRepo = nil
-				res, err := auth.NewBasicAuth(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("auth repo is not specified")))
-			})
-		})
-
-		When("encoder is not specified", func() {
-			It("should return error", func() {
-				p.Encoder = nil
-				res, err := auth.NewBasicAuth(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("encoder is not specified")))
-			})
-		})
-
-		When("hasher is not specified", func() {
-			It("should return error", func() {
-				p.Hasher = nil
-				res, err := auth.NewBasicAuth(p)
-
-				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("hasher is not specified")))
-			})
-		})
-
-		When("all parameter are specified", func() {
-			It("should return result", func() {
-				res, err := auth.NewBasicAuth(p)
-
-				Expect(res).ToNot(BeNil())
-				Expect(err).To(BeNil())
-			})
-		})
-	})
-
 	Context("ParseAuthToken function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			authRepo  *mock_repository.MockAuthRepository
+			authRepo  *mock_repository.MockAuth
 			encoder   *mock_encoding.MockEncoder
 			hasher    *mock_hashing.MockHasher
 			basicAuth auth.BasicAuth
@@ -87,10 +29,10 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			authRepo = mock_repository.NewMockAuthRepository(ctrl)
+			authRepo = mock_repository.NewMockAuth(ctrl)
 			encoder = mock_encoding.NewMockEncoder(ctrl)
 			hasher = mock_hashing.NewMockHasher(ctrl)
-			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
+			basicAuth = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
 				Encoder:  encoder,
 				Hasher:   hasher,
@@ -193,7 +135,7 @@ var _ = Describe("Basic Auth Package", func() {
 	Context("CheckCredential function", Label("unit"), func() {
 		var (
 			ctx       context.Context
-			authRepo  *mock_repository.MockAuthRepository
+			authRepo  *mock_repository.MockAuth
 			encoder   *mock_encoding.MockEncoder
 			hasher    *mock_hashing.MockHasher
 			basicAuth auth.BasicAuth
@@ -206,10 +148,10 @@ var _ = Describe("Basic Auth Package", func() {
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			authRepo = mock_repository.NewMockAuthRepository(ctrl)
+			authRepo = mock_repository.NewMockAuth(ctrl)
 			encoder = mock_encoding.NewMockEncoder(ctrl)
 			hasher = mock_hashing.NewMockHasher(ctrl)
-			basicAuth, _ = auth.NewBasicAuth(auth.NewBasicAuthParam{
+			basicAuth = auth.NewBasicAuth(auth.NewBasicAuthParam{
 				AuthRepo: authRepo,
 				Encoder:  encoder,
 				Hasher:   hasher,

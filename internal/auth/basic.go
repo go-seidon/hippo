@@ -38,9 +38,9 @@ type ParseAuthTokenResult struct {
 }
 
 type basicAuth struct {
-	oAuthRepo repository.AuthRepository
-	encoder   encoding.Encoder
-	hasher    hashing.Hasher
+	authRepo repository.Auth
+	encoder  encoding.Encoder
+	hasher   hashing.Hasher
 }
 
 func (a *basicAuth) ParseAuthToken(ctx context.Context, p ParseAuthTokenParam) (*ParseAuthTokenResult, error) {
@@ -73,7 +73,6 @@ func (a *basicAuth) ParseAuthToken(ctx context.Context, p ParseAuthTokenParam) (
 }
 
 func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam) (*CheckCredentialResult, error) {
-
 	client, err := a.ParseAuthToken(ctx, ParseAuthTokenParam{
 		Token: p.AuthToken,
 	})
@@ -81,10 +80,8 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 		return nil, err
 	}
 
-	res := &CheckCredentialResult{
-		TokenValid: false,
-	}
-	oClient, err := a.oAuthRepo.FindClient(ctx, repository.FindClientParam{
+	res := &CheckCredentialResult{TokenValid: false}
+	oClient, err := a.authRepo.FindClient(ctx, repository.FindClientParam{
 		ClientId: client.ClientId,
 	})
 	if err != nil {
@@ -104,26 +101,15 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 }
 
 type NewBasicAuthParam struct {
-	AuthRepo repository.AuthRepository
+	AuthRepo repository.Auth
 	Encoder  encoding.Encoder
 	Hasher   hashing.Hasher
 }
 
-func NewBasicAuth(p NewBasicAuthParam) (*basicAuth, error) {
-	if p.AuthRepo == nil {
-		return nil, fmt.Errorf("auth repo is not specified")
+func NewBasicAuth(p NewBasicAuthParam) *basicAuth {
+	return &basicAuth{
+		authRepo: p.AuthRepo,
+		encoder:  p.Encoder,
+		hasher:   p.Hasher,
 	}
-	if p.Encoder == nil {
-		return nil, fmt.Errorf("encoder is not specified")
-	}
-	if p.Hasher == nil {
-		return nil, fmt.Errorf("hasher is not specified")
-	}
-
-	a := &basicAuth{
-		oAuthRepo: p.AuthRepo,
-		encoder:   p.Encoder,
-		hasher:    p.Hasher,
-	}
-	return a, nil
 }
