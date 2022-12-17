@@ -4,25 +4,25 @@ package file.v1;
 
 option go_package = "./grpcapp";
 
-message DeleteFileParam {
+message DeleteFileByIdParam {
   string file_id = 1;
 }
 
-message DeleteFileResult {
+message DeleteFileByIdResult {
   int32 code = 1;
   string message = 2;
-  DeleteFileData data = 3;
+  DeleteFileByIdData data = 3;
 }
 
-message DeleteFileData {
+message DeleteFileByIdData {
   int64 deleted_at = 1;
 }
 
-message RetrieveFileParam {
+message RetrieveFileByIdParam {
   string file_id = 1;
 }
 
-message RetrieveFileResult {
+message RetrieveFileByIdResult {
   int32 code = 1;
   string message = 2;
   bytes chunks = 3;
@@ -58,7 +58,7 @@ message UploadFileData {
 }
 
 service FileService {
-  rpc DeleteFile(DeleteFileParam) returns (DeleteFileResult);
-  rpc RetrieveFile(RetrieveFileParam) returns (stream RetrieveFileResult);
+  rpc DeleteFileById(DeleteFileByIdParam) returns (DeleteFileByIdResult);
+  rpc RetrieveFileById(RetrieveFileByIdParam) returns (stream RetrieveFileByIdResult);
   rpc UploadFile(stream UploadFileParam) returns (UploadFileResult);
 }

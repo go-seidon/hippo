@@ -154,13 +154,13 @@ var _ = Describe("Handler Package", func() {
 		})
 	})
 
-	Context("DeleteFile function", Label("unit"), func() {
+	Context("DeleteFileById function", Label("unit"), func() {
 		var (
 			handler     api.FileServiceServer
 			fileService *mock_file.MockFile
 			ctx         context.Context
 			currentTs   time.Time
-			p           *api.DeleteFileParam
+			p           *api.DeleteFileByIdParam
 			delParam    file.DeleteFileParam
 			delRes      *file.DeleteFileResult
 		)
@@ -173,7 +173,7 @@ var _ = Describe("Handler Package", func() {
 			handler = grpcapp.NewFileHandler(fileService, config)
 			ctx = context.Background()
 			currentTs = time.Now()
-			p = &api.DeleteFileParam{
+			p = &api.DeleteFileByIdParam{
 				FileId: "file-id",
 			}
 			delParam = file.DeleteFileParam{
@@ -192,12 +192,12 @@ var _ = Describe("Handler Package", func() {
 					Return(delRes, nil).
 					Times(1)
 
-				res, err := handler.DeleteFile(ctx, p)
+				res, err := handler.DeleteFileById(ctx, p)
 
-				expectRes := &api.DeleteFileResult{
+				expectRes := &api.DeleteFileByIdResult{
 					Code:    1000,
 					Message: "success delete file",
-					Data: &api.DeleteFileData{
+					Data: &api.DeleteFileByIdData{
 						DeletedAt: currentTs.UnixMilli(),
 					},
 				}
@@ -214,9 +214,9 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, file.ErrorNotFound).
 					Times(1)
 
-				res, err := handler.DeleteFile(ctx, p)
+				res, err := handler.DeleteFileById(ctx, p)
 
-				expectRes := &api.DeleteFileResult{
+				expectRes := &api.DeleteFileByIdResult{
 					Code:    1004,
 					Message: "not found",
 				}
@@ -233,9 +233,9 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				res, err := handler.DeleteFile(ctx, p)
+				res, err := handler.DeleteFileById(ctx, p)
 
-				expectRes := &api.DeleteFileResult{
+				expectRes := &api.DeleteFileByIdResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -252,9 +252,9 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				res, err := handler.DeleteFile(ctx, p)
+				res, err := handler.DeleteFileById(ctx, p)
 
-				expectRes := &api.DeleteFileResult{
+				expectRes := &api.DeleteFileByIdResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -264,17 +264,17 @@ var _ = Describe("Handler Package", func() {
 		})
 	})
 
-	Context("RetrieveFile function", Label("unit"), func() {
+	Context("RetrieveFileById function", Label("unit"), func() {
 		var (
 			handler     api.FileServiceServer
 			fileService *mock_file.MockFile
 			ctx         *mock_context.MockContext
-			p           *api.RetrieveFileParam
-			pendingRes  *api.RetrieveFileResult
-			canceledRes *api.RetrieveFileResult
-			failedRes   *api.RetrieveFileResult
-			successRes  *api.RetrieveFileResult
-			stream      *mock_grpcapp.MockFileService_RetrieveFileServer
+			p           *api.RetrieveFileByIdParam
+			pendingRes  *api.RetrieveFileByIdResult
+			canceledRes *api.RetrieveFileByIdResult
+			failedRes   *api.RetrieveFileByIdResult
+			successRes  *api.RetrieveFileByIdResult
+			stream      *mock_grpcapp.MockFileService_RetrieveFileByIdServer
 			retParam    file.RetrieveFileParam
 			retRes      *file.RetrieveFileResult
 			rc          *mock_io.MockReadCloser
@@ -287,26 +287,26 @@ var _ = Describe("Handler Package", func() {
 			config := &grpcapp.GrpcAppConfig{}
 			handler = grpcapp.NewFileHandler(fileService, config)
 			ctx = mock_context.NewMockContext(ctrl)
-			p = &api.RetrieveFileParam{
+			p = &api.RetrieveFileByIdParam{
 				FileId: "file-id",
 			}
-			pendingRes = &api.RetrieveFileResult{
+			pendingRes = &api.RetrieveFileByIdResult{
 				Code:    1005,
 				Message: "retrieving file",
 			}
-			canceledRes = &api.RetrieveFileResult{
+			canceledRes = &api.RetrieveFileByIdResult{
 				Code:    1001,
 				Message: context.Canceled.Error(),
 			}
-			failedRes = &api.RetrieveFileResult{
+			failedRes = &api.RetrieveFileByIdResult{
 				Code:    1001,
 				Message: "i/o error",
 			}
-			successRes = &api.RetrieveFileResult{
+			successRes = &api.RetrieveFileByIdResult{
 				Code:    1000,
 				Message: "success retrieve file",
 			}
-			stream = mock_grpcapp.NewMockFileService_RetrieveFileServer(ctrl)
+			stream = mock_grpcapp.NewMockFileService_RetrieveFileByIdServer(ctrl)
 			retParam = file.RetrieveFileParam{
 				FileId: "file-id",
 			}
@@ -333,7 +333,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, file.ErrorNotFound).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1004,
 					Message: file.ErrorNotFound.Error(),
 				}
@@ -343,7 +343,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -357,7 +357,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, file.ErrorNotFound).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1004,
 					Message: file.ErrorNotFound.Error(),
 				}
@@ -367,7 +367,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
@@ -381,7 +381,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -391,7 +391,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -405,7 +405,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, validation.Error("invalid data")).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1002,
 					Message: "invalid data",
 				}
@@ -415,7 +415,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
@@ -429,7 +429,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -439,7 +439,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -453,7 +453,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil, fmt.Errorf("db error")).
 					Times(1)
 
-				res := &api.RetrieveFileResult{
+				res := &api.RetrieveFileByIdResult{
 					Code:    1001,
 					Message: "db error",
 				}
@@ -463,7 +463,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
@@ -489,7 +489,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -521,7 +521,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -576,7 +576,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -631,7 +631,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
@@ -692,7 +692,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -753,7 +753,7 @@ var _ = Describe("Handler Package", func() {
 					Return(nil).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
@@ -814,7 +814,7 @@ var _ = Describe("Handler Package", func() {
 					Return(fmt.Errorf("network error")).
 					Times(1)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -891,7 +891,7 @@ var _ = Describe("Handler Package", func() {
 
 				gomock.InOrder(firstStream, lastStream)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(Equal(fmt.Errorf("network error")))
 			})
@@ -968,7 +968,7 @@ var _ = Describe("Handler Package", func() {
 
 				gomock.InOrder(firstStream, lastStream)
 
-				err := handler.RetrieveFile(p, stream)
+				err := handler.RetrieveFileById(p, stream)
 
 				Expect(err).To(BeNil())
 			})
