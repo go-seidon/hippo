@@ -166,7 +166,7 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Revamp healthcheck & move to provider
+1. Split grpc handler from grpc app
 2. Use gorm for mysql repository
 3. Replace auth by using chariout auth
 4. Add gracefull shutdown rest && grpc
