@@ -3,7 +3,6 @@ package restapp
 import (
 	"context"
 	"fmt"
-	"log"
 	net_http "net/http"
 
 	"github.com/go-seidon/hippo/internal/app"
@@ -12,24 +11,21 @@ import (
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/hippo/internal/resthandler"
+	"github.com/go-seidon/hippo/internal/restmiddleware"
+	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
-	"github.com/go-seidon/provider/http"
 	"github.com/go-seidon/provider/identity/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization/json"
 	"github.com/go-seidon/provider/validation/govalidator"
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 )
-
-type ContextKey string
-
-const CorrelationIdKey = "correlationId"
-const CorrelationIdCtxKey ContextKey = CorrelationIdKey
 
 type restApp struct {
 	config     *RestAppConfig
-	server     http.Server
+	server     Server
 	logger     logging.Logger
 	repository repository.Provider
 
@@ -50,7 +46,7 @@ func (a *restApp) Run(ctx context.Context) error {
 	}
 
 	a.logger.Infof("Listening on: %s", a.config.GetAddress())
-	err = a.server.ListenAndServe()
+	err = a.server.Start(a.config.GetAddress())
 	if err != net_http.ErrServerClosed {
 		return err
 	}
@@ -111,96 +107,78 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		}
 	}
 
-	govalidator := govalidator.NewValidator()
-	ksuIdentifier := ksuid.NewIdentifier()
-	fileManager := filesystem.NewFileManager()
-	dirManager := filesystem.NewDirectoryManager()
-	locator := file.NewDailyRotate(file.DailyRotateParam{})
-
-	fileClient := file.NewFile(file.FileParam{
-		FileRepo:    repo.GetFileRepo(),
-		FileManager: fileManager,
-		Logger:      logger,
-		Identifier:  ksuIdentifier,
-		DirManager:  dirManager,
-		Locator:     locator,
-		Validator:   govalidator,
-		Config: &file.FileConfig{
-			UploadDir: p.Config.UploadDirectory,
-		},
-	})
-
-	jsonSerializer := json.NewSerializer()
-	base64Encoder := base64.NewEncoder()
-	bcryptHasher := bcrypt.NewHasher()
-
-	basicHandler := NewBasicHandler(BasicHandlerParam{
-		Logger:     p.Logger,
-		Serializer: jsonSerializer,
-		Config:     config,
-	})
-	healthHandler := NewHealthHandler(HealthHandlerParam{
-		Logger:        p.Logger,
-		Serializer:    jsonSerializer,
-		HealthService: healthClient,
-	})
-	fileHandler := NewFileHandler(FileHandlerParam{
-		Logger:      p.Logger,
-		Serializer:  jsonSerializer,
-		Config:      config,
-		FileService: fileClient,
-	})
-
-	RequestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
-		Logger: logger,
-		IgnoreURI: map[string]bool{
-			"/health": true,
-		},
-		Header: map[string]string{
-			"X-Correlation-Id": CorrelationIdKey,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	router := mux.NewRouter()
-	generalRouter := router.NewRoute().Subrouter()
-	fileRouter := router.NewRoute().Subrouter()
-
-	router.Use(RequestLogMiddleware)
-	router.Use(NewDefaultMiddleware(DefaultMiddlewareParam{
-		CorrelationIdHeaderKey: "X-Correlation-Id",
-		CorrelationIdCtxKey:    CorrelationIdCtxKey,
-	}))
-	router.HandleFunc("/", basicHandler.GetAppInfo)
-	router.NotFoundHandler = net_http.HandlerFunc(basicHandler.NotFound)
-	router.MethodNotAllowedHandler = net_http.HandlerFunc(basicHandler.MethodNotAllowed)
-
-	generalRouter.HandleFunc("/health", healthHandler.CheckHealth).Methods(net_http.MethodGet)
-	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.DeleteFileById).Methods(net_http.MethodDelete)
-	fileRouter.HandleFunc("/v1/file/{id}", fileHandler.RetrieveFileById).Methods(net_http.MethodGet)
-	fileRouter.HandleFunc("/v1/file", fileHandler.UploadFile).Methods(net_http.MethodPost)
-
-	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
-		Encoder:  base64Encoder,
-		Hasher:   bcryptHasher,
-		AuthRepo: repo.GetAuthRepo(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	BasicAuthMiddleware := NewBasicAuthMiddleware(basicAuth, jsonSerializer)
-	generalRouter.Use(BasicAuthMiddleware)
-	fileRouter.Use(BasicAuthMiddleware)
-
 	server := p.Server
 	if p.Server == nil {
-		server = &net_http.Server{
-			Addr:     config.GetAddress(),
-			Handler:  router,
-			ErrorLog: log.New(logger.WriterLevel("error"), "", 0),
-		}
+		e := echo.New()
+		server = &echoServer{e}
+
+		jsonSerializer := json.NewSerializer()
+		base64Encoder := base64.NewEncoder()
+		bcryptHasher := bcrypt.NewHasher()
+		govalidator := govalidator.NewValidator()
+		ksuIdentifier := ksuid.NewIdentifier()
+		fileManager := filesystem.NewFileManager()
+		dirManager := filesystem.NewDirectoryManager()
+		locator := file.NewDailyRotate(file.DailyRotateParam{})
+
+		basicClient := auth.NewBasicAuth(auth.NewBasicAuthParam{
+			Encoder:  base64Encoder,
+			Hasher:   bcryptHasher,
+			AuthRepo: repo.GetAuthRepo(),
+		})
+
+		fileClient := file.NewFile(file.FileParam{
+			FileRepo:    repo.GetFileRepo(),
+			FileManager: fileManager,
+			Logger:      logger,
+			Identifier:  ksuIdentifier,
+			DirManager:  dirManager,
+			Locator:     locator,
+			Validator:   govalidator,
+			Config: &file.FileConfig{
+				UploadDir: p.Config.UploadDirectory,
+			},
+		})
+
+		basicHandler := resthandler.NewBasic(resthandler.BasicParam{
+			Config: &resthandler.BasicConfig{
+				AppName:    config.AppName,
+				AppVersion: config.AppVersion,
+			},
+		})
+		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
+			HealthClient: healthClient,
+		})
+		fileHandler := resthandler.NewFile(resthandler.FileParam{
+			FileClient: fileClient,
+			FileParser: multipart.FileParser,
+		})
+
+		requestLog := restmiddleware.NewRequestLog(restmiddleware.RequestLogParam{
+			Logger: logger,
+			IgnoreURI: map[string]bool{
+				"/health": true,
+			},
+			Header: map[string]string{
+				"X-Correlation-Id": "correlationId",
+			},
+		})
+		logMiddleware := echo.WrapMiddleware(requestLog.Handle)
+
+		basicAuth := restmiddleware.NewBasicAuth(restmiddleware.BasicAuthParam{
+			Serializer:  jsonSerializer,
+			BasicClient: basicClient,
+		})
+		basicAuthMiddleware := echo.WrapMiddleware(basicAuth.Handle)
+
+		basicGroup := e.Group("", logMiddleware)
+		basicGroup.GET("/", basicHandler.GetAppInfo)
+
+		basicAuthGroup := e.Group("", basicAuthMiddleware)
+		basicAuthGroup.GET("/health", healthHandler.CheckHealth)
+		basicAuthGroup.POST("/v1/file", fileHandler.UploadFile)
+		basicAuthGroup.GET("/v1/file/:id", fileHandler.RetrieveFileById)
+		basicAuthGroup.DELETE("/v1/file/:id", fileHandler.DeleteFileById)
 	}
 
 	app := &restApp{

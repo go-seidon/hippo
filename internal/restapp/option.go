@@ -6,7 +6,6 @@ import (
 	"github.com/go-seidon/hippo/internal/app"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/http"
 	"github.com/go-seidon/provider/logging"
 )
 
@@ -33,7 +32,7 @@ func (c *RestAppConfig) GetAddress() string {
 type RestAppParam struct {
 	Config       *app.Config
 	Logger       logging.Logger
-	Server       http.Server
+	Server       Server
 	Repository   repository.Provider
 	HealthClient healthcheck.HealthCheck
 }
@@ -52,7 +51,7 @@ func WithLogger(logger logging.Logger) RestAppOption {
 	}
 }
 
-func WithServer(server http.Server) RestAppOption {
+func WithServer(server Server) RestAppOption {
 	return func(p *RestAppParam) {
 		p.Server = server
 	}

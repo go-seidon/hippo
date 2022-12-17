@@ -94,11 +94,6 @@ var _ = Describe("App Package", func() {
 
 		When("parameter is specified", func() {
 			It("should return result", func() {
-				log.
-					EXPECT().
-					WriterLevel(gomock.Eq("error")).
-					Times(1)
-
 				res, err := restapp.NewRestApp(
 					restapp.WithLogger(log),
 					restapp.WithConfig(&app.Config{
@@ -171,8 +166,8 @@ var _ = Describe("App Package", func() {
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_restapp.NewMockServer(ctrl)
 			repo = mock_repository.NewMockProvider(ctrl)
-			fileRepo := mock_repository.NewMockFileRepository(ctrl)
-			authRepo := mock_repository.NewMockAuthRepository(ctrl)
+			fileRepo := mock_repository.NewMockFile(ctrl)
+			authRepo := mock_repository.NewMockAuth(ctrl)
 			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
 			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
 
@@ -263,7 +258,7 @@ var _ = Describe("App Package", func() {
 
 				server.
 					EXPECT().
-					ListenAndServe().
+					Start(gomock.Any()).
 					Return(fmt.Errorf("port already used")).
 					Times(1)
 
@@ -299,7 +294,7 @@ var _ = Describe("App Package", func() {
 
 				server.
 					EXPECT().
-					ListenAndServe().
+					Start(gomock.Any()).
 					Return(http.ErrServerClosed).
 					Times(1)
 
