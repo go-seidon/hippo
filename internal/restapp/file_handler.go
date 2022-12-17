@@ -172,7 +172,7 @@ func (h *fileHandler) DeleteFileById(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	d := &restapp.DeleteFileData{
+	d := &restapp.DeleteFileByIdData{
 		DeletedAt: delete.DeletedAt.UnixMilli(),
 	}
 

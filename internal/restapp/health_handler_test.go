@@ -129,8 +129,10 @@ var _ = Describe("Health Handler", func() {
 					Code:    1000,
 					Message: "success check service health",
 					Data: &api.CheckHealthData{
-						Status:  "WARNING",
-						Details: details,
+						Status: "WARNING",
+						Details: api.CheckHealthData_Details{
+							AdditionalProperties: details,
+						},
 					},
 				}
 				serializer.

@@ -179,7 +179,7 @@ var _ = Describe("File Handler", func() {
 				b := restapp.ResponseBody{
 					Code:    1000,
 					Message: "success delete file",
-					Data: &api.DeleteFileData{
+					Data: &api.DeleteFileByIdData{
 						DeletedAt: res.DeletedAt.UnixMilli(),
 					},
 				}

@@ -29,9 +29,11 @@ func (h *healthHandler) CheckHealth(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	details := map[string]restapp.CheckHealthDetail{}
+	details := restapp.CheckHealthData_Details{
+		AdditionalProperties: map[string]restapp.CheckHealthDetail{},
+	}
 	for checkName, item := range r.Items {
-		details[checkName] = restapp.CheckHealthDetail{
+		details.AdditionalProperties[checkName] = restapp.CheckHealthDetail{
 			Name:      item.Name,
 			Status:    item.Status,
 			Error:     item.Error,
@@ -39,7 +41,8 @@ func (h *healthHandler) CheckHealth(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	d := &restapp.CheckHealthData{
-		Status:  r.Status,
+		Status: r.Status,
+
 		Details: details,
 	}
 

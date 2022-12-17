@@ -44,12 +44,12 @@ components:
     CheckHealthDetail:
       $ref: "./operation/check-health/response_detail.yml"
 
-    DeleteFileResponse:
+    DeleteFileByIdResponse:
       $ref: "./operation/delete-file-by-id/response_body.yml"
-    DeleteFileData:
+    DeleteFileByIdData:
       $ref: "./operation/delete-file-by-id/response_data.yml"
 
-    RetrieveFileResponse:
+    RetrieveFileByIdResponse:
       $ref: "./operation/retrieve-file-by-id/response_body.yml"
 
     UploadFileRequest:
