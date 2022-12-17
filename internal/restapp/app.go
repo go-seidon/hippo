@@ -9,6 +9,7 @@ import (
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
+	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/hippo/internal/resthandler"
 	"github.com/go-seidon/hippo/internal/restmiddleware"
@@ -148,8 +149,11 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 				AppVersion: config.AppVersion,
 			},
 		})
-		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
+		healthCheck := healthcheck.NewHealthCheck(healthcheck.HealthCheckParam{
 			HealthClient: healthClient,
+		})
+		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
+			HealthClient: healthCheck,
 		})
 		fileHandler := resthandler.NewFile(resthandler.FileParam{
 			FileClient: fileClient,
