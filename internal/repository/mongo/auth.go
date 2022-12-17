@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/datetime"
@@ -56,17 +55,10 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 	return nil, err
 }
 
-func NewAuthRepository(opts ...RepoOption) (*authRepository, error) {
+func NewAuth(opts ...RepoOption) *authRepository {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
-	}
-
-	if p.dbClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
-	}
-	if p.dbConfig == nil {
-		return nil, fmt.Errorf("invalid db config specified")
 	}
 
 	clock := p.clock
@@ -74,10 +66,9 @@ func NewAuthRepository(opts ...RepoOption) (*authRepository, error) {
 		clock = datetime.NewClock()
 	}
 
-	r := &authRepository{
+	return &authRepository{
 		dbClient: p.dbClient,
 		dbConfig: p.dbConfig,
 		clock:    clock,
 	}
-	return r, nil
 }

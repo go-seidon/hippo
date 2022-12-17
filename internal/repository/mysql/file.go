@@ -247,17 +247,10 @@ type findFileResult struct {
 	DeletedAt *int64
 }
 
-func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
+func NewFile(opts ...RepoOption) *fileRepository {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
-	}
-
-	if p.mClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
-	}
-	if p.rClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
 	}
 
 	clock := p.clock
@@ -265,10 +258,9 @@ func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
 		clock = datetime.NewClock()
 	}
 
-	r := &fileRepository{
+	return &fileRepository{
 		mClient: p.mClient,
 		rClient: p.rClient,
 		clock:   clock,
 	}
-	return r, nil
 }

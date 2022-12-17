@@ -168,17 +168,10 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 	return res, nil
 }
 
-func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
+func NewFile(opts ...RepoOption) *fileRepository {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
-	}
-
-	if p.dbClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
-	}
-	if p.dbConfig == nil {
-		return nil, fmt.Errorf("invalid db config specified")
 	}
 
 	clock := p.clock
@@ -186,10 +179,9 @@ func NewFileRepository(opts ...RepoOption) (*fileRepository, error) {
 		clock = datetime.NewClock()
 	}
 
-	r := &fileRepository{
+	return &fileRepository{
 		dbClient: p.dbClient,
 		dbConfig: p.dbConfig,
 		clock:    clock,
 	}
-	return r, nil
 }

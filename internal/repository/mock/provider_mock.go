@@ -36,10 +36,10 @@ func (m *MockProvider) EXPECT() *MockProviderMockRecorder {
 }
 
 // GetAuthRepo mocks base method.
-func (m *MockProvider) GetAuthRepo() repository.AuthRepository {
+func (m *MockProvider) GetAuthRepo() repository.Auth {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAuthRepo")
-	ret0, _ := ret[0].(repository.AuthRepository)
+	ret0, _ := ret[0].(repository.Auth)
 	return ret0
 }
 
@@ -50,10 +50,10 @@ func (mr *MockProviderMockRecorder) GetAuthRepo() *gomock.Call {
 }
 
 // GetFileRepo mocks base method.
-func (m *MockProvider) GetFileRepo() repository.FileRepository {
+func (m *MockProvider) GetFileRepo() repository.File {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFileRepo")
-	ret0, _ := ret[0].(repository.FileRepository)
+	ret0, _ := ret[0].(repository.File)
 	return ret0
 }
 

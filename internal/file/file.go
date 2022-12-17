@@ -85,7 +85,7 @@ type DeleteFileResult struct {
 }
 
 type file struct {
-	fileRepo    repository.FileRepository
+	fileRepo    repository.File
 	fileManager filesystem.FileManager
 	dirManager  filesystem.DirectoryManager
 	identifier  identity.Identifier
@@ -366,7 +366,7 @@ type FileConfig struct {
 }
 
 type FileParam struct {
-	FileRepo    repository.FileRepository
+	FileRepo    repository.File
 	FileManager filesystem.FileManager
 	DirManager  filesystem.DirectoryManager
 	Logger      logging.Logger
