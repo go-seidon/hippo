@@ -13,7 +13,7 @@ import (
 var _ = Describe("Daily Rotate Service", func() {
 	Context("NewDailyRotate function", Label("unit"), func() {
 		var (
-			p     file.NewDailyRotateParam
+			p     file.DailyRotateParam
 			clock *mock_datetime.MockClock
 		)
 
@@ -21,7 +21,7 @@ var _ = Describe("Daily Rotate Service", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			clock = mock_datetime.NewMockClock(ctrl)
-			p = file.NewDailyRotateParam{}
+			p = file.DailyRotateParam{}
 		})
 
 		When("success create rotator", func() {
@@ -53,7 +53,7 @@ var _ = Describe("Daily Rotate Service", func() {
 			ctrl := gomock.NewController(t)
 			clock = mock_datetime.NewMockClock(ctrl)
 
-			s = file.NewDailyRotate(file.NewDailyRotateParam{
+			s = file.NewDailyRotate(file.DailyRotateParam{
 				Clock: clock,
 			})
 		})

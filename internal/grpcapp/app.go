@@ -22,17 +22,17 @@ import (
 )
 
 type grpcApp struct {
-	server        Server
-	config        *GrpcAppConfig
-	logger        logging.Logger
-	repository    repository.Provider
-	healthService healthcheck.HealthCheck
+	server       Server
+	config       *GrpcAppConfig
+	logger       logging.Logger
+	repository   repository.Provider
+	healthClient healthcheck.HealthCheck
 }
 
 func (a *grpcApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
-	err := a.healthService.Start(ctx)
+	err := a.healthClient.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (a *grpcApp) Run(ctx context.Context) error {
 func (a *grpcApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
 
-	err := a.healthService.Stop(ctx)
+	err := a.healthClient.Stop(ctx)
 	if err != nil {
 		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
 	}
@@ -97,9 +97,9 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		}
 	}
 
-	healthService := p.HealthService
-	if healthService == nil {
-		healthService, err = app.NewDefaultHealthCheck(logger, repo)
+	healthClient := p.HealthClient
+	if healthClient == nil {
+		healthClient, err = app.NewDefaultHealthCheck(logger, repo)
 		if err != nil {
 			return nil, err
 		}
@@ -109,9 +109,9 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	dirManager := filesystem.NewDirectoryManager()
 	ksuIdentifier := ksuid.NewIdentifier()
 	govalidator := govalidator.NewValidator()
-	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
+	locator := file.NewDailyRotate(file.DailyRotateParam{})
 
-	fileService, err := file.NewFile(file.NewFileParam{
+	fileClient := file.NewFile(file.FileParam{
 		FileRepo:    repo.GetFileRepo(),
 		FileManager: fileManager,
 		Logger:      logger,
@@ -123,9 +123,6 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			UploadDir: p.Config.UploadDirectory,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	base64Encoder := base64.NewEncoder()
 	bcryptHasher := bcrypt.NewHasher()
@@ -159,8 +156,8 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			grpcauth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)
-	healthCheckHandler := NewHealthHandler(healthService)
-	fileHandler := NewFileHandler(fileService, config)
+	healthCheckHandler := NewHealthHandler(healthClient)
+	fileHandler := NewFileHandler(fileClient, config)
 	grpcapp.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
 	grpcapp.RegisterFileServiceServer(grpcServer, fileHandler)
 
@@ -173,11 +170,11 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	}
 
 	app := &grpcApp{
-		server:        svr,
-		logger:        logger,
-		config:        config,
-		repository:    repo,
-		healthService: healthService,
+		server:       svr,
+		logger:       logger,
+		config:       config,
+		repository:   repo,
+		healthClient: healthClient,
 	}
 	return app, nil
 }

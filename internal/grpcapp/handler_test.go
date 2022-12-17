@@ -15,8 +15,7 @@ import (
 	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	mock_context "github.com/go-seidon/provider/context/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
-	"github.com/go-seidon/provider/status"
-	"github.com/go-seidon/provider/validation"
+	"github.com/go-seidon/provider/system"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 
@@ -161,6 +160,7 @@ var _ = Describe("Handler Package", func() {
 			ctx         context.Context
 			currentTs   time.Time
 			p           *api.DeleteFileByIdParam
+			r           *api.DeleteFileByIdResult
 			delParam    file.DeleteFileParam
 			delRes      *file.DeleteFileResult
 		)
@@ -176,12 +176,89 @@ var _ = Describe("Handler Package", func() {
 			p = &api.DeleteFileByIdParam{
 				FileId: "file-id",
 			}
+			r = &api.DeleteFileByIdResult{
+				Code:    1000,
+				Message: "success delete file",
+				Data: &api.DeleteFileByIdData{
+					DeletedAt: currentTs.UnixMilli(),
+				},
+			}
 			delParam = file.DeleteFileParam{
 				FileId: "file-id",
 			}
 			delRes = &file.DeleteFileResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success delete file",
+				},
 				DeletedAt: currentTs,
 			}
+		})
+
+		When("file is not found", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, &system.Error{
+						Code:    1004,
+						Message: "file is not found",
+					}).
+					Times(1)
+
+				res, err := handler.DeleteFileById(ctx, p)
+
+				r := &api.DeleteFileByIdResult{
+					Code:    1004,
+					Message: "file is not found",
+				}
+				Expect(res).To(Equal(r))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("there is invalid param", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
+					Times(1)
+
+				res, err := handler.DeleteFileById(ctx, p)
+
+				r := &api.DeleteFileByIdResult{
+					Code:    1002,
+					Message: "invalid data",
+				}
+				Expect(res).To(Equal(r))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		When("failed delete file", func() {
+			It("should return error", func() {
+				fileService.
+					EXPECT().
+					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
+					Times(1)
+
+				res, err := handler.DeleteFileById(ctx, p)
+
+				r := &api.DeleteFileByIdResult{
+					Code:    1001,
+					Message: "network error",
+				}
+				Expect(res).To(Equal(r))
+				Expect(err).To(BeNil())
+			})
 		})
 
 		When("success delete file", func() {
@@ -194,71 +271,7 @@ var _ = Describe("Handler Package", func() {
 
 				res, err := handler.DeleteFileById(ctx, p)
 
-				expectRes := &api.DeleteFileByIdResult{
-					Code:    1000,
-					Message: "success delete file",
-					Data: &api.DeleteFileByIdData{
-						DeletedAt: currentTs.UnixMilli(),
-					},
-				}
-				Expect(res).To(Equal(expectRes))
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("file is not found", func() {
-			It("should return error", func() {
-				fileService.
-					EXPECT().
-					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
-					Return(nil, file.ErrorNotFound).
-					Times(1)
-
-				res, err := handler.DeleteFileById(ctx, p)
-
-				expectRes := &api.DeleteFileByIdResult{
-					Code:    1004,
-					Message: "not found",
-				}
-				Expect(res).To(Equal(expectRes))
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("there are invalid param", func() {
-			It("should return error", func() {
-				fileService.
-					EXPECT().
-					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
-					Return(nil, validation.Error("invalid data")).
-					Times(1)
-
-				res, err := handler.DeleteFileById(ctx, p)
-
-				expectRes := &api.DeleteFileByIdResult{
-					Code:    1002,
-					Message: "invalid data",
-				}
-				Expect(res).To(Equal(expectRes))
-				Expect(err).To(BeNil())
-			})
-		})
-
-		When("failed delete file", func() {
-			It("should return error", func() {
-				fileService.
-					EXPECT().
-					DeleteFile(gomock.Eq(ctx), gomock.Eq(delParam)).
-					Return(nil, fmt.Errorf("db error")).
-					Times(1)
-
-				res, err := handler.DeleteFileById(ctx, p)
-
-				expectRes := &api.DeleteFileByIdResult{
-					Code:    1001,
-					Message: "db error",
-				}
-				Expect(res).To(Equal(expectRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -312,6 +325,10 @@ var _ = Describe("Handler Package", func() {
 			}
 			rc = mock_io.NewMockReadCloser(ctrl)
 			retRes = &file.RetrieveFileResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success retrieve file",
+				},
 				UniqueId:  "file-id",
 				Name:      "file-name",
 				MimeType:  "image/jpeg",
@@ -330,12 +347,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, file.ErrorNotFound).
+					Return(nil, &system.Error{
+						Code:    1004,
+						Message: "file is not found",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
 					Code:    1004,
-					Message: file.ErrorNotFound.Error(),
+					Message: "file is not found",
 				}
 				stream.
 					EXPECT().
@@ -354,12 +374,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, file.ErrorNotFound).
+					Return(nil, &system.Error{
+						Code:    1004,
+						Message: "file is not found",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
 					Code:    1004,
-					Message: file.ErrorNotFound.Error(),
+					Message: "file is not found",
 				}
 				stream.
 					EXPECT().
@@ -378,7 +401,10 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, validation.Error("invalid data")).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
@@ -402,7 +428,10 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, validation.Error("invalid data")).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
@@ -426,12 +455,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, fmt.Errorf("db error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
 					Code:    1001,
-					Message: "db error",
+					Message: "network error",
 				}
 				stream.
 					EXPECT().
@@ -450,12 +482,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retParam)).
-					Return(nil, fmt.Errorf("db error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
 				res := &api.RetrieveFileByIdResult{
 					Code:    1001,
-					Message: "db error",
+					Message: "network error",
 				}
 				stream.
 					EXPECT().
@@ -1012,7 +1047,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: context.Canceled.Error(),
 				}
 				stream.
@@ -1042,7 +1077,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: context.Canceled.Error(),
 				}
 				stream.
@@ -1078,7 +1113,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: "client cancelled",
 				}
 				stream.
@@ -1114,7 +1149,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: "client cancelled",
 				}
 				stream.
@@ -1160,7 +1195,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: "file is too large",
 				}
 				stream.
@@ -1206,7 +1241,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
+					Code:    1001,
 					Message: "file is too large",
 				}
 				stream.
@@ -1276,12 +1311,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, fmt.Errorf("db error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
-					Message: "db error",
+					Code:    1001,
+					Message: "network error",
 				}
 				stream.
 					EXPECT().
@@ -1350,12 +1388,15 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, fmt.Errorf("db error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_FAILED,
-					Message: "db error",
+					Code:    1001,
+					Message: "network error",
 				}
 				stream.
 					EXPECT().
@@ -1424,11 +1465,14 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, validation.Error("invalid data")).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.INVALID_PARAM,
+					Code:    1002,
 					Message: "invalid data",
 				}
 				stream.
@@ -1443,7 +1487,7 @@ var _ = Describe("Handler Package", func() {
 			})
 		})
 
-		When("there are invalid data", func() {
+		When("there is invalid data", func() {
 			It("should return error", func() {
 				ctx.
 					EXPECT().
@@ -1498,11 +1542,14 @@ var _ = Describe("Handler Package", func() {
 				fileService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, validation.Error("invalid data")).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.INVALID_PARAM,
+					Code:    1002,
 					Message: "invalid data",
 				}
 				stream.
@@ -1570,6 +1617,10 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				uploadRes := &file.UploadFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success upload file",
+					},
 					UniqueId:   "file-id",
 					Name:       "file-name",
 					Path:       "file/path",
@@ -1585,7 +1636,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_SUCCESS,
+					Code:    1000,
 					Message: "success upload file",
 					Data: &api.UploadFileData{
 						Id:         uploadRes.UniqueId,
@@ -1662,6 +1713,10 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				uploadRes := &file.UploadFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success upload file",
+					},
 					UniqueId:   "file-id",
 					Name:       "file-name",
 					Path:       "file/path",
@@ -1677,7 +1732,7 @@ var _ = Describe("Handler Package", func() {
 					Times(1)
 
 				failedRes := &api.UploadFileResult{
-					Code:    status.ACTION_SUCCESS,
+					Code:    1000,
 					Message: "success upload file",
 					Data: &api.UploadFileData{
 						Id:         uploadRes.UniqueId,
