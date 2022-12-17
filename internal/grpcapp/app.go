@@ -11,10 +11,10 @@ import (
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/grpcauth"
 	"github.com/go-seidon/hippo/internal/grpclog"
-	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/identity/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/validation/govalidator"
@@ -26,7 +26,7 @@ type grpcApp struct {
 	config       *GrpcAppConfig
 	logger       logging.Logger
 	repository   repository.Provider
-	healthClient healthcheck.HealthCheck
+	healthClient health.HealthCheck
 }
 
 func (a *grpcApp) Run(ctx context.Context) error {

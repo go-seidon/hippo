@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/hippo/internal/app"
-	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/logging"
 )
 
@@ -34,7 +34,7 @@ type RestAppParam struct {
 	Logger       logging.Logger
 	Server       Server
 	Repository   repository.Provider
-	HealthClient healthcheck.HealthCheck
+	HealthClient health.HealthCheck
 }
 
 type RestAppOption func(*RestAppParam)
@@ -57,7 +57,7 @@ func WithServer(server Server) RestAppOption {
 	}
 }
 
-func WithService(hc healthcheck.HealthCheck) RestAppOption {
+func WithService(hc health.HealthCheck) RestAppOption {
 	return func(p *RestAppParam) {
 		p.HealthClient = hc
 	}

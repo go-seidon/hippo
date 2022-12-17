@@ -9,13 +9,13 @@ import (
 	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
-	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/hippo/internal/resthandler"
 	"github.com/go-seidon/hippo/internal/restmiddleware"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/identity/ksuid"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization/json"
@@ -30,7 +30,7 @@ type restApp struct {
 	logger     logging.Logger
 	repository repository.Provider
 
-	healthClient healthcheck.HealthCheck
+	healthClient health.HealthCheck
 }
 
 func (a *restApp) Run(ctx context.Context) error {

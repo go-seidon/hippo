@@ -12,8 +12,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/go-seidon/hippo/internal/app"
-	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	mock_restapp "github.com/go-seidon/hippo/internal/restapp/mock"
+	mock_healthcheck "github.com/go-seidon/provider/health/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 
 	"github.com/go-seidon/hippo/internal/repository"

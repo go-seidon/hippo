@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/api/restapp"
-	"github.com/go-seidon/hippo/internal/healthcheck"
-	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	"github.com/go-seidon/hippo/internal/resthandler"
+	"github.com/go-seidon/provider/health"
+	mock_healthcheck "github.com/go-seidon/provider/health/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo/v2"
@@ -66,9 +66,9 @@ var _ = Describe("Health Handler", func() {
 
 		When("success check health", func() {
 			It("should return result", func() {
-				checkRes := &healthcheck.CheckResult{
+				checkRes := &health.CheckResult{
 					Status: "OK",
-					Items: map[string]healthcheck.CheckResultItem{
+					Items: map[string]health.CheckResultItem{
 						"inet": {
 							Name:      "inet",
 							Status:    "OK",
@@ -111,9 +111,9 @@ var _ = Describe("Health Handler", func() {
 
 		When("success check health with no details", func() {
 			It("should return result", func() {
-				checkRes := &healthcheck.CheckResult{
+				checkRes := &health.CheckResult{
 					Status: "OK",
-					Items:  map[string]healthcheck.CheckResultItem{},
+					Items:  map[string]health.CheckResultItem{},
 				}
 				healthClient.
 					EXPECT().

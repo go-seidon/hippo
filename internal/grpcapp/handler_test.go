@@ -11,9 +11,9 @@ import (
 	"github.com/go-seidon/hippo/internal/file"
 	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	"github.com/go-seidon/hippo/internal/grpcapp"
-	"github.com/go-seidon/hippo/internal/healthcheck"
-	mock_healthcheck "github.com/go-seidon/hippo/internal/healthcheck/mock"
 	mock_context "github.com/go-seidon/provider/context/mock"
+	"github.com/go-seidon/provider/health"
+	mock_healthcheck "github.com/go-seidon/provider/health/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/go-seidon/provider/system"
 	"github.com/golang/mock/gomock"
@@ -66,9 +66,9 @@ var _ = Describe("Handler Package", func() {
 
 		When("no health check states available", func() {
 			It("should return result", func() {
-				checkRes := &healthcheck.CheckResult{
+				checkRes := &health.CheckResult{
 					Status: "OK",
-					Items:  map[string]healthcheck.CheckResultItem{},
+					Items:  map[string]health.CheckResultItem{},
 				}
 
 				healthService.
@@ -97,9 +97,9 @@ var _ = Describe("Handler Package", func() {
 			It("should return result", func() {
 				currentTimestamp := time.Now()
 
-				checkRes := &healthcheck.CheckResult{
+				checkRes := &health.CheckResult{
 					Status: "WARNING",
-					Items: map[string]healthcheck.CheckResultItem{
+					Items: map[string]health.CheckResultItem{
 						"inet-conn": {
 							Name:      "inet-conn",
 							Status:    "OK",

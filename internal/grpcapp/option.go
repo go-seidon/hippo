@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/go-seidon/hippo/internal/app"
-	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/logging"
 )
 
@@ -34,7 +34,7 @@ type GrpcAppParam struct {
 	Logger       logging.Logger
 	Server       Server
 	Repository   repository.Provider
-	HealthClient healthcheck.HealthCheck
+	HealthClient health.HealthCheck
 }
 
 type GrpcAppOption = func(*GrpcAppParam)
@@ -51,7 +51,7 @@ func WithLogger(logger logging.Logger) GrpcAppOption {
 	}
 }
 
-func WithService(hc healthcheck.HealthCheck) GrpcAppOption {
+func WithService(hc health.HealthCheck) GrpcAppOption {
 	return func(p *GrpcAppParam) {
 		p.HealthClient = hc
 	}

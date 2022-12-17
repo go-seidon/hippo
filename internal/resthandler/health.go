@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/go-seidon/hippo/api/restapp"
-	"github.com/go-seidon/hippo/internal/healthcheck"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/status"
 	"github.com/labstack/echo/v4"
 )
 
 type healthHandler struct {
-	healthClient healthcheck.HealthCheck
+	healthClient health.HealthCheck
 }
 
 func (h *healthHandler) CheckHealth(ctx echo.Context) error {
@@ -45,7 +45,7 @@ func (h *healthHandler) CheckHealth(ctx echo.Context) error {
 }
 
 type HealthParam struct {
-	HealthClient healthcheck.HealthCheck
+	HealthClient health.HealthCheck
 }
 
 func NewHealth(p HealthParam) *healthHandler {

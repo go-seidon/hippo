@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-seidon/hippo/api/grpcapp"
 	"github.com/go-seidon/hippo/internal/file"
-	"github.com/go-seidon/hippo/internal/healthcheck"
+	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -18,7 +18,7 @@ import (
 
 type healthHandler struct {
 	grpcapp.UnimplementedHealthServiceServer
-	healthService healthcheck.HealthCheck
+	healthService health.HealthCheck
 }
 
 func (s *healthHandler) CheckHealth(ctx context.Context, p *grpcapp.CheckHealthParam) (*grpcapp.CheckHealthResult, error) {
@@ -48,7 +48,7 @@ func (s *healthHandler) CheckHealth(ctx context.Context, p *grpcapp.CheckHealthP
 	return res, nil
 }
 
-func NewHealthHandler(healthService healthcheck.HealthCheck) *healthHandler {
+func NewHealthHandler(healthService health.HealthCheck) *healthHandler {
 	return &healthHandler{
 		healthService: healthService,
 	}
