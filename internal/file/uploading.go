@@ -8,10 +8,11 @@ import (
 
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/validation"
+	"github.com/go-seidon/provider/status"
+	"github.com/go-seidon/provider/system"
 )
 
-func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, error) {
+func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, *system.Error) {
 	s.log.Debug("In function: UploadFile")
 	defer s.log.Debug("Returning function: UploadFile")
 
@@ -22,11 +23,17 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 
 	err := s.validator.Validate(p)
 	if err != nil {
-		return nil, err
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: err.Error(),
+		}
 	}
 
 	if p.fileReader == nil {
-		return nil, validation.Error("file is not specified")
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: "file is not specified",
+		}
 	}
 
 	uploadDir := fmt.Sprintf("%s/%s", s.config.UploadDir, s.locator.GetLocation())
@@ -35,7 +42,10 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		Path: uploadDir,
 	})
 	if err != nil {
-		return nil, err
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
 	}
 
 	if !exists {
@@ -44,19 +54,28 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 			Permission: 0644,
 		})
 		if err != nil {
-			return nil, err
+			return nil, &system.Error{
+				Code:    status.ACTION_FAILED,
+				Message: err.Error(),
+			}
 		}
 	}
 
 	data := bytes.NewBuffer([]byte{})
 	_, err = io.Copy(data, p.fileReader)
 	if err != nil {
-		return nil, err
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
 	}
 
 	uniqueId, err := s.identifier.GenerateId()
 	if err != nil {
-		return nil, err
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
 	}
 
 	path := fmt.Sprintf("%s/%s", uploadDir, uniqueId)
@@ -74,10 +93,17 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		CreateFn:  NewCreateFn(data.Bytes(), s.fileManager),
 	})
 	if err != nil {
-		return nil, err
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
 	}
 
 	res := &UploadFileResult{
+		Success: system.Success{
+			Code:    status.ACTION_SUCCESS,
+			Message: "success upload file",
+		},
 		UniqueId:   cRes.UniqueId,
 		Name:       cRes.Name,
 		Path:       cRes.Path,
@@ -98,7 +124,7 @@ func NewCreateFn(data []byte, fileManager filesystem.FileManager) repository.Cre
 			return err
 		}
 		if exists {
-			return ErrorExists
+			return ErrExists
 		}
 
 		_, err = fileManager.SaveFile(ctx, filesystem.SaveFileParam{

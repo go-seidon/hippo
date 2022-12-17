@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	file "github.com/go-seidon/hippo/internal/file"
+	system "github.com/go-seidon/provider/system"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,11 +37,11 @@ func (m *MockFile) EXPECT() *MockFileMockRecorder {
 }
 
 // DeleteFile mocks base method.
-func (m *MockFile) DeleteFile(ctx context.Context, p file.DeleteFileParam) (*file.DeleteFileResult, error) {
+func (m *MockFile) DeleteFile(ctx context.Context, p file.DeleteFileParam) (*file.DeleteFileResult, *system.Error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteFile", ctx, p)
 	ret0, _ := ret[0].(*file.DeleteFileResult)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*system.Error)
 	return ret0, ret1
 }
 
@@ -51,11 +52,11 @@ func (mr *MockFileMockRecorder) DeleteFile(ctx, p interface{}) *gomock.Call {
 }
 
 // RetrieveFile mocks base method.
-func (m *MockFile) RetrieveFile(ctx context.Context, p file.RetrieveFileParam) (*file.RetrieveFileResult, error) {
+func (m *MockFile) RetrieveFile(ctx context.Context, p file.RetrieveFileParam) (*file.RetrieveFileResult, *system.Error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RetrieveFile", ctx, p)
 	ret0, _ := ret[0].(*file.RetrieveFileResult)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*system.Error)
 	return ret0, ret1
 }
 
@@ -66,7 +67,7 @@ func (mr *MockFileMockRecorder) RetrieveFile(ctx, p interface{}) *gomock.Call {
 }
 
 // UploadFile mocks base method.
-func (m *MockFile) UploadFile(ctx context.Context, opts ...file.UploadFileOption) (*file.UploadFileResult, error) {
+func (m *MockFile) UploadFile(ctx context.Context, opts ...file.UploadFileOption) (*file.UploadFileResult, *system.Error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx}
 	for _, a := range opts {
@@ -74,7 +75,7 @@ func (m *MockFile) UploadFile(ctx context.Context, opts ...file.UploadFileOption
 	}
 	ret := m.ctrl.Call(m, "UploadFile", varargs...)
 	ret0, _ := ret[0].(*file.UploadFileResult)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*system.Error)
 	return ret0, ret1
 }
 

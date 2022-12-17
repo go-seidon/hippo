@@ -13,6 +13,7 @@ import (
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
+	"github.com/go-seidon/provider/system"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
 
@@ -32,11 +33,11 @@ var _ = Describe("Deleter", func() {
 			validator   *mock_validation.MockValidator
 			s           file.File
 			deleteRes   *repository.DeleteFileResult
-			finalRes    *file.DeleteFileResult
+			r           *file.DeleteFileResult
 		)
 
 		BeforeEach(func() {
-			currentTimestamp := time.Now()
+			currentTs := time.Now()
 			ctx = context.Background()
 			p = file.DeleteFileParam{
 				FileId: "mock-file-id",
@@ -63,24 +64,28 @@ var _ = Describe("Deleter", func() {
 				},
 			})
 			deleteRes = &repository.DeleteFileResult{
-				DeletedAt: currentTimestamp,
+				DeletedAt: currentTs,
 			}
-			finalRes = &file.DeleteFileResult{
-				DeletedAt: currentTimestamp,
+			r = &file.DeleteFileResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success delete file",
+				},
+				DeletedAt: currentTs,
 			}
 
-			log.EXPECT().
+			log.
+				EXPECT().
 				Debug("In function: DeleteFile").
 				Times(1)
-			log.EXPECT().
+			log.
+				EXPECT().
 				Debug("Returning function: DeleteFile").
 				Times(1)
 		})
 
-		When("parameter are not valid", func() {
+		When("parameter is not valid", func() {
 			It("should return error", func() {
-				p.FileId = ""
-
 				validator.
 					EXPECT().
 					Validate(gomock.Eq(p)).
@@ -90,7 +95,8 @@ var _ = Describe("Deleter", func() {
 				res, err := s.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid data")))
+				Expect(err.Code).To(Equal(int32(1002)))
+				Expect(err.Message).To(Equal("invalid data"))
 			})
 		})
 
@@ -105,13 +111,14 @@ var _ = Describe("Deleter", func() {
 				fileRepo.
 					EXPECT().
 					DeleteFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, fmt.Errorf("failed delete file")).
+					Return(nil, fmt.Errorf("network error")).
 					Times(1)
 
 				res, err := s.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("failed delete file")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("network error"))
 			})
 		})
 
@@ -132,7 +139,8 @@ var _ = Describe("Deleter", func() {
 				res, err := s.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err.Code).To(Equal(int32(1004)))
+				Expect(err.Message).To(Equal("file is not found"))
 			})
 		})
 
@@ -153,11 +161,12 @@ var _ = Describe("Deleter", func() {
 				res, err := s.DeleteFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err.Code).To(Equal(int32(1004)))
+				Expect(err.Message).To(Equal("file is deleted"))
 			})
 		})
 
-		When("failed success file", func() {
+		When("success delete file", func() {
 			It("should return result", func() {
 				validator.
 					EXPECT().
@@ -173,7 +182,7 @@ var _ = Describe("Deleter", func() {
 
 				res, err := s.DeleteFile(ctx, p)
 
-				Expect(res).To(Equal(finalRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -235,7 +244,7 @@ var _ = Describe("Deleter", func() {
 
 				err := fn(ctx, deleteFnParam)
 
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err).To(Equal(file.ErrNotFound))
 			})
 		})
 

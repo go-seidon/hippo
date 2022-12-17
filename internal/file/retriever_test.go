@@ -13,6 +13,7 @@ import (
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
+	"github.com/go-seidon/provider/system"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -81,6 +82,10 @@ var _ = Describe("Retriever", func() {
 				File: osFile,
 			}
 			r = &file.RetrieveFileResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success retrieve file",
+				},
 				Data:      osFile,
 				UniqueId:  retrieveRes.UniqueId,
 				Name:      retrieveRes.Name,
@@ -89,18 +94,18 @@ var _ = Describe("Retriever", func() {
 				Extension: retrieveRes.Extension,
 			}
 
-			log.EXPECT().
+			log.
+				EXPECT().
 				Debug("In function: RetrieveFile").
 				Times(1)
-			log.EXPECT().
+			log.
+				EXPECT().
 				Debug("Returning function: RetrieveFile").
 				Times(1)
 		})
 
-		When("parameter are not valid", func() {
+		When("parameter is not valid", func() {
 			It("should return error", func() {
-				p.FileId = ""
-
 				validator.
 					EXPECT().
 					Validate(gomock.Eq(p)).
@@ -110,7 +115,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("invalid data")))
+				Expect(err.Code).To(Equal(int32(1002)))
+				Expect(err.Message).To(Equal("invalid data"))
 			})
 		})
 
@@ -131,7 +137,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err.Code).To(Equal(int32(1004)))
+				Expect(err.Message).To(Equal("file is not found"))
 			})
 		})
 
@@ -152,7 +159,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err.Code).To(Equal(int32(1004)))
+				Expect(err.Message).To(Equal("file is deleted"))
 			})
 		})
 
@@ -173,7 +181,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("db error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("db error"))
 			})
 		})
 
@@ -200,7 +209,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(file.ErrorNotFound))
+				Expect(err.Code).To(Equal(int32(1004)))
+				Expect(err.Message).To(Equal("file is not found"))
 			})
 		})
 
@@ -227,7 +237,8 @@ var _ = Describe("Retriever", func() {
 				res, err := s.RetrieveFile(ctx, p)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("disk error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("disk error"))
 			})
 		})
 

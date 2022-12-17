@@ -11,7 +11,6 @@ import (
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/provider/status"
-	"github.com/go-seidon/provider/validation"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	grpc_status "google.golang.org/grpc/status"
@@ -67,27 +66,15 @@ func (h *fileHandler) DeleteFileById(ctx context.Context, p *grpcapp.DeleteFileB
 	})
 	if err != nil {
 		res := &grpcapp.DeleteFileByIdResult{
-			Code:    status.ACTION_FAILED,
-			Message: err.Error(),
+			Code:    err.Code,
+			Message: err.Message,
 		}
-
-		if errors.Is(err, file.ErrorNotFound) {
-			res.Code = status.RESOURCE_NOTFOUND
-			res.Message = err.Error()
-		}
-
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			res.Code = status.INVALID_PARAM
-			res.Message = e.Error()
-		}
-
 		return res, nil
 	}
 
 	res := &grpcapp.DeleteFileByIdResult{
-		Code:    status.ACTION_SUCCESS,
-		Message: "success delete file",
+		Code:    deletion.Success.Code,
+		Message: deletion.Success.Message,
 		Data: &grpcapp.DeleteFileByIdData{
 			DeletedAt: deletion.DeletedAt.UnixMilli(),
 		},
@@ -96,33 +83,22 @@ func (h *fileHandler) DeleteFileById(ctx context.Context, p *grpcapp.DeleteFileB
 }
 
 func (h *fileHandler) RetrieveFileById(p *grpcapp.RetrieveFileByIdParam, stream grpcapp.FileService_RetrieveFileByIdServer) error {
-	retrieval, err := h.fileService.RetrieveFile(stream.Context(), file.RetrieveFileParam{
+	retrieval, rerr := h.fileService.RetrieveFile(stream.Context(), file.RetrieveFileParam{
 		FileId: p.FileId,
 	})
-	if err != nil {
+	if rerr != nil {
 		res := &grpcapp.RetrieveFileByIdResult{
-			Code:    status.ACTION_FAILED,
-			Message: err.Error(),
+			Code:    rerr.Code,
+			Message: rerr.Message,
 		}
-		if errors.Is(err, file.ErrorNotFound) {
-			res.Code = status.RESOURCE_NOTFOUND
-			res.Message = err.Error()
-		}
-
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			res.Code = status.INVALID_PARAM
-			res.Message = e.Error()
-		}
-
-		err = stream.Send(res)
+		err := stream.Send(res)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	err = stream.SendHeader(metadata.New(map[string]string{
+	err := stream.SendHeader(metadata.New(map[string]string{
 		"file_name":      retrieval.Name,
 		"file_mimetype":  retrieval.MimeType,
 		"file_extension": retrieval.Extension,
@@ -170,8 +146,8 @@ func (h *fileHandler) RetrieveFileById(p *grpcapp.RetrieveFileByIdParam, stream 
 
 		if errors.Is(err, io.EOF) {
 			err = stream.Send(&grpcapp.RetrieveFileByIdResult{
-				Code:    status.ACTION_SUCCESS,
-				Message: "success retrieve file",
+				Code:    retrieval.Success.Code,
+				Message: retrieval.Success.Message,
 			})
 			if err != nil {
 				return err
@@ -254,7 +230,7 @@ func (h *fileHandler) UploadFile(stream grpcapp.FileService_UploadFileServer) er
 		return nil
 	}
 
-	upload, err := h.fileService.UploadFile(
+	upload, uerr := h.fileService.UploadFile(
 		stream.Context(),
 		file.WithFileInfo(
 			fileInfo.Name,
@@ -264,28 +240,22 @@ func (h *fileHandler) UploadFile(stream grpcapp.FileService_UploadFileServer) er
 		),
 		file.WithReader(fileReader),
 	)
-	if err != nil {
+	if uerr != nil {
 		res := &grpcapp.UploadFileResult{
-			Code:    status.ACTION_FAILED,
-			Message: err.Error(),
+			Code:    uerr.Code,
+			Message: uerr.Message,
 		}
 
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			res.Code = status.INVALID_PARAM
-			res.Message = e.Error()
-		}
-
-		err = stream.SendAndClose(res)
+		err := stream.SendAndClose(res)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	err = stream.SendAndClose(&grpcapp.UploadFileResult{
-		Code:    status.ACTION_SUCCESS,
-		Message: "success upload file",
+	err := stream.SendAndClose(&grpcapp.UploadFileResult{
+		Code:    upload.Success.Code,
+		Message: upload.Success.Message,
 		Data: &grpcapp.UploadFileData{
 			Id:         upload.UniqueId,
 			Name:       upload.Name,

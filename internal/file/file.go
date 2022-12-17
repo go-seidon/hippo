@@ -10,13 +10,14 @@ import (
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/identity"
 	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/system"
 	"github.com/go-seidon/provider/validation"
 )
 
 type File interface {
-	UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, error)
-	RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, error)
-	DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, error)
+	UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, *system.Error)
+	RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, *system.Error)
+	DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, *system.Error)
 }
 
 type UploadFileOption = func(*UploadFileParam)
@@ -45,6 +46,7 @@ type UploadFileParam struct {
 }
 
 type UploadFileResult struct {
+	Success    system.Success
 	UniqueId   string
 	Name       string
 	Path       string
@@ -59,6 +61,7 @@ type RetrieveFileParam struct {
 }
 
 type RetrieveFileResult struct {
+	Success   system.Success
 	Data      io.ReadCloser
 	UniqueId  string
 	Name      string
@@ -74,6 +77,7 @@ type DeleteFileParam struct {
 }
 
 type DeleteFileResult struct {
+	Success   system.Success
 	DeletedAt time.Time
 }
 

@@ -15,7 +15,7 @@ import (
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
-	"github.com/go-seidon/provider/validation"
+	"github.com/go-seidon/provider/system"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -26,25 +26,26 @@ var _ = Describe("Uploader", func() {
 
 	Context("UploadFile function", Label("unit"), func() {
 		var (
-			ctx              context.Context
-			currentTimestamp time.Time
-			fileRepo         *mock_repository.MockFileRepository
-			fileManager      *mock_filesystem.MockFileManager
-			dirManager       *mock_filesystem.MockDirectoryManager
-			logger           *mock_logging.MockLogger
-			reader           *mock_io.MockReader
-			identifier       *mock_identifier.MockIdentifier
-			locator          *mock_file.MockUploadLocation
-			validator        *mock_validation.MockValidator
-			s                file.File
-			dirExistsParam   filesystem.IsDirectoryExistsParam
-			createDirParam   filesystem.CreateDirParam
-			createFileRes    *repository.CreateFileResult
-			opts             []file.UploadFileOption
+			ctx            context.Context
+			currentTs      time.Time
+			fileRepo       *mock_repository.MockFileRepository
+			fileManager    *mock_filesystem.MockFileManager
+			dirManager     *mock_filesystem.MockDirectoryManager
+			logger         *mock_logging.MockLogger
+			reader         *mock_io.MockReader
+			identifier     *mock_identifier.MockIdentifier
+			locator        *mock_file.MockUploadLocation
+			validator      *mock_validation.MockValidator
+			s              file.File
+			dirExistsParam filesystem.IsDirectoryExistsParam
+			createDirParam filesystem.CreateDirParam
+			createFileRes  *repository.CreateFileResult
+			opts           []file.UploadFileOption
+			r              *file.UploadFileResult
 		)
 
 		BeforeEach(func() {
-			currentTimestamp = time.Now()
+			currentTs = time.Now()
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
@@ -82,12 +83,25 @@ var _ = Describe("Uploader", func() {
 				Mimetype:  "mock-mimetype",
 				Extension: "mock-extension",
 				Size:      200,
-				CreatedAt: currentTimestamp,
+				CreatedAt: currentTs,
 			}
 			dataOpt := file.WithReader(reader)
 			infoOpt := file.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
 			opts = append(opts, dataOpt)
 			opts = append(opts, infoOpt)
+			r = &file.UploadFileResult{
+				Success: system.Success{
+					Code:    1000,
+					Message: "success upload file",
+				},
+				UniqueId:   "mock-unique-id",
+				Name:       "mock-name",
+				Path:       "mock-path",
+				Mimetype:   "mock-mimetype",
+				Extension:  "mock-extension",
+				Size:       200,
+				UploadedAt: currentTs,
+			}
 
 			logger.
 				EXPECT().
@@ -99,22 +113,23 @@ var _ = Describe("Uploader", func() {
 				Times(1)
 		})
 
-		When("there are invalid data", func() {
+		When("there is invalid data", func() {
 			It("should return error", func() {
 				validator.
 					EXPECT().
 					Validate(gomock.Any()).
-					Return(validation.Error("invalid data")).
+					Return(fmt.Errorf("invalid data")).
 					Times(1)
 
 				res, err := s.UploadFile(ctx)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(validation.Error("invalid data")))
+				Expect(err.Code).To(Equal(int32(1002)))
+				Expect(err.Message).To(Equal("invalid data"))
 			})
 		})
 
-		When("file data is not specified", func() {
+		When("file is not specified", func() {
 			It("should return error", func() {
 				validator.
 					EXPECT().
@@ -125,7 +140,8 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(validation.Error("file is not specified")))
+				Expect(err.Code).To(Equal(int32(1002)))
+				Expect(err.Message).To(Equal("file is not specified"))
 			})
 		})
 
@@ -152,7 +168,8 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx, opts...)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("disk error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("disk error"))
 			})
 		})
 
@@ -178,13 +195,14 @@ var _ = Describe("Uploader", func() {
 				dirManager.
 					EXPECT().
 					CreateDir(gomock.Eq(ctx), gomock.Eq(createDirParam)).
-					Return(nil, fmt.Errorf("r/w error")).
+					Return(nil, fmt.Errorf("i/o error")).
 					Times(1)
 
 				res, err := s.UploadFile(ctx, opts...)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("r/w error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("i/o error"))
 			})
 		})
 
@@ -226,7 +244,8 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx, copts...)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("disk error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("disk error"))
 			})
 		})
 
@@ -271,11 +290,12 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx, copts...)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("generate error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("generate error"))
 			})
 		})
 
-		When("failed create file", func() {
+		When("failed write file record", func() {
 			It("should return error", func() {
 				validator.
 					EXPECT().
@@ -321,7 +341,8 @@ var _ = Describe("Uploader", func() {
 				res, err := s.UploadFile(ctx, opts...)
 
 				Expect(res).To(BeNil())
-				Expect(err).To(Equal(fmt.Errorf("db error")))
+				Expect(err.Code).To(Equal(int32(1001)))
+				Expect(err.Message).To(Equal("db error"))
 			})
 		})
 
@@ -370,16 +391,7 @@ var _ = Describe("Uploader", func() {
 
 				res, err := s.UploadFile(ctx, opts...)
 
-				expectedRes := &file.UploadFileResult{
-					UniqueId:   "mock-unique-id",
-					Name:       "mock-name",
-					Path:       "mock-path",
-					Mimetype:   "mock-mimetype",
-					Extension:  "mock-extension",
-					Size:       200,
-					UploadedAt: currentTimestamp,
-				}
-				Expect(res).To(Equal(expectedRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -440,7 +452,7 @@ var _ = Describe("Uploader", func() {
 
 				err := fn(ctx, createFnParam)
 
-				Expect(err).To(Equal(file.ErrorExists))
+				Expect(err).To(Equal(file.ErrExists))
 			})
 		})
 

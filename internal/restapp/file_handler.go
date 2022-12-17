@@ -2,7 +2,6 @@ package restapp
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/serialization"
 	"github.com/go-seidon/provider/status"
-	"github.com/go-seidon/provider/validation"
 	"github.com/gorilla/mux"
 )
 
@@ -50,7 +48,7 @@ func (h *fileHandler) UploadFile(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	uploadRes, err := h.fileService.UploadFile(req.Context(),
+	uploadRes, uerr := h.fileService.UploadFile(req.Context(),
 		file.WithReader(fileReader),
 		file.WithFileInfo(
 			fileInfo.Name,
@@ -59,16 +57,14 @@ func (h *fileHandler) UploadFile(w http.ResponseWriter, req *http.Request) {
 			fileInfo.Size,
 		),
 	)
-	if err != nil {
-		code := status.ACTION_FAILED
+	if uerr != nil {
 		httpCode := http.StatusInternalServerError
-		message := err.Error()
+		code := uerr.Code
+		message := uerr.Message
 
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			code = status.INVALID_PARAM
+		switch uerr.Code {
+		case status.INVALID_PARAM:
 			httpCode = http.StatusBadRequest
-			message = e.Error()
 		}
 
 		Response(
@@ -99,25 +95,19 @@ func (h *fileHandler) UploadFile(w http.ResponseWriter, req *http.Request) {
 func (h *fileHandler) RetrieveFileById(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
-	r, err := h.fileService.RetrieveFile(req.Context(), file.RetrieveFileParam{
+	retrieve, rerr := h.fileService.RetrieveFile(req.Context(), file.RetrieveFileParam{
 		FileId: vars["id"],
 	})
-	if err != nil {
-		code := status.ACTION_FAILED
+	if rerr != nil {
 		httpCode := http.StatusInternalServerError
-		message := err.Error()
+		code := rerr.Code
+		message := rerr.Message
 
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			code = status.INVALID_PARAM
+		switch rerr.Code {
+		case status.INVALID_PARAM:
 			httpCode = http.StatusBadRequest
-			message = e.Error()
-		}
-
-		if errors.Is(err, file.ErrorNotFound) {
-			code = status.RESOURCE_NOTFOUND
+		case status.RESOURCE_NOTFOUND:
 			httpCode = http.StatusNotFound
-			message = err.Error()
 		}
 
 		Response(
@@ -128,10 +118,10 @@ func (h *fileHandler) RetrieveFileById(w http.ResponseWriter, req *http.Request)
 		)
 		return
 	}
-	defer r.Data.Close()
+	defer retrieve.Data.Close()
 
 	data := bytes.NewBuffer([]byte{})
-	_, err = io.Copy(data, r.Data)
+	_, err := io.Copy(data, retrieve.Data)
 	if err != nil {
 		Response(
 			WithWriterSerializer(w, h.serializer),
@@ -142,41 +132,35 @@ func (h *fileHandler) RetrieveFileById(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	if r.MimeType != "" {
-		w.Header().Set("Content-Type", r.MimeType)
+	if retrieve.MimeType != "" {
+		w.Header().Set("Content-Type", retrieve.MimeType)
 	} else {
 		w.Header().Del("Content-Type")
 	}
 
-	w.Header().Set("X-File-Name", r.Name)
-	w.Header().Set("X-File-Mimetype", r.MimeType)
-	w.Header().Set("X-File-Extension", r.Extension)
-	w.Header().Set("X-File-Size", fmt.Sprintf("%d", r.Size))
+	w.Header().Set("X-File-Name", retrieve.Name)
+	w.Header().Set("X-File-Mimetype", retrieve.MimeType)
+	w.Header().Set("X-File-Extension", retrieve.Extension)
+	w.Header().Set("X-File-Size", fmt.Sprintf("%d", retrieve.Size))
 	w.Write(data.Bytes())
 }
 
 func (h *fileHandler) DeleteFileById(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
-	r, err := h.fileService.DeleteFile(req.Context(), file.DeleteFileParam{
+	delete, derr := h.fileService.DeleteFile(req.Context(), file.DeleteFileParam{
 		FileId: vars["id"],
 	})
-	if err != nil {
-		code := status.ACTION_FAILED
+	if derr != nil {
 		httpCode := http.StatusInternalServerError
-		message := err.Error()
+		code := derr.Code
+		message := derr.Message
 
-		if errors.Is(err, file.ErrorNotFound) {
-			code = status.RESOURCE_NOTFOUND
-			httpCode = http.StatusNotFound
-			message = err.Error()
-		}
-
-		switch e := err.(type) {
-		case *validation.ValidationError:
-			code = status.INVALID_PARAM
+		switch derr.Code {
+		case status.INVALID_PARAM:
 			httpCode = http.StatusBadRequest
-			message = e.Error()
+		case status.RESOURCE_NOTFOUND:
+			httpCode = http.StatusNotFound
 		}
 
 		Response(
@@ -189,7 +173,7 @@ func (h *fileHandler) DeleteFileById(w http.ResponseWriter, req *http.Request) {
 	}
 
 	d := &restapp.DeleteFileData{
-		DeletedAt: r.DeletedAt.UnixMilli(),
+		DeletedAt: delete.DeletedAt.UnixMilli(),
 	}
 
 	Response(

@@ -20,7 +20,7 @@ import (
 	"github.com/go-seidon/provider/serialization"
 	"github.com/go-seidon/provider/serialization/json"
 	mock_serialization "github.com/go-seidon/provider/serialization/mock"
-	"github.com/go-seidon/provider/validation"
+	"github.com/go-seidon/provider/system"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -64,20 +64,19 @@ var _ = Describe("File Handler", func() {
 
 		When("failed delete file", func() {
 			It("should write response", func() {
-
-				err := fmt.Errorf("failed delete file")
-
-				b := restapp.ResponseBody{
-					Code:    1001,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1001,
+					Message: "network error",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -100,20 +99,19 @@ var _ = Describe("File Handler", func() {
 
 		When("file is not found", func() {
 			It("should write response", func() {
-
-				err := file.ErrorNotFound
-
-				b := restapp.ResponseBody{
-					Code:    1004,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1004,
+						Message: "file is not found",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1004,
+					Message: "file is not found",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -134,22 +132,21 @@ var _ = Describe("File Handler", func() {
 			})
 		})
 
-		When("there are invalid data", func() {
+		When("there is invalid data", func() {
 			It("should write response", func() {
-
-				err := validation.Error("invalid data")
-
-				b := restapp.ResponseBody{
-					Code:    1002,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					DeleteFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1002,
+					Message: "invalid data",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -173,6 +170,10 @@ var _ = Describe("File Handler", func() {
 		When("success delete file", func() {
 			It("should write response", func() {
 				res := &file.DeleteFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success delete file",
+					},
 					DeletedAt: time.Now(),
 				}
 				b := restapp.ResponseBody{
@@ -247,20 +248,19 @@ var _ = Describe("File Handler", func() {
 
 		When("failed retrieve file", func() {
 			It("should write response", func() {
-
-				err := fmt.Errorf("failed retrieve file")
-
-				b := restapp.ResponseBody{
-					Code:    1001,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "network error",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1001,
+					Message: "network error",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -283,20 +283,19 @@ var _ = Describe("File Handler", func() {
 
 		When("file is not found", func() {
 			It("should write response", func() {
-
-				err := file.ErrorNotFound
-
-				b := restapp.ResponseBody{
-					Code:    1004,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1004,
+						Message: "file is not found",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1004,
+					Message: "file is not found",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -317,22 +316,21 @@ var _ = Describe("File Handler", func() {
 			})
 		})
 
-		When("there are invalid data", func() {
+		When("there is invalid data", func() {
 			It("should write response", func() {
-
-				err := validation.Error("invalid data")
-
-				b := restapp.ResponseBody{
-					Code:    1002,
-					Message: err.Error(),
-				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
-					Return(nil, err).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1002,
+					Message: "invalid data",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -355,7 +353,6 @@ var _ = Describe("File Handler", func() {
 
 		When("failed read file", func() {
 			It("should write response", func() {
-
 				fileData.
 					EXPECT().
 					Close().
@@ -368,20 +365,22 @@ var _ = Describe("File Handler", func() {
 					Times(1)
 
 				res := &file.RetrieveFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success retrieve file",
+					},
 					Data: fileData,
 				}
-
-				b := restapp.ResponseBody{
-					Code:    1001,
-					Message: "read error",
-				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
 					Return(res, nil).
 					Times(1)
 
+				b := restapp.ResponseBody{
+					Code:    1001,
+					Message: "read error",
+				}
 				serializer.
 					EXPECT().
 					Marshal(b).
@@ -404,7 +403,6 @@ var _ = Describe("File Handler", func() {
 
 		When("mimetype is empty", func() {
 			It("should write response", func() {
-
 				fileData.
 					EXPECT().
 					Close().
@@ -417,6 +415,10 @@ var _ = Describe("File Handler", func() {
 					Times(1)
 
 				res := &file.RetrieveFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success retrieve file",
+					},
 					Data:      fileData,
 					UniqueId:  "mock-unique-id",
 					Name:      "mock-name",
@@ -425,7 +427,6 @@ var _ = Describe("File Handler", func() {
 					Extension: "mock-extension",
 					DeletedAt: nil,
 				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
@@ -449,7 +450,6 @@ var _ = Describe("File Handler", func() {
 
 		When("mimetype is not empty", func() {
 			It("should write response", func() {
-
 				fileData.
 					EXPECT().
 					Close().
@@ -462,6 +462,10 @@ var _ = Describe("File Handler", func() {
 					Times(1)
 
 				res := &file.RetrieveFileResult{
+					Success: system.Success{
+						Code:    1000,
+						Message: "success retrieve file",
+					},
 					Data:      fileData,
 					UniqueId:  "mock-unique-id",
 					Name:      "mock-name",
@@ -470,7 +474,6 @@ var _ = Describe("File Handler", func() {
 					Extension: "mock-extension",
 					DeletedAt: nil,
 				}
-
 				fileService.
 					EXPECT().
 					RetrieveFile(gomock.Any(), gomock.Eq(p)).
@@ -559,7 +562,10 @@ var _ = Describe("File Handler", func() {
 				uploadService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, fmt.Errorf("disk error")).
+					Return(nil, &system.Error{
+						Code:    1001,
+						Message: "disk error",
+					}).
 					Times(1)
 
 				w := httptest.NewRecorder()
@@ -581,7 +587,10 @@ var _ = Describe("File Handler", func() {
 				uploadService.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx), gomock.Any()).
-					Return(nil, validation.Error("invalid data")).
+					Return(nil, &system.Error{
+						Code:    1002,
+						Message: "invalid data",
+					}).
 					Times(1)
 
 				w := httptest.NewRecorder()
