@@ -127,14 +127,11 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	base64Encoder := base64.NewEncoder()
 	bcryptHasher := bcrypt.NewHasher()
 
-	basicAuth, err := auth.NewBasicAuth(auth.NewBasicAuthParam{
+	basicClient := auth.NewBasicAuth(auth.NewBasicAuthParam{
 		AuthRepo: repo.GetAuthRepo(),
 		Encoder:  base64Encoder,
 		Hasher:   bcryptHasher,
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	grpcLogOpt := []grpclog.LogInterceptorOption{
 		grpclog.WithLogger(logger),
@@ -145,7 +142,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			"X-Correlation-Id",
 		}),
 	}
-	grpcBasicAuth := grpcauth.WithAuth(BasicAuth(basicAuth))
+	grpcBasicAuth := grpcauth.WithAuth(BasicAuth(basicClient))
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			grpclog.UnaryServerInterceptor(grpcLogOpt...),
