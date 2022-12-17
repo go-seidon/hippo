@@ -1,7 +1,9 @@
 package file
 
 import (
+	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -10,6 +12,7 @@ import (
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/identity"
 	"github.com/go-seidon/provider/logging"
+	"github.com/go-seidon/provider/status"
 	"github.com/go-seidon/provider/system"
 	"github.com/go-seidon/provider/validation"
 )
@@ -92,11 +95,277 @@ type file struct {
 	config      *FileConfig
 }
 
+func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, *system.Error) {
+	s.log.Debug("In function: RetrieveFile")
+	defer s.log.Debug("Returning function: RetrieveFile")
+
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: err.Error(),
+		}
+	}
+
+	retrieve, err := s.fileRepo.RetrieveFile(ctx, repository.RetrieveFileParam{
+		UniqueId: p.FileId,
+	})
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is not found",
+			}
+		} else if errors.Is(err, repository.ErrDeleted) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is deleted",
+			}
+		}
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	open, err := s.fileManager.OpenFile(ctx, filesystem.OpenFileParam{
+		Path: retrieve.Path,
+	})
+	if err != nil {
+		if errors.Is(err, filesystem.ErrorFileNotFound) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is not found",
+			}
+		}
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	res := &RetrieveFileResult{
+		Success: system.Success{
+			Code:    status.ACTION_SUCCESS,
+			Message: "success retrieve file",
+		},
+		Data:      open.File,
+		UniqueId:  retrieve.UniqueId,
+		Name:      retrieve.Name,
+		Path:      retrieve.Path,
+		MimeType:  retrieve.MimeType,
+		Extension: retrieve.Extension,
+		Size:      retrieve.Size,
+	}
+	return res, nil
+}
+
+func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, *system.Error) {
+	s.log.Debug("In function: UploadFile")
+	defer s.log.Debug("Returning function: UploadFile")
+
+	p := UploadFileParam{}
+	for _, opt := range opts {
+		opt(&p)
+	}
+
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: err.Error(),
+		}
+	}
+
+	if p.fileReader == nil {
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: "file is not specified",
+		}
+	}
+
+	uploadDir := fmt.Sprintf("%s/%s", s.config.UploadDir, s.locator.GetLocation())
+
+	exists, err := s.dirManager.IsDirectoryExists(ctx, filesystem.IsDirectoryExistsParam{
+		Path: uploadDir,
+	})
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	if !exists {
+		_, err := s.dirManager.CreateDir(ctx, filesystem.CreateDirParam{
+			Path:       uploadDir,
+			Permission: 0644,
+		})
+		if err != nil {
+			return nil, &system.Error{
+				Code:    status.ACTION_FAILED,
+				Message: err.Error(),
+			}
+		}
+	}
+
+	data := bytes.NewBuffer([]byte{})
+	_, err = io.Copy(data, p.fileReader)
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	uniqueId, err := s.identifier.GenerateId()
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	path := fmt.Sprintf("%s/%s", uploadDir, uniqueId)
+	if p.fileExtension != "" {
+		path = fmt.Sprintf("%s.%s", path, p.fileExtension)
+	}
+
+	cRes, err := s.fileRepo.CreateFile(ctx, repository.CreateFileParam{
+		UniqueId:  uniqueId,
+		Path:      path,
+		Name:      p.fileName,
+		Mimetype:  p.fileMimetype,
+		Extension: p.fileExtension,
+		Size:      p.fileSize,
+		CreateFn:  NewCreateFn(data.Bytes(), s.fileManager),
+	})
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	res := &UploadFileResult{
+		Success: system.Success{
+			Code:    status.ACTION_SUCCESS,
+			Message: "success upload file",
+		},
+		UniqueId:   cRes.UniqueId,
+		Name:       cRes.Name,
+		Path:       cRes.Path,
+		Mimetype:   cRes.Mimetype,
+		Extension:  cRes.Extension,
+		Size:       cRes.Size,
+		UploadedAt: cRes.CreatedAt,
+	}
+	return res, nil
+}
+
+func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, *system.Error) {
+	s.log.Debug("In function: DeleteFile")
+	defer s.log.Debug("Returning function: DeleteFile")
+
+	err := s.validator.Validate(p)
+	if err != nil {
+		return nil, &system.Error{
+			Code:    status.INVALID_PARAM,
+			Message: err.Error(),
+		}
+	}
+
+	deleteion, err := s.fileRepo.DeleteFile(ctx, repository.DeleteFileParam{
+		UniqueId: p.FileId,
+		DeleteFn: NewDeleteFn(s.fileManager),
+	})
+	if err != nil {
+		if errors.Is(err, repository.ErrDeleted) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is deleted",
+			}
+		} else if errors.Is(err, repository.ErrNotFound) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is not found",
+			}
+		} else if errors.Is(err, ErrNotFound) {
+			return nil, &system.Error{
+				Code:    status.RESOURCE_NOTFOUND,
+				Message: "file is not found",
+			}
+		}
+		return nil, &system.Error{
+			Code:    status.ACTION_FAILED,
+			Message: err.Error(),
+		}
+	}
+
+	res := &DeleteFileResult{
+		Success: system.Success{
+			Code:    status.ACTION_SUCCESS,
+			Message: "success delete file",
+		},
+		DeletedAt: deleteion.DeletedAt,
+	}
+	return res, nil
+}
+
+func NewCreateFn(data []byte, fileManager filesystem.FileManager) repository.CreateFn {
+	return func(ctx context.Context, cp repository.CreateFnParam) error {
+		exists, err := fileManager.IsFileExists(ctx, filesystem.IsFileExistsParam{
+			Path: cp.FilePath,
+		})
+		if err != nil {
+			return err
+		}
+		if exists {
+			return ErrExists
+		}
+
+		_, err = fileManager.SaveFile(ctx, filesystem.SaveFileParam{
+			Name:       cp.FilePath,
+			Data:       data,
+			Permission: 0644,
+		})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func NewDeleteFn(fileManager filesystem.FileManager) repository.DeleteFn {
+	return func(ctx context.Context, r repository.DeleteFnParam) error {
+		exists, err := fileManager.IsFileExists(ctx, filesystem.IsFileExistsParam{
+			Path: r.FilePath,
+		})
+		if err != nil {
+			return err
+		}
+
+		if !exists {
+			return ErrNotFound
+		}
+
+		_, err = fileManager.RemoveFile(ctx, filesystem.RemoveFileParam{
+			Path: r.FilePath,
+		})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 type FileConfig struct {
 	UploadDir string
 }
 
-type NewFileParam struct {
+type FileParam struct {
 	FileRepo    repository.FileRepository
 	FileManager filesystem.FileManager
 	DirManager  filesystem.DirectoryManager
@@ -107,33 +376,8 @@ type NewFileParam struct {
 	Config      *FileConfig
 }
 
-func NewFile(p NewFileParam) (*file, error) {
-	if p.FileRepo == nil {
-		return nil, fmt.Errorf("file repo is not specified")
-	}
-	if p.FileManager == nil {
-		return nil, fmt.Errorf("file manager is not specified")
-	}
-	if p.DirManager == nil {
-		return nil, fmt.Errorf("directory manager is not specified")
-	}
-	if p.Logger == nil {
-		return nil, fmt.Errorf("logger is not specified")
-	}
-	if p.Identifier == nil {
-		return nil, fmt.Errorf("identifier is not specified")
-	}
-	if p.Config == nil {
-		return nil, fmt.Errorf("config is not specified")
-	}
-	if p.Locator == nil {
-		return nil, fmt.Errorf("locator is not specified")
-	}
-	if p.Validator == nil {
-		return nil, fmt.Errorf("validator is not specified")
-	}
-
-	s := &file{
+func NewFile(p FileParam) *file {
+	return &file{
 		fileRepo:    p.FileRepo,
 		fileManager: p.FileManager,
 		dirManager:  p.DirManager,
@@ -143,5 +387,4 @@ func NewFile(p NewFileParam) (*file, error) {
 		config:      p.Config,
 		validator:   p.Validator,
 	}
-	return s, nil
 }

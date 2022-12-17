@@ -30,11 +30,11 @@ func (c *GrpcAppConfig) GetAddress() string {
 }
 
 type GrpcAppParam struct {
-	Config        *app.Config
-	Logger        logging.Logger
-	Server        Server
-	Repository    repository.Provider
-	HealthService healthcheck.HealthCheck
+	Config       *app.Config
+	Logger       logging.Logger
+	Server       Server
+	Repository   repository.Provider
+	HealthClient healthcheck.HealthCheck
 }
 
 type GrpcAppOption = func(*GrpcAppParam)
@@ -51,9 +51,9 @@ func WithLogger(logger logging.Logger) GrpcAppOption {
 	}
 }
 
-func WithService(healthService healthcheck.HealthCheck) GrpcAppOption {
+func WithService(hc healthcheck.HealthCheck) GrpcAppOption {
 	return func(p *GrpcAppParam) {
-		p.HealthService = healthService
+		p.HealthClient = hc
 	}
 }
 

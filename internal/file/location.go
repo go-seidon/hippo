@@ -22,11 +22,11 @@ func (l *dailyRotate) GetLocation() string {
 	return fmt.Sprintf("%s/%s/%s", year, month, day)
 }
 
-type NewDailyRotateParam struct {
+type DailyRotateParam struct {
 	Clock datetime.Clock
 }
 
-func NewDailyRotate(p NewDailyRotateParam) *dailyRotate {
+func NewDailyRotate(p DailyRotateParam) *dailyRotate {
 	var clock datetime.Clock
 	if p.Clock != nil {
 		clock = p.Clock

@@ -33,13 +33,13 @@ type restApp struct {
 	logger     logging.Logger
 	repository repository.Provider
 
-	healthService healthcheck.HealthCheck
+	healthClient healthcheck.HealthCheck
 }
 
 func (a *restApp) Run(ctx context.Context) error {
 	a.logger.Infof("Running %s:%s", a.config.GetAppName(), a.config.GetAppVersion())
 
-	err := a.healthService.Start(ctx)
+	err := a.healthClient.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (a *restApp) Run(ctx context.Context) error {
 func (a *restApp) Stop(ctx context.Context) error {
 	a.logger.Infof("Stopping %s on: %s", a.config.GetAppName(), a.config.GetAddress())
 
-	err := a.healthService.Stop(ctx)
+	err := a.healthClient.Stop(ctx)
 	if err != nil {
 		a.logger.Errorf("Failed stopping healthcheck, err: %s", err.Error())
 	}
@@ -103,9 +103,9 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		}
 	}
 
-	healthService := p.HealthService
-	if healthService == nil {
-		healthService, err = app.NewDefaultHealthCheck(logger, repo)
+	healthClient := p.HealthClient
+	if healthClient == nil {
+		healthClient, err = app.NewDefaultHealthCheck(logger, repo)
 		if err != nil {
 			return nil, err
 		}
@@ -115,9 +115,9 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	ksuIdentifier := ksuid.NewIdentifier()
 	fileManager := filesystem.NewFileManager()
 	dirManager := filesystem.NewDirectoryManager()
-	locator := file.NewDailyRotate(file.NewDailyRotateParam{})
+	locator := file.NewDailyRotate(file.DailyRotateParam{})
 
-	fileService, err := file.NewFile(file.NewFileParam{
+	fileClient := file.NewFile(file.FileParam{
 		FileRepo:    repo.GetFileRepo(),
 		FileManager: fileManager,
 		Logger:      logger,
@@ -129,9 +129,6 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			UploadDir: p.Config.UploadDirectory,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	jsonSerializer := json.NewSerializer()
 	base64Encoder := base64.NewEncoder()
@@ -145,13 +142,13 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	healthHandler := NewHealthHandler(HealthHandlerParam{
 		Logger:        p.Logger,
 		Serializer:    jsonSerializer,
-		HealthService: healthService,
+		HealthService: healthClient,
 	})
 	fileHandler := NewFileHandler(FileHandlerParam{
 		Logger:      p.Logger,
 		Serializer:  jsonSerializer,
 		Config:      config,
-		FileService: fileService,
+		FileService: fileClient,
 	})
 
 	RequestLogMiddleware, err := NewRequestLogMiddleware(RequestLogMiddlewareParam{
@@ -207,11 +204,11 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	}
 
 	app := &restApp{
-		server:        server,
-		config:        config,
-		logger:        logger,
-		healthService: healthService,
-		repository:    repo,
+		server:       server,
+		config:       config,
+		logger:       logger,
+		healthClient: healthClient,
+		repository:   repo,
 	}
 	return app, nil
 }

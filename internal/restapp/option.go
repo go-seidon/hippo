@@ -31,11 +31,11 @@ func (c *RestAppConfig) GetAddress() string {
 }
 
 type RestAppParam struct {
-	Config        *app.Config
-	Logger        logging.Logger
-	Server        http.Server
-	Repository    repository.Provider
-	HealthService healthcheck.HealthCheck
+	Config       *app.Config
+	Logger       logging.Logger
+	Server       http.Server
+	Repository   repository.Provider
+	HealthClient healthcheck.HealthCheck
 }
 
 type RestAppOption func(*RestAppParam)
@@ -58,9 +58,9 @@ func WithServer(server http.Server) RestAppOption {
 	}
 }
 
-func WithService(healthService healthcheck.HealthCheck) RestAppOption {
+func WithService(hc healthcheck.HealthCheck) RestAppOption {
 	return func(p *RestAppParam) {
-		p.HealthService = healthService
+		p.HealthClient = hc
 	}
 }
 
