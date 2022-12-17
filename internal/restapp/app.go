@@ -21,6 +21,7 @@ import (
 	"github.com/go-seidon/provider/serialization/json"
 	"github.com/go-seidon/provider/validation/govalidator"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type restApp struct {
@@ -110,6 +111,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	server := p.Server
 	if p.Server == nil {
 		e := echo.New()
+		e.Use(middleware.Recover())
 		server = &echoServer{e}
 
 		jsonSerializer := json.NewSerializer()
