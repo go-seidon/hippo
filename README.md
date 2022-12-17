@@ -166,14 +166,11 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Split grpc handler from grpc app
-2. Use gorm for mysql repository
-3. Replace auth by using chariout auth
-4. Add gracefull shutdown rest && grpc
-5. Upload docker image to docker hub
+1. Use gorm for mysql repository
+2. Replace auth by using chariot auth
 
-## Blocker
-1. Update `generate-oapi` script and `github.com/deepmap/oapi-codegen` version once the `File` and `gorilla` support is released
+3. Add gracefull shutdown rest && grpc
+4. Upload docker image to docker hub
 
 ## Nice to have
 1. Simplify factory function interface not returning error

@@ -10,6 +10,7 @@ import (
 	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/grpcauth"
+	"github.com/go-seidon/hippo/internal/grpchandler"
 	"github.com/go-seidon/hippo/internal/grpclog"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
@@ -157,8 +158,15 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	healthCheck := healthcheck.NewHealthCheck(healthcheck.HealthCheckParam{
 		HealthClient: healthClient,
 	})
-	healthCheckHandler := NewHealthHandler(healthCheck)
-	fileHandler := NewFileHandler(fileClient, config)
+	healthCheckHandler := grpchandler.NewHealth(grpchandler.HealthParam{
+		HealthClient: healthCheck,
+	})
+	fileHandler := grpchandler.NewFile(grpchandler.FileParam{
+		FileClient: fileClient,
+		Config: &grpchandler.FileConfig{
+			UploadFormSize: config.UploadFormSize,
+		},
+	})
 	grpcapp.RegisterHealthServiceServer(grpcServer, healthCheckHandler)
 	grpcapp.RegisterFileServiceServer(grpcServer, fileHandler)
 
