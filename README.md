@@ -168,9 +168,7 @@ C:\Windows\System32\drivers\etc\hosts
 ## Todo
 1. Use gorm for mysql repository
 2. Replace auth by using chariot auth
-
-3. Add gracefull shutdown rest && grpc
-4. Upload docker image to docker hub
+3. Upload docker image to docker hub
 
 ## Nice to have
 1. Simplify factory function interface not returning error
