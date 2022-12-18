@@ -112,7 +112,15 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	server := p.Server
 	if p.Server == nil {
 		e := echo.New()
+		e.Debug = p.Config.AppDebug
+		e.HTTPErrorHandler = NewErrorHandler(ErrorHandlerParam{
+			Debug:  p.Config.AppDebug,
+			Logger: logger,
+		})
 		e.Use(middleware.Recover())
+		e.Use(NewRequestLog(RequestLogParam{
+			Logger: logger,
+		}))
 		server = &echoServer{e}
 
 		jsonSerializer := json.NewSerializer()
@@ -160,24 +168,13 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			FileParser: multipart.FileParser,
 		})
 
-		requestLog := restmiddleware.NewRequestLog(restmiddleware.RequestLogParam{
-			Logger: logger,
-			IgnoreURI: map[string]bool{
-				"/health": true,
-			},
-			Header: map[string]string{
-				"X-Correlation-Id": "correlationId",
-			},
-		})
-		logMiddleware := echo.WrapMiddleware(requestLog.Handle)
-
 		basicAuth := restmiddleware.NewBasicAuth(restmiddleware.BasicAuthParam{
 			Serializer:  jsonSerializer,
 			BasicClient: basicClient,
 		})
 		basicAuthMiddleware := echo.WrapMiddleware(basicAuth.Handle)
 
-		basicGroup := e.Group("", logMiddleware)
+		basicGroup := e.Group("")
 		basicGroup.GET("/", basicHandler.GetAppInfo)
 
 		basicAuthGroup := e.Group("", basicAuthMiddleware)
