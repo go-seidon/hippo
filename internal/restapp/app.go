@@ -175,7 +175,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		basicAuthMiddleware := echo.WrapMiddleware(basicAuth.Handle)
 
 		basicGroup := e.Group("")
-		basicGroup.GET("/", basicHandler.GetAppInfo)
+		basicGroup.GET("/info", basicHandler.GetAppInfo)
 
 		basicAuthGroup := e.Group("", basicAuthMiddleware)
 		basicAuthGroup.GET("/health", healthHandler.CheckHealth)

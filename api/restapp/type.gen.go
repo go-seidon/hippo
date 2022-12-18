@@ -112,14 +112,14 @@ type ServerError = ResponseBodyInfo
 // UnauthenticatedAccess defines model for UnauthenticatedAccess.
 type UnauthenticatedAccess = ResponseBodyInfo
 
-// GetAppInfoParams defines parameters for GetAppInfo.
-type GetAppInfoParams struct {
+// CheckHealthParams defines parameters for CheckHealth.
+type CheckHealthParams struct {
 	// correlation id for tracing purposes
 	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
 }
 
-// CheckHealthParams defines parameters for CheckHealth.
-type CheckHealthParams struct {
+// GetAppInfoParams defines parameters for GetAppInfo.
+type GetAppInfoParams struct {
 	// correlation id for tracing purposes
 	XCorrelationId *CorrelationId `json:"X-Correlation-Id,omitempty"`
 }
