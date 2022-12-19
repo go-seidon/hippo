@@ -72,7 +72,6 @@ type RetrieveFileResult struct {
 	MimeType  string
 	Extension string
 	Size      int64
-	DeletedAt *int64
 }
 
 type DeleteFileParam struct {
@@ -116,15 +115,17 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 				Code:    status.RESOURCE_NOTFOUND,
 				Message: "file is not found",
 			}
-		} else if errors.Is(err, repository.ErrDeleted) {
-			return nil, &system.Error{
-				Code:    status.RESOURCE_NOTFOUND,
-				Message: "file is deleted",
-			}
 		}
 		return nil, &system.Error{
 			Code:    status.ACTION_FAILED,
 			Message: err.Error(),
+		}
+	}
+
+	if retrieve.DeletedAt != nil {
+		return nil, &system.Error{
+			Code:    status.RESOURCE_NOTFOUND,
+			Message: "file is deleted",
 		}
 	}
 
@@ -153,7 +154,7 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 		UniqueId:  retrieve.UniqueId,
 		Name:      retrieve.Name,
 		Path:      retrieve.Path,
-		MimeType:  retrieve.MimeType,
+		MimeType:  retrieve.Mimetype,
 		Extension: retrieve.Extension,
 		Size:      retrieve.Size,
 	}
@@ -275,7 +276,7 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 		}
 	}
 
-	deleteion, err := s.fileRepo.DeleteFile(ctx, repository.DeleteFileParam{
+	deletion, err := s.fileRepo.DeleteFile(ctx, repository.DeleteFileParam{
 		UniqueId: p.FileId,
 		DeleteFn: NewDeleteFn(s.fileManager),
 	})
@@ -285,12 +286,7 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 				Code:    status.RESOURCE_NOTFOUND,
 				Message: "file is deleted",
 			}
-		} else if errors.Is(err, repository.ErrNotFound) {
-			return nil, &system.Error{
-				Code:    status.RESOURCE_NOTFOUND,
-				Message: "file is not found",
-			}
-		} else if errors.Is(err, ErrNotFound) {
+		} else if errors.Is(err, repository.ErrNotFound) || errors.Is(err, ErrNotFound) {
 			return nil, &system.Error{
 				Code:    status.RESOURCE_NOTFOUND,
 				Message: "file is not found",
@@ -307,7 +303,7 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 			Code:    status.ACTION_SUCCESS,
 			Message: "success delete file",
 		},
-		DeletedAt: deleteion.DeletedAt,
+		DeletedAt: deletion.DeletedAt,
 	}
 	return res, nil
 }

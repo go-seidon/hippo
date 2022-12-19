@@ -27,7 +27,7 @@ type grpcApp struct {
 	server       Server
 	config       *GrpcAppConfig
 	logger       logging.Logger
-	repository   repository.Provider
+	repository   repository.Repository
 	healthClient health.HealthCheck
 }
 
@@ -114,7 +114,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	locator := file.NewDailyRotate(file.DailyRotateParam{})
 
 	fileClient := file.NewFile(file.FileParam{
-		FileRepo:    repo.GetFileRepo(),
+		FileRepo:    repo.GetFile(),
 		FileManager: fileManager,
 		Logger:      logger,
 		Identifier:  ksuIdentifier,
@@ -130,7 +130,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	bcryptHasher := bcrypt.NewHasher()
 
 	basicClient := auth.NewBasicAuth(auth.NewBasicAuthParam{
-		AuthRepo: repo.GetAuthRepo(),
+		AuthRepo: repo.GetAuth(),
 		Encoder:  base64Encoder,
 		Hasher:   bcryptHasher,
 	})

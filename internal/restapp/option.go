@@ -33,7 +33,7 @@ type RestAppParam struct {
 	Config       *app.Config
 	Logger       logging.Logger
 	Server       Server
-	Repository   repository.Provider
+	Repository   repository.Repository
 	HealthClient health.HealthCheck
 }
 
@@ -63,7 +63,7 @@ func WithService(hc health.HealthCheck) RestAppOption {
 	}
 }
 
-func WithRepository(repo repository.Provider) RestAppOption {
+func WithRepository(repo repository.Repository) RestAppOption {
 	return func(p *RestAppParam) {
 		p.Repository = repo
 	}
