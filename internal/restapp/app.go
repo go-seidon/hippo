@@ -118,6 +118,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			Logger: logger,
 		})
 		e.Use(middleware.Recover())
+		e.Use(middleware.RequestID())
 		e.Use(NewRequestLog(RequestLogParam{
 			Logger: logger,
 		}))
@@ -144,6 +145,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			FileManager: fileManager,
 			Logger:      logger,
 			Identifier:  ksuIdentifier,
+			Clock:       clock,
 			DirManager:  dirManager,
 			Locator:     locator,
 			Validator:   govalidator,
