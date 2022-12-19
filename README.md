@@ -166,24 +166,30 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Use gorm for mysql repository
-2. Replace auth by using chariot auth
-3. Upload docker image to docker hub
+1. Add auth management API
+- mongo repo implementation
+- rest api
+2. Rename `config/local.yml` to `config.default.yml`
+3. Devs: Observability
+- prometheus (metric exporter)
+4. Devs: Monitoring
+- grafana data visualization
+5. Devs: Tracing
+- open telemetry (https://opentelemetry.io/)
+6. Upload docker image to docker hub
 
 ## Nice to have
-1. Simplify factory function interface not returning error
-2. Upload location strategy
-3. Add repo: `postgre`
-4. Add tracing: `logging.WithReqCtx(ctx)` to parse `correlationId`
-5. Update github workflow (cqc.yml) instead of running docker-compose prefer to use mongo docker services
-6. Separate unit test and integration test workflow (cqc.yml)
+1. Upload location strategy
+2. Add repo: `postgre`
+3. Update github workflow (cqc.yml) instead of running docker-compose prefer o use mongo docker services
+4. Separate unit test and integration test workflow (cqc.yml)
 
 ## Tech Debt
-1. Separate findFile query in DeleteFile and RetrieveFile repository/mysql
-2. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
-3. Change NewDailyRotate using optional param
+1. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
+2. Change NewDailyRotate using optional param
 
 ## Issue
 1. Verify script EOL
 If you're using window make sure to change the bash script from CRLF to LF (https://stackoverflow.com/questions/29140377/sh-file-not-found)
+2. Gorm not inserting has many association, issue since gorm@v1.22.5 [ref](https://github.com/go-gorm/gorm/issues/5754). Current solution is to use gorm@v1.22.4, mysql@v1.2.1, dbresolver@v1.1.0
 
