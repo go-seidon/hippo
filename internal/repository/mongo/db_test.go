@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -63,6 +64,8 @@ type InsertAuthClientParam struct {
 	Name         string
 	ClientId     string
 	ClientSecret string
+	Type         string
+	Status       string
 	DbName       string
 }
 
@@ -86,6 +89,14 @@ func InsertAuthClient(dbClient *mongo.Client, p InsertAuthClientParam) error {
 			Key:   "client_secret",
 			Value: p.ClientSecret,
 		},
+		{
+			Key:   "type",
+			Value: p.Type,
+		},
+		{
+			Key:   "status",
+			Value: p.Status,
+		},
 	}
 
 	_, err := cl.InsertOne(ctx, data)
@@ -104,6 +115,7 @@ type InsertFileParam struct {
 	Size      int64
 	CreatedAt int64
 	UpdatedAt int64
+	DeletedAt int64
 	DbName    string
 }
 
@@ -112,6 +124,8 @@ func InsertFile(dbClient *mongo.Client, p InsertFileParam) error {
 	ctx := context.Background()
 	createdAt := time.UnixMilli(p.CreatedAt).UTC()
 	updatedAt := time.UnixMilli(p.UpdatedAt).UTC()
+	deletedAt := time.UnixMilli(p.DeletedAt).UTC()
+
 	data := bson.D{
 		{
 			Key:   "_id",
@@ -145,6 +159,13 @@ func InsertFile(dbClient *mongo.Client, p InsertFileParam) error {
 			Key:   "updated_at",
 			Value: updatedAt,
 		},
+	}
+
+	if p.DeletedAt != 0 {
+		data = append(data, primitive.E{
+			Key:   "deleted_at",
+			Value: deletedAt,
+		})
 	}
 
 	_, err := cl.InsertOne(ctx, data)
