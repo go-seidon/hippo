@@ -166,7 +166,11 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-1. Rename `config/local.yml` to `config.default.yml`
+0. App enhancement
+- Rename `config/local.yml` to `config.default.yml`
+- Add db indexes (mongo + mysql)
+- Change mariadb -> mysql
+- Change docker image name (db-r1 -> db-1, etc)
 2. Devs: Observability
 - prometheus (metric exporter)
 3. Devs: Monitoring
