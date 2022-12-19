@@ -1,5 +1,5 @@
 
-CREATE TABLE `file` (
+CREATE TABLE IF NOT EXISTS `file` (
   `id` VARCHAR(128) NOT NULL,
   `name` VARCHAR(4096) NOT NULL,
   `path` TEXT NOT NULL,

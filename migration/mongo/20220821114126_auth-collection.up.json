@@ -11,6 +11,12 @@
           "name": {
             "bsonType": "string"
           },
+          "type": {
+            "bsonType": "string"
+          },
+          "status": {
+            "bsonType": "string"
+          },
           "client_id": {
             "bsonType": "string"
           },
@@ -26,6 +32,8 @@
         },
         "required": [
           "name",
+          "type",
+          "status",
           "client_id",
           "client_secret"
         ]
