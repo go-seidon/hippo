@@ -7,9 +7,9 @@ const (
 	PROVIDER_MONGO = "mongo"
 )
 
-type Provider interface {
+type Repository interface {
 	Init(ctx context.Context) error
 	Ping(ctx context.Context) error
-	GetAuthRepo() Auth
-	GetFileRepo() File
+	GetAuth() Auth
+	GetFile() File
 }
