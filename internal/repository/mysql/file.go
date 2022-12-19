@@ -157,7 +157,7 @@ func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*r
 		return nil, findRes.Error
 	}
 
-	if !currentFile.DeletedAt.Valid {
+	if currentFile.DeletedAt.Valid {
 		txRes := tx.Rollback()
 		if txRes.Error != nil {
 			return nil, txRes.Error

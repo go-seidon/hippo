@@ -831,7 +831,7 @@ var _ = Describe("File Repository", func() {
 					return nil
 				},
 			}
-			findStmt = regexp.QuoteMeta("SELECT `id`,`deleted_at` FROM `file` WHERE id = ? ORDER BY `file`.`id` LIMIT 1")
+			findStmt = regexp.QuoteMeta("SELECT id, deleted_at FROM `file` WHERE id = ? ORDER BY `file`.`id` LIMIT 1")
 			deleteStmt = regexp.QuoteMeta("UPDATE `file` SET `deleted_at`=?,`updated_at`=? WHERE id = ?")
 			checkStmt = regexp.QuoteMeta("SELECT id, path, deleted_at FROM `file` WHERE id = ? ORDER BY `file`.`id")
 			findRows = sqlmock.
