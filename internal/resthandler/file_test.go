@@ -30,6 +30,7 @@ var _ = Describe("File Handler", func() {
 			h          func(ctx echo.Context) error
 			rec        *httptest.ResponseRecorder
 			fileClient *mock_file.MockFile
+			fileData   *mock_io.MockReadAtSeekCloser
 			uploadRes  *file.UploadFileResult
 		)
 
@@ -86,11 +87,12 @@ var _ = Describe("File Handler", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileClient = mock_file.NewMockFile(ctrl)
+			fileData = mock_io.NewMockReadAtSeekCloser(ctrl)
 			fileHandler := resthandler.NewFile(resthandler.FileParam{
 				FileClient: fileClient,
 				FileParser: func(h *mime_multipart.FileHeader) (*multipart.FileInfo, error) {
 					return &multipart.FileInfo{
-						Data:      nil,
+						Data:      fileData,
 						Name:      "dolphin 22",
 						Size:      23342,
 						Extension: "jpg",
@@ -156,6 +158,12 @@ var _ = Describe("File Handler", func() {
 
 		When("there is invalid data", func() {
 			It("should return error", func() {
+				fileData.
+					EXPECT().
+					Close().
+					Return(nil).
+					Times(1)
+
 				fileClient.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx.Request().Context()), gomock.Any()).
@@ -179,6 +187,12 @@ var _ = Describe("File Handler", func() {
 
 		When("failed upload file", func() {
 			It("should return error", func() {
+				fileData.
+					EXPECT().
+					Close().
+					Return(nil).
+					Times(1)
+
 				fileClient.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx.Request().Context()), gomock.Any()).
@@ -202,6 +216,12 @@ var _ = Describe("File Handler", func() {
 
 		When("success upload file", func() {
 			It("should return result", func() {
+				fileData.
+					EXPECT().
+					Close().
+					Return(nil).
+					Times(1)
+
 				fileClient.
 					EXPECT().
 					UploadFile(gomock.Eq(ctx.Request().Context()), gomock.Any()).
@@ -346,6 +366,12 @@ var _ = Describe("File Handler", func() {
 
 		When("success retrieve file", func() {
 			It("should return error", func() {
+				fileData.
+					EXPECT().
+					Close().
+					Return(nil).
+					Times(1)
+
 				fileData.
 					EXPECT().
 					Read(gomock.Any()).

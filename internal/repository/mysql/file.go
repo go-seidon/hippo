@@ -144,7 +144,7 @@ func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*r
 
 	currentFile := &File{}
 	findRes := tx.
-		Select("id").
+		Select("id, deleted_at").
 		First(currentFile, "id = ?", p.UniqueId)
 	if findRes.Error != nil {
 		txRes := tx.Rollback()
@@ -155,6 +155,14 @@ func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*r
 			return nil, repository.ErrNotFound
 		}
 		return nil, findRes.Error
+	}
+
+	if currentFile.DeletedAt.Valid {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, repository.ErrDeleted
 	}
 
 	updateRes := tx.
@@ -174,7 +182,7 @@ func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*r
 
 	file := &File{}
 	checkRes := tx.
-		Select(`id, deleted_at`).
+		Select(`id, path, deleted_at`).
 		First(file, "id = ?", p.UniqueId)
 	if checkRes.Error != nil {
 		txRes := tx.Rollback()

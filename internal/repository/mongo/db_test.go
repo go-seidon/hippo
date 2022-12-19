@@ -66,6 +66,8 @@ type InsertAuthClientParam struct {
 	ClientSecret string
 	Type         string
 	Status       string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 	DbName       string
 }
 
@@ -97,6 +99,20 @@ func InsertAuthClient(dbClient *mongo.Client, p InsertAuthClientParam) error {
 			Key:   "status",
 			Value: p.Status,
 		},
+	}
+
+	if !p.CreatedAt.IsZero() {
+		data = append(data, primitive.E{
+			Key:   "created_at",
+			Value: p.CreatedAt,
+		})
+	}
+
+	if !p.UpdatedAt.IsZero() {
+		data = append(data, primitive.E{
+			Key:   "updated_at",
+			Value: p.UpdatedAt,
+		})
 	}
 
 	_, err := cl.InsertOne(ctx, data)

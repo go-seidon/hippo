@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/identity"
 	"github.com/go-seidon/provider/logging"
 	"github.com/go-seidon/provider/status"
@@ -88,6 +89,7 @@ type file struct {
 	fileManager filesystem.FileManager
 	dirManager  filesystem.DirectoryManager
 	identifier  identity.Identifier
+	clock       datetime.Clock
 	log         logging.Logger
 	locator     UploadLocation
 	validator   validation.Validator
@@ -232,6 +234,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		path = fmt.Sprintf("%s.%s", path, p.fileExtension)
 	}
 
+	currentTs := s.clock.Now()
 	cRes, err := s.fileRepo.CreateFile(ctx, repository.CreateFileParam{
 		UniqueId:  uniqueId,
 		Path:      path,
@@ -239,6 +242,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 		Mimetype:  p.fileMimetype,
 		Extension: p.fileExtension,
 		Size:      p.fileSize,
+		CreatedAt: currentTs,
 		CreateFn:  NewCreateFn(data.Bytes(), s.fileManager),
 	})
 	if err != nil {
@@ -276,9 +280,11 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 		}
 	}
 
+	currentTs := s.clock.Now()
 	deletion, err := s.fileRepo.DeleteFile(ctx, repository.DeleteFileParam{
-		UniqueId: p.FileId,
-		DeleteFn: NewDeleteFn(s.fileManager),
+		UniqueId:  p.FileId,
+		DeletedAt: currentTs,
+		DeleteFn:  NewDeleteFn(s.fileManager),
 	})
 	if err != nil {
 		if errors.Is(err, repository.ErrDeleted) {
@@ -367,6 +373,7 @@ type FileParam struct {
 	DirManager  filesystem.DirectoryManager
 	Logger      logging.Logger
 	Identifier  identity.Identifier
+	Clock       datetime.Clock
 	Locator     UploadLocation
 	Validator   validation.Validator
 	Config      *FileConfig
@@ -378,6 +385,7 @@ func NewFile(p FileParam) *file {
 		fileManager: p.FileManager,
 		dirManager:  p.DirManager,
 		identifier:  p.Identifier,
+		clock:       p.Clock,
 		log:         p.Logger,
 		locator:     p.Locator,
 		config:      p.Config,

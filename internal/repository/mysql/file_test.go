@@ -831,15 +831,15 @@ var _ = Describe("File Repository", func() {
 					return nil
 				},
 			}
-			findStmt = regexp.QuoteMeta("SELECT `id` FROM `file` WHERE id = ? ORDER BY `file`.`id` LIMIT 1")
+			findStmt = regexp.QuoteMeta("SELECT id, deleted_at FROM `file` WHERE id = ? ORDER BY `file`.`id` LIMIT 1")
 			deleteStmt = regexp.QuoteMeta("UPDATE `file` SET `deleted_at`=?,`updated_at`=? WHERE id = ?")
-			checkStmt = regexp.QuoteMeta("SELECT id, deleted_at FROM `file` WHERE id = ? ORDER BY `file`.`id")
+			checkStmt = regexp.QuoteMeta("SELECT id, path, deleted_at FROM `file` WHERE id = ? ORDER BY `file`.`id")
 			findRows = sqlmock.
-				NewRows([]string{"id"}).
-				AddRow("id")
-			checkRows = sqlmock.
 				NewRows([]string{"id", "deleted_at"}).
-				AddRow("id", currentTs.UnixMilli())
+				AddRow("id", nil)
+			checkRows = sqlmock.
+				NewRows([]string{"id", "path", "deleted_at"}).
+				AddRow("id", "path", currentTs.UnixMilli())
 		})
 
 		AfterEach(func() {
@@ -920,6 +920,53 @@ var _ = Describe("File Repository", func() {
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(repository.ErrNotFound))
+			})
+		})
+
+		When("failed rollback during file deleted", func() {
+			It("should return error", func() {
+				dbClient.
+					ExpectBegin()
+
+				findRows := sqlmock.
+					NewRows([]string{"id", "deleted_at"}).
+					AddRow("id", currentTs.UnixMilli())
+				dbClient.
+					ExpectQuery(findStmt).
+					WithArgs(p.UniqueId).
+					WillReturnRows(findRows)
+
+				dbClient.
+					ExpectRollback().
+					WillReturnError(fmt.Errorf("rollback error"))
+
+				res, err := fileRepo.DeleteFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(fmt.Errorf("rollback error")))
+			})
+		})
+
+		When("file is already deleted", func() {
+			It("should return error", func() {
+				dbClient.
+					ExpectBegin()
+
+				findRows := sqlmock.
+					NewRows([]string{"id", "deleted_at"}).
+					AddRow("id", currentTs.UnixMilli())
+				dbClient.
+					ExpectQuery(findStmt).
+					WithArgs(p.UniqueId).
+					WillReturnRows(findRows)
+
+				dbClient.
+					ExpectRollback()
+
+				res, err := fileRepo.DeleteFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(repository.ErrDeleted))
 			})
 		})
 

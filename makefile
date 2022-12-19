@@ -59,6 +59,7 @@ test-watch-integration:
 .PHONY: generate-mock
 generate-mock:
 	mockgen -package=mock_grpcapp -source api/grpcapp/file_grpc.pb.go -destination=api/grpcapp/mock/file_grpc_mock.go
+	mockgen -package=mock_auth -source internal/auth/client.go -destination=internal/auth/mock/client_mock.go
 	mockgen -package=mock_auth -source internal/auth/basic.go -destination=internal/auth/mock/basic_mock.go
 	mockgen -package=mock_file -source internal/file/file.go -destination=internal/file/mock/file_mock.go
 	mockgen -package=mock_file -source internal/file/location.go -destination=internal/file/mock/location_mock.go
@@ -150,7 +151,7 @@ dummy: ## used by migrate script as do-nothing targets
 
 
 MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3308)/hippo?x-tls-insecure-skip-verify=true
-MONGO_DB_URI=mongodb://admin:123456@localhost:27030/hippo
+MONGO_DB_URI=mongodb://admin:123456@localhost:27031/hippo
 
 .PHONY: migrate-mysql
 migrate-mysql:

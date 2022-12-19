@@ -11,6 +11,6 @@ CREATE TABLE IF NOT EXISTS `file` (
   `deleted_at` BIGINT NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) 
-DEFAULT CHARACTER SET utf8
-COLLATE utf8_unicode_ci
+DEFAULT CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci
 ENGINE = InnoDB;

@@ -13,7 +13,7 @@ server-id = 1
 log_bin = /var/log/mysql/mysql-bin.log
 
 # enum: ROW, STATEMENT, MIXED
-binlog_format = ROW 
+# binlog_format = MIXED 
 
 # database to be replicated
 # add more database by entering new entry, e.g:

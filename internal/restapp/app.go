@@ -14,6 +14,7 @@ import (
 	"github.com/go-seidon/hippo/internal/resthandler"
 	"github.com/go-seidon/hippo/internal/restmiddleware"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
+	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
 	"github.com/go-seidon/provider/health"
@@ -117,6 +118,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			Logger: logger,
 		})
 		e.Use(middleware.Recover())
+		e.Use(middleware.RequestID())
 		e.Use(NewRequestLog(RequestLogParam{
 			Logger: logger,
 		}))
@@ -129,6 +131,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		ksuIdentifier := ksuid.NewIdentifier()
 		fileManager := filesystem.NewFileManager()
 		dirManager := filesystem.NewDirectoryManager()
+		clock := datetime.NewClock()
 		locator := file.NewDailyRotate(file.DailyRotateParam{})
 
 		basicClient := auth.NewBasicAuth(auth.NewBasicAuthParam{
@@ -142,6 +145,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			FileManager: fileManager,
 			Logger:      logger,
 			Identifier:  ksuIdentifier,
+			Clock:       clock,
 			DirManager:  dirManager,
 			Locator:     locator,
 			Validator:   govalidator,
@@ -162,6 +166,18 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		healthHandler := resthandler.NewHealth(resthandler.HealthParam{
 			HealthClient: healthCheck,
 		})
+
+		authClient := auth.NewAuthClient(auth.AuthClientParam{
+			Validator:  govalidator,
+			Hasher:     bcryptHasher,
+			Identifier: ksuIdentifier,
+			Clock:      clock,
+			AuthRepo:   repo.GetAuth(),
+		})
+		authHandler := resthandler.NewAuth(resthandler.AuthParam{
+			AuthClient: authClient,
+		})
+
 		fileHandler := resthandler.NewFile(resthandler.FileParam{
 			FileClient: fileClient,
 			FileParser: multipart.FileParser,
@@ -178,6 +194,10 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 
 		basicAuthGroup := e.Group("", basicAuthMiddleware)
 		basicAuthGroup.GET("/health", healthHandler.CheckHealth)
+		basicAuthGroup.POST("/v1/auth-client", authHandler.CreateClient)
+		basicAuthGroup.POST("/v1/auth-client/search", authHandler.SearchClient)
+		basicAuthGroup.GET("/v1/auth-client/:id", authHandler.GetClientById)
+		basicAuthGroup.PUT("/v1/auth-client/:id", authHandler.UpdateClientById)
 		basicAuthGroup.POST("/v1/file", fileHandler.UploadFile)
 		basicAuthGroup.GET("/v1/file/:id", fileHandler.RetrieveFileById)
 		basicAuthGroup.DELETE("/v1/file/:id", fileHandler.DeleteFileById)

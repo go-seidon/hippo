@@ -32,6 +32,7 @@ func (h *fileHandler) UploadFile(ctx echo.Context) error {
 			Message: ferr.Error(),
 		})
 	}
+	defer fileInfo.Data.Close()
 
 	uploadFile, err := h.fileClient.UploadFile(
 		ctx.Request().Context(),
@@ -86,6 +87,7 @@ func (h *fileHandler) RetrieveFileById(ctx echo.Context) error {
 			Message: err.Message,
 		})
 	}
+	defer findFile.Data.Close()
 
 	header := ctx.Response().Header()
 	header.Set("X-File-Name", findFile.Name)

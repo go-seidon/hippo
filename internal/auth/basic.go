@@ -81,7 +81,7 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 	}
 
 	res := &CheckCredentialResult{TokenValid: false}
-	oClient, err := a.authRepo.FindClient(ctx, repository.FindClientParam{
+	authClient, err := a.authRepo.FindClient(ctx, repository.FindClientParam{
 		ClientId: client.ClientId,
 	})
 	if err != nil {
@@ -91,7 +91,11 @@ func (a *basicAuth) CheckCredential(ctx context.Context, p CheckCredentialParam)
 		return nil, err
 	}
 
-	err = a.hasher.Verify(oClient.ClientSecret, client.ClientSecret)
+	if authClient.Status != STATUS_ACTIVE {
+		return res, nil
+	}
+
+	err = a.hasher.Verify(authClient.ClientSecret, client.ClientSecret)
 	if err != nil {
 		return res, nil
 	}

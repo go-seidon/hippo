@@ -14,6 +14,7 @@ import (
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
+	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
@@ -300,6 +301,7 @@ var _ = Describe("File", func() {
 			logger         *mock_logging.MockLogger
 			reader         *mock_io.MockReader
 			identifier     *mock_identifier.MockIdentifier
+			clock          *mock_datetime.MockClock
 			locator        *mock_file.MockUploadLocation
 			validator      *mock_validation.MockValidator
 			s              file.File
@@ -311,7 +313,7 @@ var _ = Describe("File", func() {
 		)
 
 		BeforeEach(func() {
-			currentTs = time.Now()
+			currentTs = time.Now().UTC()
 			ctx = context.Background()
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
@@ -320,6 +322,7 @@ var _ = Describe("File", func() {
 			dirManager = mock_filesystem.NewMockDirectoryManager(ctrl)
 			logger = mock_logging.NewMockLogger(ctrl)
 			identifier = mock_identifier.NewMockIdentifier(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 			locator = mock_file.NewMockUploadLocation(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
@@ -329,6 +332,7 @@ var _ = Describe("File", func() {
 				DirManager:  dirManager,
 				Logger:      logger,
 				Identifier:  identifier,
+				Clock:       clock,
 				Locator:     locator,
 				Validator:   validator,
 				Config: &file.FileConfig{
@@ -598,6 +602,12 @@ var _ = Describe("File", func() {
 					Return("mock-unique-id", nil).
 					Times(1)
 
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					CreateFile(gomock.Eq(ctx), gomock.Any()).
@@ -647,6 +657,12 @@ var _ = Describe("File", func() {
 					EXPECT().
 					GenerateId().
 					Return("mock-unique-id", nil).
+					Times(1)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
 					Times(1)
 
 				fileRepo.
@@ -767,9 +783,11 @@ var _ = Describe("File", func() {
 	Context("DeleteFile function", Label("unit"), func() {
 		var (
 			ctx         context.Context
+			currentTs   time.Time
 			p           file.DeleteFileParam
 			fileRepo    *mock_repository.MockFile
 			fileManager *mock_filesystem.MockFileManager
+			clock       *mock_datetime.MockClock
 			log         *mock_logging.MockLogger
 			validator   *mock_validation.MockValidator
 			s           file.File
@@ -778,7 +796,7 @@ var _ = Describe("File", func() {
 		)
 
 		BeforeEach(func() {
-			currentTs := time.Now()
+			currentTs = time.Now().UTC()
 			ctx = context.Background()
 			p = file.DeleteFileParam{
 				FileId: "mock-file-id",
@@ -789,6 +807,7 @@ var _ = Describe("File", func() {
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
 			dirManager := mock_filesystem.NewMockDirectoryManager(ctrl)
 			identifier := mock_identifier.NewMockIdentifier(ctrl)
+			clock = mock_datetime.NewMockClock(ctrl)
 			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
@@ -798,6 +817,7 @@ var _ = Describe("File", func() {
 				DirManager:  dirManager,
 				Logger:      log,
 				Identifier:  identifier,
+				Clock:       clock,
 				Locator:     locator,
 				Validator:   validator,
 				Config: &file.FileConfig{
@@ -849,6 +869,12 @@ var _ = Describe("File", func() {
 					Return(nil).
 					Times(1)
 
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					DeleteFile(gomock.Eq(ctx), gomock.Any()).
@@ -869,6 +895,12 @@ var _ = Describe("File", func() {
 					EXPECT().
 					Validate(gomock.Eq(p)).
 					Return(nil).
+					Times(1)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
 					Times(1)
 
 				fileRepo.
@@ -893,6 +925,12 @@ var _ = Describe("File", func() {
 					Return(nil).
 					Times(1)
 
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
+					Times(1)
+
 				fileRepo.
 					EXPECT().
 					DeleteFile(gomock.Eq(ctx), gomock.Any()).
@@ -913,6 +951,12 @@ var _ = Describe("File", func() {
 					EXPECT().
 					Validate(gomock.Eq(p)).
 					Return(nil).
+					Times(1)
+
+				clock.
+					EXPECT().
+					Now().
+					Return(currentTs).
 					Times(1)
 
 				fileRepo.

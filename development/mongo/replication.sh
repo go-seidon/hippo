@@ -3,19 +3,19 @@
 # variable definition
 replica_set_name='rs-hippo'
 
-h1_ct_name='mongo-db-1'
+h1_ct_name='hippo_mongo-db-1_1'
 h1_db_host='localhost'
 h1_db_port='27031'
 h1_db_root_username='root'
 h1_db_root_password='toor'
 
-h2_ct_name='mongo-db-2'
+h2_ct_name='hippo_mongo-db-2_1'
 h2_db_host='localhost'
 h2_db_port='27032'
 h2_db_root_username='root'
 h2_db_root_password='toor'
 
-h3_ct_name='mongo-db-3'
+h3_ct_name='hippo_mongo-db-3_1'
 h3_db_host='localhost'
 h3_db_port='27033'
 h3_db_root_username='root'
@@ -74,7 +74,7 @@ sleep 3
 
 # 6. initiate replica set with default primary member
 echo "[6] initiate replica set: $replica_set_name...  "
-h1_init_res=`docker exec $h1_ct_name sh -c "./data/script/rs-init.sh"`
+h1_init_res=`docker exec $h1_ct_name sh -c "chmod +x ./data/script/rs-init.sh && ./data/script/rs-init.sh"`
 echo "init status            : $h1_init_res"
 printf "[DONE]\n\n"
 
