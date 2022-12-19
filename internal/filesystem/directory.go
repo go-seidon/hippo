@@ -31,16 +31,14 @@ type directoryManager struct {
 
 func (dm *directoryManager) IsDirectoryExists(ctx context.Context, p IsDirectoryExistsParam) (bool, error) {
 	_, err := os.Stat(p.Path)
-	if err == nil {
-		return true, nil
+	if err != nil {
+		notExists := errors.Is(err, os.ErrNotExist)
+		if notExists {
+			return false, nil
+		}
+		return false, err
 	}
-
-	notExists := errors.Is(err, os.ErrNotExist)
-	if notExists {
-		return false, nil
-	}
-
-	return false, err
+	return true, nil
 }
 
 func (dm *directoryManager) CreateDir(ctx context.Context, p CreateDirParam) (*CreateDirResult, error) {
@@ -49,9 +47,9 @@ func (dm *directoryManager) CreateDir(ctx context.Context, p CreateDirParam) (*C
 		return nil, err
 	}
 
-	currentTimestamp := time.Now()
+	currentTs := time.Now()
 	res := &CreateDirResult{
-		CreatedAt: currentTimestamp,
+		CreatedAt: currentTs,
 	}
 	return res, nil
 }

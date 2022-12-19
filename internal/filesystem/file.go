@@ -50,32 +50,29 @@ type fileManager struct {
 
 func (fm *fileManager) IsFileExists(ctx context.Context, p IsFileExistsParam) (bool, error) {
 	_, err := os.Stat(p.Path)
-	if err == nil {
-		return true, nil
+	if err != nil {
+		notExists := errors.Is(err, os.ErrNotExist)
+		if notExists {
+			return false, nil
+		}
+		return false, err
 	}
-
-	notExists := errors.Is(err, os.ErrNotExist)
-	if notExists {
-		return false, nil
-	}
-
-	return false, err
+	return true, nil
 }
 
 func (fm *fileManager) OpenFile(ctx context.Context, p OpenFileParam) (*OpenFileResult, error) {
 	file, err := os.Open(p.Path)
-	if err == nil {
-		res := &OpenFileResult{
-			File: file,
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, ErrorFileNotFound
 		}
-		return res, nil
+		return nil, err
 	}
 
-	if errors.Is(err, os.ErrNotExist) {
-		return nil, ErrorFileNotFound
+	res := &OpenFileResult{
+		File: file,
 	}
-
-	return nil, err
+	return res, nil
 }
 
 // @note: save file/overwrite if exists
@@ -85,27 +82,27 @@ func (fm *fileManager) SaveFile(ctx context.Context, p SaveFileParam) (*SaveFile
 		return nil, err
 	}
 
-	currentTimestamp := time.Now()
+	currentTs := time.Now()
 	res := &SaveFileResult{
-		SavedAt: currentTimestamp,
+		SavedAt: currentTs,
 	}
 	return res, nil
 }
 
 func (fm *fileManager) RemoveFile(ctx context.Context, p RemoveFileParam) (*RemoveFileResult, error) {
 	err := os.Remove(p.Path)
-	if err == nil {
-		res := &RemoveFileResult{
-			RemovedAt: time.Now(),
+	if err != nil {
+		notExists := errors.Is(err, os.ErrNotExist)
+		if notExists {
+			return nil, ErrorFileNotFound
 		}
-		return res, nil
+		return nil, err
 	}
 
-	notExists := errors.Is(err, os.ErrNotExist)
-	if notExists {
-		return nil, ErrorFileNotFound
+	res := &RemoveFileResult{
+		RemovedAt: time.Now(),
 	}
-	return nil, err
+	return res, nil
 }
 
 func NewFileManager() *fileManager {
