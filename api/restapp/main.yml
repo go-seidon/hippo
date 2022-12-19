@@ -22,6 +22,12 @@ paths:
     $ref: "./path/file.yml"
   /v1/file/{id}:
     $ref: "./path/file_id.yml"
+  /v1/auth-client:
+    $ref: "./path/auth_client.yml"
+  /v1/auth-client/search:
+    $ref: "./path/auth_client_search.yml"
+  /v1/auth-client/{id}:
+    $ref: "./path/auth_client_id.yml"
 components:
   parameters:
     ObjectId: 
@@ -31,12 +37,16 @@ components:
   schemas:
     ResponseBodyInfo:
       $ref: "./schema/response_body_info.yml"
+    RequestPagination:
+      $ref: "./schema/request_pagination.yml"
 
+    # app
     GetAppInfoResponse:
       $ref: "./operation/get-app-info/response_body.yml"
     GetAppInfoData:
       $ref: "./operation/get-app-info/response_data.yml"
 
+    # health
     CheckHealthResponse:
       $ref: "./operation/check-health/response_body.yml"
     CheckHealthData:
@@ -44,6 +54,7 @@ components:
     CheckHealthDetail:
       $ref: "./operation/check-health/response_detail.yml"
 
+    # file
     DeleteFileByIdResponse:
       $ref: "./operation/delete-file-by-id/response_body.yml"
     DeleteFileByIdData:
@@ -58,6 +69,39 @@ components:
       $ref: "./operation/upload-file/response_body.yml"
     UploadFileData:
       $ref: "./operation/upload-file/response_data.yml"
+
+    # auth client management
+    CreateAuthClientRequest:
+      $ref: "./operation/create-auth-client/request_body.yml"
+    CreateAuthClientResponse:
+      $ref: "./operation/create-auth-client/response_body.yml"
+    CreateAuthClientData:
+      $ref: "./operation/create-auth-client/response_data.yml"
+
+    UpdateAuthClientByIdRequest:
+      $ref: "./operation/update-auth-client-by-id/request_body.yml"
+    UpdateAuthClientByIdResponse:
+      $ref: "./operation/update-auth-client-by-id/response_body.yml"
+    UpdateAuthClientByIdData:
+      $ref: "./operation/update-auth-client-by-id/response_data.yml"
+
+    GetAuthClientByIdResponse:
+      $ref: "./operation/get-auth-client-by-id/response_body.yml"
+    GetAuthClientByIdData:
+      $ref: "./operation/get-auth-client-by-id/response_data.yml"
+
+    SearchAuthClientRequest:
+      $ref: "./operation/search-auth-client/request_body.yml"
+    SearchAuthClientFilter:
+      $ref: "./operation/search-auth-client/request_filter.yml"
+    SearchAuthClientResponse:
+      $ref: "./operation/search-auth-client/response_body.yml"
+    SearchAuthClientData:
+      $ref: "./operation/search-auth-client/response_data.yml"
+    SearchAuthClientSummary:
+      $ref: "./operation/search-auth-client/response_summary.yml"
+    SearchAuthClientItem:
+      $ref: "./operation/search-auth-client/response_item.yml"
 
   responses:
     BadRequest:
