@@ -33,7 +33,7 @@ type GrpcAppParam struct {
 	Config       *app.Config
 	Logger       logging.Logger
 	Server       Server
-	Repository   repository.Provider
+	Repository   repository.Repository
 	HealthClient health.HealthCheck
 }
 
@@ -63,7 +63,7 @@ func WithServer(server Server) GrpcAppOption {
 	}
 }
 
-func WithRepository(repo repository.Provider) GrpcAppOption {
+func WithRepository(repo repository.Repository) GrpcAppOption {
 	return func(p *GrpcAppParam) {
 		p.Repository = repo
 	}

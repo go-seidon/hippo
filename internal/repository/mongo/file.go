@@ -2,112 +2,20 @@ package mongo
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/datetime"
 	db_mongo "github.com/go-seidon/provider/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type fileRepository struct {
+type file struct {
 	dbConfig *DbConfig
 	dbClient db_mongo.Client
-	clock    datetime.Clock
 }
 
-func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
-	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
-	findFilter := bson.D{
-		{
-			Key:   "_id",
-			Value: p.UniqueId,
-		},
-	}
-	file := struct {
-		Id   string `bson:"_id"`
-		Name string `bson:"name"`
-		Path string `bson:"path"`
-	}{}
-	err := cl.FindOne(ctx, findFilter).Decode(&file)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, repository.ErrNotFound
-		}
-		return nil, err
-	}
-
-	err = p.DeleteFn(ctx, repository.DeleteFnParam{
-		FilePath: file.Path,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	currentTimestamp := r.clock.Now()
-	updateFilter := bson.D{
-		{
-			Key:   "_id",
-			Value: p.UniqueId,
-		},
-	}
-	data := bson.M{
-		"$set": bson.M{
-			"deleted_at": currentTimestamp,
-		},
-	}
-	deleteRes, err := cl.UpdateOne(ctx, updateFilter, data)
-	if err != nil {
-		return nil, err
-	}
-
-	if deleteRes.ModifiedCount != 1 {
-		return nil, fmt.Errorf("record is not updated")
-	}
-
-	res := &repository.DeleteFileResult{
-		DeletedAt: currentTimestamp,
-	}
-	return res, nil
-}
-
-func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
-	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
-	findFilter := bson.D{
-		{
-			Key:   "_id",
-			Value: p.UniqueId,
-		},
-	}
-	file := struct {
-		Id        string `bson:"_id"`
-		Name      string `bson:"name"`
-		Path      string `bson:"path"`
-		Mimetype  string `bson:"mimetype"`
-		Extension string `bson:"extension"`
-		Size      int64  `bson:"size"`
-	}{}
-	err := cl.FindOne(ctx, findFilter).Decode(&file)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, repository.ErrNotFound
-		}
-		return nil, err
-	}
-
-	res := &repository.RetrieveFileResult{
-		UniqueId:  file.Id,
-		Name:      file.Name,
-		Path:      file.Path,
-		MimeType:  file.Mimetype,
-		Extension: file.Extension,
-		Size:      file.Size,
-	}
-	return res, nil
-}
-
-func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
+func (r *file) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
 	err := p.CreateFn(ctx, repository.CreateFnParam{
 		FilePath: p.Path,
 	})
@@ -115,7 +23,6 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 		return nil, err
 	}
 
-	currentTimestamp := r.clock.Now()
 	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
 	data := bson.D{
 		{
@@ -144,11 +51,11 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 		},
 		{
 			Key:   "created_at",
-			Value: currentTimestamp,
+			Value: p.CreatedAt,
 		},
 		{
 			Key:   "updated_at",
-			Value: currentTimestamp,
+			Value: p.CreatedAt,
 		},
 	}
 	_, err = cl.InsertOne(ctx, data)
@@ -163,25 +70,113 @@ func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFile
 		Mimetype:  p.Mimetype,
 		Extension: p.Extension,
 		Size:      p.Size,
-		CreatedAt: currentTimestamp,
+		CreatedAt: p.CreatedAt,
 	}
 	return res, nil
 }
 
-func NewFile(opts ...RepoOption) *fileRepository {
+func (r *file) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
+	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
+	findFilter := bson.D{
+		{
+			Key:   "_id",
+			Value: p.UniqueId,
+		},
+	}
+	file := struct {
+		Id        string     `bson:"_id"`
+		Name      string     `bson:"name"`
+		Path      string     `bson:"path"`
+		Mimetype  string     `bson:"mimetype"`
+		Extension string     `bson:"extension"`
+		Size      int64      `bson:"size"`
+		CreatedAt time.Time  `bson:"created_at"`
+		DeletedAt *time.Time `bson:"deleted_at"`
+	}{}
+	err := cl.FindOne(ctx, findFilter).Decode(&file)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, repository.ErrNotFound
+		}
+		return nil, err
+	}
+
+	res := &repository.RetrieveFileResult{
+		UniqueId:  file.Id,
+		Name:      file.Name,
+		Path:      file.Path,
+		Mimetype:  file.Mimetype,
+		Extension: file.Extension,
+		Size:      file.Size,
+		CreatedAt: file.CreatedAt,
+		DeletedAt: file.DeletedAt,
+	}
+	return res, nil
+}
+
+func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
+	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("file")
+	findFilter := bson.D{
+		{
+			Key:   "_id",
+			Value: p.UniqueId,
+		},
+	}
+	file := struct {
+		Id        string     `bson:"_id"`
+		Name      string     `bson:"name"`
+		Path      string     `bson:"path"`
+		DeletedAt *time.Time `bson:"deleted_at"`
+	}{}
+	err := cl.FindOne(ctx, findFilter).Decode(&file)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, repository.ErrNotFound
+		}
+		return nil, err
+	}
+
+	if file.DeletedAt != nil {
+		return nil, repository.ErrDeleted
+	}
+
+	err = p.DeleteFn(ctx, repository.DeleteFnParam{
+		FilePath: file.Path,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	updateFilter := bson.D{
+		{
+			Key:   "_id",
+			Value: p.UniqueId,
+		},
+	}
+	data := bson.M{
+		"$set": bson.M{
+			"deleted_at": p.DeletedAt,
+		},
+	}
+	_, err = cl.UpdateOne(ctx, updateFilter, data)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &repository.DeleteFileResult{
+		DeletedAt: p.DeletedAt,
+	}
+	return res, nil
+}
+
+func NewFile(opts ...RepoOption) *file {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
 	}
 
-	clock := p.clock
-	if clock == nil {
-		clock = datetime.NewClock()
-	}
-
-	return &fileRepository{
+	return &file{
 		dbClient: p.dbClient,
 		dbConfig: p.dbConfig,
-		clock:    clock,
 	}
 }

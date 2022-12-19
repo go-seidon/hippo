@@ -18,6 +18,7 @@ import (
 	mock_io "github.com/go-seidon/provider/io/mock"
 	mock_logging "github.com/go-seidon/provider/logging/mock"
 	"github.com/go-seidon/provider/system"
+	"github.com/go-seidon/provider/typeconv"
 	mock_validation "github.com/go-seidon/provider/validation/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -34,6 +35,7 @@ var _ = Describe("File", func() {
 	Context("RetrieveFile function", Label("unit"), func() {
 		var (
 			ctx           context.Context
+			currentTs     time.Time
 			p             file.RetrieveFileParam
 			r             *file.RetrieveFileResult
 			fileRepo      *mock_repository.MockFile
@@ -49,6 +51,7 @@ var _ = Describe("File", func() {
 
 		BeforeEach(func() {
 			ctx = context.Background()
+			currentTs = time.Now().UTC()
 			p = file.RetrieveFileParam{
 				FileId: "mock-file-id",
 			}
@@ -80,7 +83,7 @@ var _ = Describe("File", func() {
 				UniqueId:  p.FileId,
 				Name:      "mock-name",
 				Path:      "mock-path",
-				MimeType:  "mock-mimetype",
+				Mimetype:  "mock-mimetype",
 				Extension: "mock-extension",
 			}
 			openParam = filesystem.OpenFileParam{
@@ -99,7 +102,7 @@ var _ = Describe("File", func() {
 				UniqueId:  retrieveRes.UniqueId,
 				Name:      retrieveRes.Name,
 				Path:      retrieveRes.Path,
-				MimeType:  retrieveRes.MimeType,
+				MimeType:  retrieveRes.Mimetype,
 				Extension: retrieveRes.Extension,
 			}
 
@@ -159,10 +162,18 @@ var _ = Describe("File", func() {
 					Return(nil).
 					Times(1)
 
+				retrieveRes := &repository.RetrieveFileResult{
+					UniqueId:  p.FileId,
+					Name:      "mock-name",
+					Path:      "mock-path",
+					Mimetype:  "mock-mimetype",
+					Extension: "mock-extension",
+					DeletedAt: typeconv.Time(currentTs),
+				}
 				fileRepo.
 					EXPECT().
 					RetrieveFile(gomock.Eq(ctx), gomock.Eq(retrieveParam)).
-					Return(nil, repository.ErrDeleted).
+					Return(retrieveRes, nil).
 					Times(1)
 
 				res, err := s.RetrieveFile(ctx, p)

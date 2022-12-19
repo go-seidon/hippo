@@ -26,11 +26,10 @@ import (
 )
 
 type restApp struct {
-	config     *RestAppConfig
-	server     Server
-	logger     logging.Logger
-	repository repository.Provider
-
+	config       *RestAppConfig
+	server       Server
+	logger       logging.Logger
+	repository   repository.Repository
 	healthClient health.HealthCheck
 }
 
@@ -135,11 +134,11 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 		basicClient := auth.NewBasicAuth(auth.NewBasicAuthParam{
 			Encoder:  base64Encoder,
 			Hasher:   bcryptHasher,
-			AuthRepo: repo.GetAuthRepo(),
+			AuthRepo: repo.GetAuth(),
 		})
 
 		fileClient := file.NewFile(file.FileParam{
-			FileRepo:    repo.GetFileRepo(),
+			FileRepo:    repo.GetFile(),
 			FileManager: fileManager,
 			Logger:      logger,
 			Identifier:  ksuIdentifier,

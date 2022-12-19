@@ -28,7 +28,7 @@ var _ = Describe("App Package", func() {
 		var (
 			cfg           *app.Config
 			logger        *mock_logging.MockLogger
-			repository    *mock_repository.MockProvider
+			repository    *mock_repository.MockRepository
 			healthService *mock_healthcheck.MockHealthCheck
 		)
 
@@ -41,11 +41,11 @@ var _ = Describe("App Package", func() {
 				RepositoryProvider: "mongo",
 			}
 			logger = mock_logging.NewMockLogger(ctrl)
-			repository = mock_repository.NewMockProvider(ctrl)
+			repository = mock_repository.NewMockRepository(ctrl)
 			fileRepo := mock_repository.NewMockFile(ctrl)
 			authRepo := mock_repository.NewMockAuth(ctrl)
-			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
-			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
+			repository.EXPECT().GetFile().Return(fileRepo).AnyTimes()
+			repository.EXPECT().GetAuth().Return(authRepo).AnyTimes()
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 		})
 
@@ -145,7 +145,7 @@ var _ = Describe("App Package", func() {
 			logger        *mock_logging.MockLogger
 			healthService *mock_healthcheck.MockHealthCheck
 			server        *mock_grpcapp.MockServer
-			repository    *mock_repository.MockProvider
+			repository    *mock_repository.MockRepository
 		)
 
 		BeforeEach(func() {
@@ -163,11 +163,11 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
-			repository = mock_repository.NewMockProvider(ctrl)
+			repository = mock_repository.NewMockRepository(ctrl)
 			fileRepo := mock_repository.NewMockFile(ctrl)
 			authRepo := mock_repository.NewMockAuth(ctrl)
-			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
-			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
+			repository.EXPECT().GetFile().Return(fileRepo).AnyTimes()
+			repository.EXPECT().GetAuth().Return(authRepo).AnyTimes()
 
 			grpcApp, _ = grpcapp.NewGrpcApp(
 				grpcapp.WithConfig(cfg),
@@ -320,11 +320,11 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_grpcapp.NewMockServer(ctrl)
-			repository := mock_repository.NewMockProvider(ctrl)
+			repository := mock_repository.NewMockRepository(ctrl)
 			fileRepo := mock_repository.NewMockFile(ctrl)
 			authRepo := mock_repository.NewMockAuth(ctrl)
-			repository.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
-			repository.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
+			repository.EXPECT().GetFile().Return(fileRepo).AnyTimes()
+			repository.EXPECT().GetAuth().Return(authRepo).AnyTimes()
 
 			grpcApp, _ = grpcapp.NewGrpcApp(
 				grpcapp.WithConfig(cfg),

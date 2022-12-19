@@ -8,9 +8,12 @@ import (
 	repository_mysql "github.com/go-seidon/hippo/internal/repository/mysql"
 	db_mongo "github.com/go-seidon/provider/mongo"
 	db_mysql "github.com/go-seidon/provider/mysql"
+	gorm_mysql "gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
-func NewDefaultRepository(config *Config) (repository.Provider, error) {
+func NewDefaultRepository(config *Config) (repository.Repository, error) {
 	if config == nil {
 		return nil, fmt.Errorf("invalid config")
 	}
@@ -20,9 +23,9 @@ func NewDefaultRepository(config *Config) (repository.Provider, error) {
 		return nil, fmt.Errorf("invalid repository provider")
 	}
 
-	var repo repository.Provider
+	var repo repository.Repository
 	if config.RepositoryProvider == repository.PROVIDER_MYSQL {
-		dbMaster, err := db_mysql.NewClient(
+		dbPrimary, err := db_mysql.NewClient(
 			db_mysql.WithAuth(config.MySQLMasterUser, config.MySQLMasterPassword),
 			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLMasterDBName}),
 			db_mysql.WithLocation(config.MySQLMasterHost, config.MySQLMasterPort),
@@ -32,7 +35,7 @@ func NewDefaultRepository(config *Config) (repository.Provider, error) {
 			return nil, err
 		}
 
-		dbReplica, err := db_mysql.NewClient(
+		dbSecondary, err := db_mysql.NewClient(
 			db_mysql.WithAuth(config.MySQLReplicaUser, config.MySQLReplicaPassword),
 			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLReplicaDBName}),
 			db_mysql.WithLocation(config.MySQLReplicaHost, config.MySQLReplicaPort),
@@ -42,9 +45,30 @@ func NewDefaultRepository(config *Config) (repository.Provider, error) {
 			return nil, err
 		}
 
+		dbClient, err := gorm.Open(gorm_mysql.New(gorm_mysql.Config{
+			Conn:                      dbPrimary,
+			SkipInitializeWithVersion: true,
+		}), &gorm.Config{
+			DisableAutomaticPing: true,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		err = dbClient.Use(dbresolver.Register(dbresolver.Config{
+			Replicas: []gorm.Dialector{
+				gorm_mysql.New(gorm_mysql.Config{
+					Conn:                      dbSecondary,
+					SkipInitializeWithVersion: true,
+				}),
+			},
+		}))
+		if err != nil {
+			return nil, err
+		}
+
 		repo, err = repository_mysql.NewRepository(
-			repository_mysql.WithDbMaster(dbMaster),
-			repository_mysql.WithDbReplica(dbReplica),
+			repository_mysql.WithGormClient(dbClient),
 		)
 		if err != nil {
 			return nil, err

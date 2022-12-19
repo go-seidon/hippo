@@ -155,7 +155,7 @@ var _ = Describe("App Package", func() {
 			logger        *mock_logging.MockLogger
 			server        *mock_restapp.MockServer
 			healthService *mock_healthcheck.MockHealthCheck
-			repo          *mock_repository.MockProvider
+			repo          *mock_repository.MockRepository
 			ctx           context.Context
 		)
 
@@ -165,11 +165,11 @@ var _ = Describe("App Package", func() {
 			logger = mock_logging.NewMockLogger(ctrl)
 			healthService = mock_healthcheck.NewMockHealthCheck(ctrl)
 			server = mock_restapp.NewMockServer(ctrl)
-			repo = mock_repository.NewMockProvider(ctrl)
+			repo = mock_repository.NewMockRepository(ctrl)
 			fileRepo := mock_repository.NewMockFile(ctrl)
 			authRepo := mock_repository.NewMockAuth(ctrl)
-			repo.EXPECT().GetFileRepo().Return(fileRepo).AnyTimes()
-			repo.EXPECT().GetAuthRepo().Return(authRepo).AnyTimes()
+			repo.EXPECT().GetFile().Return(fileRepo).AnyTimes()
+			repo.EXPECT().GetAuth().Return(authRepo).AnyTimes()
 
 			ra, _ = restapp.NewRestApp(
 				restapp.WithConfig(&app.Config{

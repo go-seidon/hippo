@@ -19,6 +19,7 @@ var _ = Describe("Auth Repository", func() {
 			client *mongo.Client
 			repo   repository.Auth
 			p      repository.FindClientParam
+			r      *repository.FindClientResult
 		)
 
 		BeforeAll(func() {
@@ -46,11 +47,21 @@ var _ = Describe("Auth Repository", func() {
 			p = repository.FindClientParam{
 				ClientId: "mock-client-id",
 			}
+			r = &repository.FindClientResult{
+				Id:           "mock-id",
+				Name:         "mock-client-name",
+				ClientId:     "mock-client-id",
+				ClientSecret: "mock-client-secret",
+				Type:         "basic",
+				Status:       "active",
+			}
 			err := InsertAuthClient(client, InsertAuthClientParam{
 				Id:           "mock-id",
 				Name:         "mock-client-name",
 				ClientId:     "mock-client-id",
 				ClientSecret: "mock-client-secret",
+				Type:         "basic",
+				Status:       "active",
 				DbName:       "hippo_test",
 			})
 			if err != nil {
@@ -62,10 +73,15 @@ var _ = Describe("Auth Repository", func() {
 			_, err := client.
 				Database("hippo_test").
 				Collection("auth_client").
-				DeleteOne(ctx, bson.D{
+				DeleteMany(ctx, bson.D{
 					{
-						Key:   "client_id",
-						Value: "mock-client-id",
+						Key: "client_id",
+						Value: bson.D{
+							{
+								Key:   "$in",
+								Value: []string{"mock-client-id"},
+							},
+						},
 					},
 				})
 			if err != nil {
@@ -80,15 +96,11 @@ var _ = Describe("Auth Repository", func() {
 			}
 		})
 
-		When("client is available", func() {
+		When("client is available using client_id", func() {
 			It("should return result", func() {
 				res, err := repo.FindClient(ctx, p)
 
-				expectedRes := &repository.FindClientResult{
-					ClientId:     "mock-client-id",
-					ClientSecret: "mock-client-secret",
-				}
-				Expect(res).To(Equal(expectedRes))
+				Expect(res).To(Equal(r))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -96,10 +108,22 @@ var _ = Describe("Auth Repository", func() {
 		When("client is not available", func() {
 			It("should return error", func() {
 				p.ClientId = "invalid-client-id"
+				p.Id = ""
 				res, err := repo.FindClient(ctx, p)
 
 				Expect(res).To(BeNil())
 				Expect(err).To(Equal(repository.ErrNotFound))
+			})
+		})
+
+		When("client is available using id", func() {
+			It("should return result", func() {
+				p.ClientId = ""
+				p.Id = "mock-id"
+				res, err := repo.FindClient(ctx, p)
+
+				Expect(res).To(Equal(r))
+				Expect(err).To(BeNil())
 			})
 		})
 	})

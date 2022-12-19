@@ -64,16 +64,37 @@ var _ = Describe("File Repository", func() {
 			if err != nil {
 				AbortSuite("failed prepare seed data: " + err.Error())
 			}
+
+			err = InsertFile(client, InsertFileParam{
+				Id:        "deleted-unique-id",
+				Name:      "image",
+				Path:      "/file/2022",
+				Mimetype:  "image/jpeg",
+				Extension: "jpeg",
+				Size:      200,
+				CreatedAt: 1660380011999,
+				UpdatedAt: 1660380011999,
+				DeletedAt: 1660380011999,
+				DbName:    "hippo_test",
+			})
+			if err != nil {
+				AbortSuite("failed prepare seed data: " + err.Error())
+			}
 		})
 
 		AfterEach(func() {
 			_, err := client.
 				Database("hippo_test").
 				Collection("file").
-				DeleteOne(ctx, bson.D{
+				DeleteMany(ctx, bson.D{
 					{
-						Key:   "_id",
-						Value: "mock-unique-id",
+						Key: "_id",
+						Value: bson.D{
+							{
+								Key:   "$in",
+								Value: []string{"mock-unique-id", "deleted-unique-id"},
+							},
+						},
 					},
 				})
 			if err != nil {
@@ -98,8 +119,19 @@ var _ = Describe("File Repository", func() {
 			})
 		})
 
+		When("file is deleted", func() {
+			It("should return error", func() {
+				p.UniqueId = "deleted-unique-id"
+				res, err := repo.DeleteFile(ctx, p)
+
+				Expect(res).To(BeNil())
+				Expect(err).To(Equal(repository.ErrDeleted))
+			})
+		})
+
 		When("failed proceed callback", func() {
 			It("should return error", func() {
+				p.UniqueId = "mock-unique-id"
 				p.DeleteFn = func(ctx context.Context, p repository.DeleteFnParam) error {
 					return fmt.Errorf("failed proceed callback")
 				}

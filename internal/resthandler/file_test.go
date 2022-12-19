@@ -272,7 +272,6 @@ var _ = Describe("File Handler", func() {
 				Name:      "dolhpin",
 				Extension: "jpg",
 				Size:      2334,
-				DeletedAt: nil,
 			}
 		})
 

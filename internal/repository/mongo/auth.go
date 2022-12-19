@@ -2,30 +2,58 @@ package mongo
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/datetime"
 	db_mongo "github.com/go-seidon/provider/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type authRepository struct {
+type auth struct {
 	dbConfig *DbConfig
 	dbClient db_mongo.Client
-	clock    datetime.Clock
 }
 
-func (r *authRepository) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
+func (r *auth) FindClient(ctx context.Context, p repository.FindClientParam) (*repository.FindClientResult, error) {
 	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("auth_client")
-	filter := bson.D{
-		{
-			Key:   "client_id",
-			Value: p.ClientId,
-		},
+
+	var filter bson.D
+	if p.ClientId != "" {
+		filter = bson.D{
+			{
+				Key:   "client_id",
+				Value: p.ClientId,
+			},
+		}
+	} else {
+		filter = bson.D{
+			{
+				Key:   "_id",
+				Value: p.Id,
+			},
+		}
 	}
+
 	projection := options.FindOne().SetProjection(bson.D{
+		{
+			Key:   "_id",
+			Value: 1,
+		},
+		{
+			Key:   "name",
+			Value: 1,
+		},
+		{
+			Key:   "type",
+			Value: 1,
+		},
+		{
+			Key:   "status",
+			Value: 1,
+		},
 		{
 			Key:   "client_id",
 			Value: 1,
@@ -34,41 +62,70 @@ func (r *authRepository) FindClient(ctx context.Context, p repository.FindClient
 			Key:   "client_secret",
 			Value: 1,
 		},
+		{
+			Key:   "created_at",
+			Value: 1,
+		},
+		{
+			Key:   "updated_at",
+			Value: 1,
+		},
 	})
 
-	authClient := struct {
-		ClientId     string `bson:"client_id"`
-		ClientSecret string `bson:"client_secret"`
+	client := struct {
+		Id           string     `bson:"_id"`
+		Name         string     `bson:"name"`
+		Type         string     `bson:"type"`
+		Status       string     `bson:"status"`
+		ClientId     string     `bson:"client_id"`
+		ClientSecret string     `bson:"client_secret"`
+		CreatedAt    time.Time  `bson:"created_at"`
+		UpdatedAt    *time.Time `bson:"updated_at"`
 	}{}
-	err := cl.FindOne(ctx, filter, projection).Decode(&authClient)
-	if err == nil {
-		res := repository.FindClientResult{
-			ClientId:     authClient.ClientId,
-			ClientSecret: authClient.ClientSecret,
+	err := cl.FindOne(ctx, filter, projection).Decode(&client)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, repository.ErrNotFound
 		}
-		return &res, nil
+		return nil, err
 	}
 
-	if err == mongo.ErrNoDocuments {
-		return nil, repository.ErrNotFound
+	res := &repository.FindClientResult{
+		Id:           client.Id,
+		Name:         client.Name,
+		Type:         client.Type,
+		Status:       client.Status,
+		ClientId:     client.ClientId,
+		ClientSecret: client.ClientSecret,
+		CreatedAt:    client.CreatedAt,
+		UpdatedAt:    client.UpdatedAt,
 	}
-	return nil, err
+	return res, nil
 }
 
-func NewAuth(opts ...RepoOption) *authRepository {
+// @todo: add implementation
+func (r *auth) CreateClient(ctx context.Context, p repository.CreateClientParam) (*repository.CreateClientResult, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+// @todo: add implementation
+func (r *auth) UpdateClient(ctx context.Context, p repository.UpdateClientParam) (*repository.UpdateClientResult, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+// @todo: add implementation
+func (r *auth) SearchClient(ctx context.Context, p repository.SearchClientParam) (*repository.SearchClientResult, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+func NewAuth(opts ...RepoOption) *auth {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
 	}
 
-	clock := p.clock
-	if clock == nil {
-		clock = datetime.NewClock()
-	}
-
-	return &authRepository{
+	return &auth{
 		dbClient: p.dbClient,
 		dbConfig: p.dbConfig,
-		clock:    clock,
 	}
 }
