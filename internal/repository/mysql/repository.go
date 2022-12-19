@@ -1,70 +1,63 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/go-seidon/provider/datetime"
-	db_mysql "github.com/go-seidon/provider/mysql"
+	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/provider/mysql"
 )
 
-type RepositoryParam struct {
-	mClient db_mysql.Client
-	rClient db_mysql.Client
-	clock   datetime.Clock
+type mysqlRepository struct {
+	dbClient mysql.Pingable
+	authRepo *auth
+	fileRepo *file
 }
 
-type RepoOption = func(*RepositoryParam)
-
-func WithDbMaster(dbClient db_mysql.Client) RepoOption {
-	return func(ro *RepositoryParam) {
-		ro.mClient = dbClient
-	}
+func (p *mysqlRepository) Init(ctx context.Context) error {
+	return nil
 }
 
-func WithDbReplica(dbClient db_mysql.Client) RepoOption {
-	return func(ro *RepositoryParam) {
-		ro.rClient = dbClient
-	}
+func (p *mysqlRepository) Ping(ctx context.Context) error {
+	return p.dbClient.PingContext(ctx)
 }
 
-func WithClock(clock datetime.Clock) RepoOption {
-	return func(ro *RepositoryParam) {
-		ro.clock = clock
-	}
+func (p *mysqlRepository) GetAuth() repository.Auth {
+	return p.authRepo
 }
 
-func NewRepository(opts ...RepoOption) (*provider, error) {
+func (p *mysqlRepository) GetFile() repository.File {
+	return p.fileRepo
+}
+
+func NewRepository(opts ...RepoOption) (*mysqlRepository, error) {
 	p := RepositoryParam{}
 	for _, opt := range opts {
 		opt(&p)
 	}
 
-	if p.mClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
-	}
-	if p.rClient == nil {
-		return nil, fmt.Errorf("invalid db client specified")
+	if p.dbClient == nil && p.gormClient == nil {
+		return nil, fmt.Errorf("invalid db client")
 	}
 
-	clock := p.clock
-	if clock == nil {
-		clock = datetime.NewClock()
+	var err error
+	dbClient := p.dbClient
+	if dbClient == nil {
+		dbClient, err = p.gormClient.DB()
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	authRepo := &authRepository{
-		mClient: p.mClient,
-		rClient: p.rClient,
-		clock:   clock,
+	authRepo := &auth{
+		gormClient: p.gormClient,
 	}
-	fileRepo := &fileRepository{
-		mClient: p.mClient,
-		rClient: p.rClient,
-		clock:   clock,
+	fileRepo := &file{
+		gormClient: p.gormClient,
 	}
 
-	repo := &provider{
-		mClient:  p.mClient,
-		rClient:  p.rClient,
+	repo := &mysqlRepository{
+		dbClient: dbClient,
 		authRepo: authRepo,
 		fileRepo: fileRepo,
 	}

@@ -4,263 +4,230 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
+	"time"
 
 	"github.com/go-seidon/hippo/internal/repository"
-	"github.com/go-seidon/provider/datetime"
-	db_mysql "github.com/go-seidon/provider/mysql"
+	"github.com/go-seidon/provider/typeconv"
+	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
-type fileRepository struct {
-	mClient db_mysql.Client
-	rClient db_mysql.Client
-	clock   datetime.Clock
+type file struct {
+	gormClient *gorm.DB
 }
 
-func (r *fileRepository) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
-	currentTimestamp := r.clock.Now()
-
-	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelRepeatableRead,
-	})
-	if err != nil {
-		return nil, err
+func (r *file) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
+	tx := r.gormClient.
+		WithContext(ctx).
+		Clauses(dbresolver.Write).
+		Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
 
-	file, err := r.findFile(ctx, findFileParam{
-		UniqueId:      p.UniqueId,
-		DbTransaction: tx,
-		ShouldLock:    true,
-	})
-	if err != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
+	currentFile := &File{}
+	checkRes := tx.
+		Select("id").
+		First(currentFile, "id = ?", p.UniqueId)
+	if !errors.Is(checkRes.Error, gorm.ErrRecordNotFound) {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
 		}
-		return nil, err
-	}
-
-	if file.DeletedAt != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
+		if checkRes.Error == nil {
+			return nil, repository.ErrExists
 		}
-
-		return nil, repository.ErrDeleted
+		return nil, checkRes.Error
 	}
 
-	deleteQuery := `
-		UPDATE file 
-		SET deleted_at = ?
-		WHERE id = ?
-	`
-	qRes, err := tx.Exec(
-		deleteQuery,
-		currentTimestamp.UnixMilli(),
-		file.UniqueId,
-	)
-	if err != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
-		}
-		return nil, err
-	}
-
-	// error is ommited since mysql driver is able to returning totalAffected
-	totalAffected, _ := qRes.RowsAffected()
-	if totalAffected != 1 {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
-		}
-		return nil, fmt.Errorf("record is not updated")
-	}
-
-	err = p.DeleteFn(ctx, repository.DeleteFnParam{
-		FilePath: file.Path,
-	})
-	if err != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
-		}
-		return nil, err
-	}
-
-	txErr := tx.Commit()
-	if txErr != nil {
-		return nil, txErr
-	}
-
-	res := &repository.DeleteFileResult{
-		DeletedAt: currentTimestamp,
-	}
-	return res, nil
-}
-
-func (r *fileRepository) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
-	file, err := r.findFile(ctx, findFileParam{
-		UniqueId: p.UniqueId,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if file.DeletedAt != nil {
-		return nil, repository.ErrDeleted
-	}
-
-	res := &repository.RetrieveFileResult{
-		UniqueId:  file.UniqueId,
-		Name:      file.Name,
-		Path:      file.Path,
-		MimeType:  file.MimeType,
-		Extension: file.Extension,
-		Size:      file.Size,
-	}
-	return res, nil
-}
-
-func (r *fileRepository) CreateFile(ctx context.Context, p repository.CreateFileParam) (*repository.CreateFileResult, error) {
-	currentTimestamp := r.clock.Now()
-
-	tx, err := r.mClient.BeginTx(ctx, &sql.TxOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	insertQuery := `
-		INSERT INTO file (
-			id, name, path, 
-			mimetype, extension, size, 
-			created_at, updated_at
-		) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-	`
-	_, err = tx.Exec(
-		insertQuery,
-		p.UniqueId,
-		p.Name,
-		p.Path,
-		p.Mimetype,
-		p.Extension,
-		p.Size,
-		currentTimestamp.UnixMilli(),
-		currentTimestamp.UnixMilli(),
-	)
-	if err != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
-		}
-		return nil, err
-	}
-
-	err = p.CreateFn(ctx, repository.CreateFnParam{
-		FilePath: p.Path,
-	})
-	if err != nil {
-		txErr := tx.Rollback()
-		if txErr != nil {
-			return nil, txErr
-		}
-		return nil, err
-	}
-
-	txErr := tx.Commit()
-	if txErr != nil {
-		return nil, txErr
-	}
-	res := &repository.CreateFileResult{
-		UniqueId:  p.UniqueId,
+	createParam := &File{
+		Id:        p.UniqueId,
 		Name:      p.Name,
 		Path:      p.Path,
 		Mimetype:  p.Mimetype,
 		Extension: p.Extension,
 		Size:      p.Size,
-		CreatedAt: currentTimestamp,
+		CreatedAt: p.CreatedAt.UnixMilli(),
+		UpdatedAt: p.CreatedAt.UnixMilli(),
+	}
+	createRes := tx.Create(createParam)
+	if createRes.Error != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, createRes.Error
+	}
+
+	file := &File{}
+	findRes := tx.
+		Select("id, name, path, mimetype, extension, size, created_at").
+		First(file, "id = ?", p.UniqueId)
+	if findRes.Error != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, findRes.Error
+	}
+
+	err := p.CreateFn(ctx, repository.CreateFnParam{
+		FilePath: p.Path,
+	})
+	if err != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, err
+	}
+
+	txRes := tx.Commit()
+	if txRes.Error != nil {
+		return nil, txRes.Error
+	}
+
+	res := &repository.CreateFileResult{
+		UniqueId:  file.Id,
+		Path:      file.Path,
+		Name:      file.Name,
+		Mimetype:  file.Mimetype,
+		Extension: file.Extension,
+		Size:      file.Size,
+		CreatedAt: time.UnixMilli(file.CreatedAt).UTC(),
 	}
 	return res, nil
 }
 
-// @note: using replica client by default
-// when transaction occured switch to master client (through `DbTransaction`)
-func (r *fileRepository) findFile(ctx context.Context, p findFileParam) (*findFileResult, error) {
-	var q db_mysql.Queryable
-	q = r.rClient
+func (r *file) RetrieveFile(ctx context.Context, p repository.RetrieveFileParam) (*repository.RetrieveFileResult, error) {
+	query := r.gormClient.
+		WithContext(ctx).
+		Clauses(dbresolver.Read)
 
-	if p.DbTransaction != nil {
-		q = p.DbTransaction
+	file := &File{}
+	findRes := query.
+		Select("id, name, path, mimetype, extension, size, created_at, deleted_at").
+		First(file, "id = ?", p.UniqueId)
+	if findRes.Error != nil {
+		if errors.Is(findRes.Error, gorm.ErrRecordNotFound) {
+			return nil, repository.ErrNotFound
+		}
+		return nil, findRes.Error
 	}
 
-	sqlQuery := `
-		SELECT 
-			id, name, path,
-			mimetype, extension, size,
-			created_at, updated_at, deleted_at
-		FROM file
-		WHERE id = ?
-	`
-	if p.ShouldLock {
-		sqlQuery += ` FOR UPDATE `
+	var deletedAt *time.Time
+	if file.DeletedAt.Valid {
+		deletedAt = typeconv.Time(time.UnixMilli(file.DeletedAt.Int64).UTC())
 	}
 
-	var res findFileResult
-	row := q.QueryRow(sqlQuery, p.UniqueId)
-	err := row.Scan(
-		&res.UniqueId,
-		&res.Name,
-		&res.Path,
-		&res.MimeType,
-		&res.Extension,
-		&res.Size,
-		&res.CreatedAt,
-		&res.UpdatedAt,
-		&res.DeletedAt,
-	)
-	if err == nil {
-		return &res, nil
+	res := &repository.RetrieveFileResult{
+		UniqueId:  file.Id,
+		Path:      file.Path,
+		Name:      file.Name,
+		Mimetype:  file.Mimetype,
+		Extension: file.Extension,
+		Size:      file.Size,
+		CreatedAt: time.UnixMilli(file.CreatedAt).UTC(),
+		DeletedAt: deletedAt,
 	}
-
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, repository.ErrNotFound
-	}
-	return nil, err
+	return res, nil
 }
 
-type findFileParam struct {
-	UniqueId      string
-	ShouldLock    bool
-	DbTransaction *sql.Tx
+func (r *file) DeleteFile(ctx context.Context, p repository.DeleteFileParam) (*repository.DeleteFileResult, error) {
+	tx := r.gormClient.
+		WithContext(ctx).
+		Clauses(dbresolver.Write).
+		Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	currentFile := &File{}
+	findRes := tx.
+		Select("id").
+		First(currentFile, "id = ?", p.UniqueId)
+	if findRes.Error != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		if errors.Is(findRes.Error, gorm.ErrRecordNotFound) {
+			return nil, repository.ErrNotFound
+		}
+		return nil, findRes.Error
+	}
+
+	updateRes := tx.
+		Model(&File{}).
+		Where("id = ?", p.UniqueId).
+		Updates(map[string]interface{}{
+			"updated_at": p.DeletedAt.UnixMilli(),
+			"deleted_at": p.DeletedAt.UnixMilli(),
+		})
+	if updateRes.Error != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, updateRes.Error
+	}
+
+	file := &File{}
+	checkRes := tx.
+		Select(`id, deleted_at`).
+		First(file, "id = ?", p.UniqueId)
+	if checkRes.Error != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, checkRes.Error
+	}
+
+	err := p.DeleteFn(ctx, repository.DeleteFnParam{
+		FilePath: file.Path,
+	})
+	if err != nil {
+		txRes := tx.Rollback()
+		if txRes.Error != nil {
+			return nil, txRes.Error
+		}
+		return nil, err
+	}
+
+	txRes := tx.Commit()
+	if txRes.Error != nil {
+		return nil, txRes.Error
+	}
+
+	res := &repository.DeleteFileResult{
+		DeletedAt: time.UnixMilli(file.DeletedAt.Int64).UTC(),
+	}
+	return res, nil
 }
 
-type findFileResult struct {
-	UniqueId  string
-	Name      string
-	Path      string
-	MimeType  string
-	Extension string
-	Size      int64
-	CreatedAt int64
-	UpdatedAt int64
-	DeletedAt *int64
+type FileParam struct {
+	GormClient *gorm.DB
 }
 
-func NewFile(opts ...RepoOption) *fileRepository {
-	p := RepositoryParam{}
-	for _, opt := range opts {
-		opt(&p)
+func NewFile(p FileParam) *file {
+	return &file{
+		gormClient: p.GormClient,
 	}
+}
 
-	clock := p.clock
-	if clock == nil {
-		clock = datetime.NewClock()
-	}
+type File struct {
+	Id        string        `gorm:"column:id;primaryKey"`
+	Path      string        `gorm:"column:path"`
+	Name      string        `gorm:"column:name"`
+	Mimetype  string        `gorm:"column:mimetype"`
+	Extension string        `gorm:"column:extension"`
+	Size      int64         `gorm:"column:size"`
+	CreatedAt int64         `gorm:"column:created_at"`
+	UpdatedAt int64         `gorm:"column:updated_at;autoUpdateTime:milli"`
+	DeletedAt sql.NullInt64 `gorm:"column:deleted_at;<-:update"`
+}
 
-	return &fileRepository{
-		mClient: p.mClient,
-		rClient: p.rClient,
-		clock:   clock,
-	}
+func (File) TableName() string {
+	return "file"
 }
