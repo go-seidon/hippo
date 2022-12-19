@@ -112,14 +112,8 @@ r1_status_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_passw
 echo "$r1_status_res"
 printf "[DONE]\n\n"
 
-# 10. running db migration in r1
-echo "[10] running db migration in $r1_ct_name...  "
-r1_db_migration='mysql://'$r1_db_root_username':'$r1_db_root_password'@tcp('$r1_db_host':'$r1_db_port')/hippo?x-tls-insecure-skip-verify=true'
-migrate -database "$r1_db_migration" -path ./migration/mysql up
-printf "[DONE]\n\n"
-
-# 11. grant user for replication in r1 db
-echo "[11] granting user in $r1_ct_name for replication...  "
+# 10. grant user for replication in r1 db
+echo "[10] granting user in $r1_ct_name for replication...  "
 
 # granting r2 in r1
 grant_r2_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$r2_db_username'"@"%" IDENTIFIED BY "'$r2_db_password'"; FLUSH PRIVILEGES;'
@@ -139,8 +133,8 @@ grant_r3_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_passwo
 echo "$grant_r3_res"
 printf "[DONE]\n\n"
 
-# 12. check master status in r1 db
-echo "[12] checking master status in $r1_ct_name...  "
+# 11. check master status in r1 db
+echo "[11] checking master status in $r1_ct_name...  "
 r1_status_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e 'SHOW MASTER STATUS'"`
 r1_log_file=`echo $r1_status_res | awk '{print $5}'`
 r1_log_position=`echo $r1_status_res | awk '{print $6}'`
@@ -150,8 +144,8 @@ printf "[DONE]\n\n"
 
 sleep 3
 
-# 13. try to connect to r2 db
-echo "[13] connecting to $r2_ct_name...  "
+# 12. try to connect to r2 db
+echo "[12] connecting to $r2_ct_name...  "
 until docker exec "$r2_ct_name" sh -c "export MYSQL_PWD=$r2_db_root_password; mysql -u $r2_db_root_username -e ';'"
 do
   echo "Waiting for '$r2_ct_name' database connection..."
@@ -159,8 +153,8 @@ do
 done
 printf "[DONE]\n\n"
 
-# 14. adding replica in r2 db
-echo "[14] adding replica in $r2_ct_name...  "
+# 13. adding replica in r2 db
+echo "[13] adding replica in $r2_ct_name...  "
 echo "master host         : $(docker-ip $r1_ct_name)"
 echo "username            : $r2_db_username"
 echo "password            : $r2_db_password"
@@ -171,20 +165,14 @@ add_r2_res=`docker exec $r2_ct_name sh -c "export MYSQL_PWD=$r2_db_root_password
 echo "$add_r2_res"
 printf "[DONE]\n\n"
 
-# 15. showing replica status
-echo "[15] showing $r2_ct_name status...  "
+# 14. showing replica status
+echo "[14] showing $r2_ct_name status...  "
 r2_status_res=`docker exec $r2_ct_name sh -c "export MYSQL_PWD=$r2_db_root_password; mysql -u $r2_db_root_username -e 'SHOW SLAVE STATUS\G'"`
 echo "$r2_status_res"
 printf "[DONE]\n\n"
 
-# 16. running db migration in r2
-echo "[16] running db migration in $r2_ct_name...  "
-r2_db_migration='mysql://'$r2_db_root_username':'$r2_db_root_password'@tcp('$r2_db_host':'$r2_db_port')/hippo?x-tls-insecure-skip-verify=true'
-migrate -database "$r2_db_migration" -path ./migration/mysql up
-printf "[DONE]\n\n"
-
-# 17. try to connect to r3 db
-echo "[17] connecting to $r3_ct_name...  "
+# 15. try to connect to r3 db
+echo "[15] connecting to $r3_ct_name...  "
 until docker exec "$r3_ct_name" sh -c "export MYSQL_PWD=$r3_db_root_password; mysql -u $r3_db_root_username -e ';'"
 do
   echo "Waiting for '$r3_ct_name' database connection..."
@@ -192,8 +180,8 @@ do
 done
 printf "[DONE]\n\n"
 
-# 18. adding replica in r3 db
-echo "[18] adding replica in $r3_ct_name...  "
+# 16. adding replica in r3 db
+echo "[16] adding replica in $r3_ct_name...  "
 echo "master host         : $(docker-ip $r1_ct_name)"
 echo "username            : $r3_db_username"
 echo "password            : $r3_db_password"
@@ -204,17 +192,11 @@ add_r3_res=`docker exec $r3_ct_name sh -c "export MYSQL_PWD=$r3_db_root_password
 echo "$add_r3_res"
 printf "[DONE]\n\n"
 
-# 19. showing replica status
-echo "[19] showing $r3_ct_name status...  "
+# 17. showing replica status
+echo "[17] showing $r3_ct_name status...  "
 r3_status_res=`docker exec $r3_ct_name sh -c "export MYSQL_PWD=$r3_db_root_password; mysql -u $r3_db_root_username -e 'SHOW SLAVE STATUS\G'"`
 echo "$r3_status_res"
 printf "[DONE]\n\n"
 
-# 20. running db migration in r3
-echo "[20] running db migration in $r3_ct_name...  "
-r3_db_migration='mysql://'$r3_db_root_username':'$r3_db_root_password'@tcp('$r3_db_host':'$r3_db_port')/hippo?x-tls-insecure-skip-verify=true'
-migrate -database "$r3_db_migration" -path ./migration/mysql up
-printf "[DONE]\n\n"
-
-# 21. done
+# 18. done
 echo "exiting...  "
