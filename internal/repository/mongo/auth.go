@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 type auth struct {
@@ -22,7 +23,12 @@ type auth struct {
 
 // @note: return `ErrExists` if client_id is already created
 func (r *auth) CreateClient(ctx context.Context, p repository.CreateClientParam) (*repository.CreateClientResult, error) {
-	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("auth_client")
+	cl := r.dbClient.
+		Database(
+			r.dbConfig.DbName,
+			options.Database().SetReadPreference(readpref.Primary()),
+		).
+		Collection("auth_client")
 
 	currentClient := struct {
 		Id       string `bson:"_id"`
@@ -198,7 +204,12 @@ func (r *auth) FindClient(ctx context.Context, p repository.FindClientParam) (*r
 }
 
 func (r *auth) UpdateClient(ctx context.Context, p repository.UpdateClientParam) (*repository.UpdateClientResult, error) {
-	cl := r.dbClient.Database(r.dbConfig.DbName).Collection("auth_client")
+	cl := r.dbClient.
+		Database(
+			r.dbConfig.DbName,
+			options.Database().SetReadPreference(readpref.Primary()),
+		).
+		Collection("auth_client")
 
 	currentClient := struct {
 		Id       string `bson:"_id"`
