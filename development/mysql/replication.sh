@@ -1,33 +1,33 @@
 #!/bin/bash
 
 # variable definition
-m1_ct_name='hippo_mysql-db_1'
-m1_db_root_username='root'
-m1_db_root_password='toor'
+h1_ct_name='hippo_mysql-db-1_1'
+h1_db_root_username='root'
+h1_db_root_password='toor'
 
-r1_ct_name='hippo_mysql-db-r1_1'
-r1_db_host='localhost'
-r1_db_port='3311'
-r1_db_root_username='root'
-r1_db_root_password='toor'
-r1_db_username='hippo-r1'
-r1_db_password='123456'
+h2_ct_name='hippo_mysql-db-2_1'
+h2_db_host='localhost'
+h2_db_port='3312'
+h2_db_root_username='root'
+h2_db_root_password='toor'
+h2_db_username='hippo-h2'
+h2_db_password='123456'
 
-r2_ct_name='hippo_mysql-db-r2_1'
-r2_db_host='localhost'
-r2_db_port='3312'
-r2_db_root_username='root'
-r2_db_root_password='toor'
-r2_db_username='hippo-r2'
-r2_db_password='123456'
+h3_ct_name='hippo_mysql-db-3_1'
+h3_db_host='localhost'
+h3_db_port='3313'
+h3_db_root_username='root'
+h3_db_root_password='toor'
+h3_db_username='hippo-h3'
+h3_db_password='123456'
 
-r3_ct_name='hippo_mysql-db-r3_1'
-r3_db_host='localhost'
-r3_db_port='3313'
-r3_db_root_username='root'
-r3_db_root_password='toor'
-r3_db_username='hippo-r3'
-r3_db_password='123456'
+h4_ct_name='hippo_mysql-db-4_1'
+h4_db_host='localhost'
+h4_db_port='3314'
+h4_db_root_username='root'
+h4_db_root_password='toor'
+h4_db_username='hippo-h4'
+h4_db_password='123456'
 
 # function definition
 docker-ip() {
@@ -36,15 +36,16 @@ docker-ip() {
 
 # 1. turn off docker-compose (if any)
 echo "[1] turning off docker compose...  "
-docker-compose stop mysql-db mysql-db-r1 mysql-db-r2 mysql-db-r3
-docker-compose rm -v -f mysql-db-r1 mysql-db-r2 mysql-db-r3
+docker-compose stop mysql-db-1 mysql-db-2 mysql-db-3 mysql-db-4
+docker-compose rm -v -f mysql-db-1 mysql-db-2 mysql-db-3 mysql-db-4
 printf "[DONE]\n\n"
 
-# 2. remove mysql-db replica data volume (if any)
-echo "[2] removing $m1_ct_name data volume...  "
-docker volume rm hippo_mysql-db-r1-data
-docker volume rm hippo_mysql-db-r2-data
-docker volume rm hippo_mysql-db-r3-data
+# 2. remove mysql-db data volume (if any)
+echo "[2] removing data volume...  "
+docker volume rm hippo_mysql-db-1-data
+docker volume rm hippo_mysql-db-2-data
+docker volume rm hippo_mysql-db-3-data
+docker volume rm hippo_mysql-db-4-data
 printf "[DONE]\n\n"
 
 # 3. rebuild and run docker-compose
@@ -53,149 +54,149 @@ docker-compose build
 docker-compose up -d
 printf "[DONE]\n\n"
 
-sleep 3
+sleep 4
 
 # 4. try to connect to m1 db
-echo "[4] connecting to $m1_ct_name...  "
-until docker exec "$m1_ct_name" sh -c "export MYSQL_PWD=$m1_db_root_password; mysql -u $m1_db_root_username -e ';'"
+echo "[4] connecting to $h1_ct_name...  "
+until docker exec "$h1_ct_name" sh -c "mysql -u$h1_db_root_username -p$h1_db_root_password -e ';'"
 do
-  echo "Waiting for '$m1_ct_name' database connection..."
+  echo "Waiting for '$h1_ct_name' database connection..."
   sleep 4
 done
 printf "[DONE]\n\n"
 
 # 5. grant user for replication in m1 db
-echo "[5] granting user in $m1_ct_name for replication...  "
-grant_r1_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$r1_db_username'"@"%" IDENTIFIED BY "'$r1_db_password'"; FLUSH PRIVILEGES;'
-docker exec $m1_ct_name sh -c "export MYSQL_PWD=$m1_db_root_password; mysql -u $m1_db_root_username -e '$grant_r1_stmt'"
+echo "[5] granting user in $h1_ct_name for replication...  "
+grant_r1_stmt='CREATE USER "'$h2_db_username'"@"'%'" IDENTIFIED WITH mysql_native_password BY "'$h2_db_password'"; GRANT REPLICATION SLAVE ON *.* TO "'$h2_db_username'"@"%"; FLUSH PRIVILEGES;'
+docker exec $h1_ct_name sh -c "mysql -u$h1_db_root_username -p$h1_db_root_password -e '$grant_r1_stmt'"
 
-grant_r1_res_stmt='SHOW GRANTS FOR "'$r1_db_username'"@"%"'
-grant_r1_res=`docker exec $m1_ct_name sh -c "export MYSQL_PWD=$m1_db_root_password; mysql -u $m1_db_root_username -e '$grant_r1_res_stmt'"`
+grant_r1_res_stmt='SHOW GRANTS FOR "'$h2_db_username'"@"%"'
+grant_r1_res=`docker exec $h1_ct_name sh -c "mysql -u$h1_db_root_username -p$h1_db_root_password -e '$grant_r1_res_stmt'"`
 echo "$grant_r1_res"
 printf "[DONE]\n\n"
 
 # 6. check master status in m1 db
-echo "[6] checking master status in $m1_ct_name...  "
-m1_status_res=`docker exec $m1_ct_name sh -c "export MYSQL_PWD=$m1_db_root_password; mysql -u $m1_db_root_username -e 'SHOW MASTER STATUS'"`
-m1_log_file=`echo $m1_status_res | awk '{print $5}'`
-m1_log_position=`echo $m1_status_res | awk '{print $6}'`
-echo "log file            : $m1_log_file"
-echo "log position        : $m1_log_position"
+echo "[6] checking master status in $h1_ct_name...  "
+h1_status_res=`docker exec $h1_ct_name sh -c "mysql -u$h1_db_root_username -p$h1_db_root_password -e 'SHOW MASTER STATUS'"`
+h1_log_file=`echo $h1_status_res | awk '{print $6}'`
+h1_log_position=`echo $h1_status_res | awk '{print $7}'`
+echo "log file            : $h1_log_file"
+echo "log position        : $h1_log_position"
 printf "[DONE]\n\n"
 
 sleep 3
 
 # 7. try to connect to r1 db
-echo "[7] connecting to $r1_ct_name...  "
-until docker exec "$r1_ct_name" sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e ';'"
+echo "[7] connecting to $h2_ct_name...  "
+until docker exec "$h2_ct_name" sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e ';'"
 do
-  echo "Waiting for '$r1_ct_name' database connection..."
+  echo "Waiting for '$h2_ct_name' database connection..."
   sleep 4
 done
 printf "[DONE]\n\n"
 
-# 8. adding replica in r1 db
-echo "[8] adding replica in $r1_ct_name...  "
-echo "master host         : $(docker-ip $m1_ct_name)"
-echo "username            : $r1_db_username"
-echo "password            : $r1_db_password"
-echo "log file            : $m1_log_file"
-echo "log position        : $m1_log_position"
-add_r1_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $m1_ct_name)'", MASTER_USER="'$r1_db_username'", MASTER_PASSWORD="'$r1_db_password'", MASTER_LOG_FILE="'$m1_log_file'", MASTER_LOG_POS='$m1_log_position'; START SLAVE;'
-add_r1_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e '$add_r1_stmt'"`
-echo "$add_r1_res"
+# 8. adding replica in h2 db
+echo "[8] adding replica in $h2_ct_name...  "
+echo "master host         : $(docker-ip $h1_ct_name)"
+echo "username            : $h2_db_username"
+echo "password            : $h2_db_password"
+echo "log file            : $h1_log_file"
+echo "log position        : $h1_log_position"
+add_h2_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $h1_ct_name)'", MASTER_USER="'$h2_db_username'", MASTER_PASSWORD="'$h2_db_password'", MASTER_LOG_FILE="'$h1_log_file'", MASTER_LOG_POS='$h1_log_position'; START SLAVE;'
+add_h2_res=`docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e '$add_h2_stmt'"`
+echo "$add_h2_res"
 printf "[DONE]\n\n"
 
 # 9. showing replica status
-echo "[9] showing $r1_ct_name status...  "
-r1_status_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e 'SHOW SLAVE STATUS\G'"`
-echo "$r1_status_res"
+echo "[9] showing $h2_ct_name status...  "
+h2_status_res=`docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e 'SHOW SLAVE STATUS\G'"`
+echo "$h2_status_res"
 printf "[DONE]\n\n"
 
-# 10. grant user for replication in r1 db
-echo "[10] granting user in $r1_ct_name for replication...  "
+# 10. grant user for replication in h2 db
+echo "[10] granting user in $h2_ct_name for replication...  "
 
-# granting r2 in r1
-grant_r2_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$r2_db_username'"@"%" IDENTIFIED BY "'$r2_db_password'"; FLUSH PRIVILEGES;'
-docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e '$grant_r2_stmt'"
+# granting h3 in h2
+grant_h3_stmt='CREATE USER "'$h3_db_username'"@"'%'" IDENTIFIED WITH mysql_native_password BY "'$h3_db_password'"; GRANT REPLICATION SLAVE ON *.* TO "'$h3_db_username'"@"%"; FLUSH PRIVILEGES;'
+docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e '$grant_h3_stmt'"
 
-grant_r2_res_stmt='SHOW GRANTS FOR "'$r2_db_username'"@"%"'
-grant_r2_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e '$grant_r2_res_stmt'"`
-echo "$grant_r2_res"
+grant_h3_res_stmt='SHOW GRANTS FOR "'$h3_db_username'"@"%"'
+grant_h3_res=`docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e '$grant_h3_res_stmt'"`
+echo "$grant_h3_res"
 printf "[DONE]\n\n"
 
-# granting r3 in r1
-grant_r3_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$r3_db_username'"@"%" IDENTIFIED BY "'$r3_db_password'"; FLUSH PRIVILEGES;'
-docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e '$grant_r3_stmt'"
+# granting h4 in h2
+grant_h4_stmt='CREATE USER "'$h4_db_username'"@"'%'" IDENTIFIED WITH mysql_native_password BY "'$h4_db_password'"; GRANT REPLICATION SLAVE ON *.* TO "'$h4_db_username'"@"%"; FLUSH PRIVILEGES;'
+docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e '$grant_h4_stmt'"
 
-grant_r3_res_stmt='SHOW GRANTS FOR "'$r3_db_username'"@"%"'
-grant_r3_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e '$grant_r3_res_stmt'"`
-echo "$grant_r3_res"
+grant_h4_res_stmt='SHOW GRANTS FOR "'$h4_db_username'"@"%"'
+grant_h4_res=`docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e '$grant_h4_res_stmt'"`
+echo "$grant_h4_res"
 printf "[DONE]\n\n"
 
-# 11. check master status in r1 db
-echo "[11] checking master status in $r1_ct_name...  "
-r1_status_res=`docker exec $r1_ct_name sh -c "export MYSQL_PWD=$r1_db_root_password; mysql -u $r1_db_root_username -e 'SHOW MASTER STATUS'"`
-r1_log_file=`echo $r1_status_res | awk '{print $5}'`
-r1_log_position=`echo $r1_status_res | awk '{print $6}'`
-echo "log file            : $r1_log_file"
-echo "log position        : $r1_log_position"
+# 11. check master status in h2 db
+echo "[11] checking master status in $h2_ct_name...  "
+h2_status_res=`docker exec $h2_ct_name sh -c "mysql -u$h2_db_root_username -p$h2_db_root_password -e 'SHOW MASTER STATUS'"`
+h2_log_file=`echo $h2_status_res | awk '{print $6}'`
+h2_log_position=`echo $h2_status_res | awk '{print $7}'`
+echo "log file            : $h2_log_file"
+echo "log position        : $h2_log_position"
 printf "[DONE]\n\n"
 
 sleep 3
 
-# 12. try to connect to r2 db
-echo "[12] connecting to $r2_ct_name...  "
-until docker exec "$r2_ct_name" sh -c "export MYSQL_PWD=$r2_db_root_password; mysql -u $r2_db_root_username -e ';'"
+# 12. try to connect to h3 db
+echo "[12] connecting to $h3_ct_name...  "
+until docker exec "$h3_ct_name" sh -c "mysql -u$h3_db_root_username -p$h3_db_root_password -e ';'"
 do
-  echo "Waiting for '$r2_ct_name' database connection..."
+  echo "Waiting for '$h3_ct_name' database connection..."
   sleep 4
 done
 printf "[DONE]\n\n"
 
-# 13. adding replica in r2 db
-echo "[13] adding replica in $r2_ct_name...  "
-echo "master host         : $(docker-ip $r1_ct_name)"
-echo "username            : $r2_db_username"
-echo "password            : $r2_db_password"
-echo "log file            : $r1_log_file"
-echo "log position        : $r1_log_position"
-add_r2_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $r1_ct_name)'", MASTER_USER="'$r2_db_username'", MASTER_PASSWORD="'$r2_db_password'", MASTER_LOG_FILE="'$r1_log_file'", MASTER_LOG_POS='$r1_log_position'; START SLAVE;'
-add_r2_res=`docker exec $r2_ct_name sh -c "export MYSQL_PWD=$r2_db_root_password; mysql -u $r2_db_root_username -e '$add_r2_stmt'"`
-echo "$add_r2_res"
+# 13. adding replica in h3 db
+echo "[13] adding replica in $h3_ct_name...  "
+echo "master host         : $(docker-ip $h2_ct_name)"
+echo "username            : $h3_db_username"
+echo "password            : $h3_db_password"
+echo "log file            : $h2_log_file"
+echo "log position        : $h2_log_position"
+add_h3_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $h2_ct_name)'", MASTER_USER="'$h3_db_username'", MASTER_PASSWORD="'$h3_db_password'", MASTER_LOG_FILE="'$h2_log_file'", MASTER_LOG_POS='$h2_log_position'; START SLAVE;'
+add_h3_res=`docker exec $h3_ct_name sh -c "mysql -u$h3_db_root_username -p$h3_db_root_password -e '$add_h3_stmt'"`
+echo "$add_h3_res"
 printf "[DONE]\n\n"
 
 # 14. showing replica status
-echo "[14] showing $r2_ct_name status...  "
-r2_status_res=`docker exec $r2_ct_name sh -c "export MYSQL_PWD=$r2_db_root_password; mysql -u $r2_db_root_username -e 'SHOW SLAVE STATUS\G'"`
-echo "$r2_status_res"
+echo "[14] showing $h3_ct_name status...  "
+h3_status_res=`docker exec $h3_ct_name sh -c "mysql -u$h3_db_root_username -p$h3_db_root_password -e 'SHOW SLAVE STATUS\G'"`
+echo "$h3_status_res"
 printf "[DONE]\n\n"
 
-# 15. try to connect to r3 db
-echo "[15] connecting to $r3_ct_name...  "
-until docker exec "$r3_ct_name" sh -c "export MYSQL_PWD=$r3_db_root_password; mysql -u $r3_db_root_username -e ';'"
+# 15. try to connect to h4 db
+echo "[15] connecting to $h4_ct_name...  "
+until docker exec "$h4_ct_name" sh -c "mysql -u$h4_db_root_username -p$h4_db_root_password -e ';'"
 do
-  echo "Waiting for '$r3_ct_name' database connection..."
+  echo "Waiting for '$h4_ct_name' database connection..."
   sleep 4
 done
 printf "[DONE]\n\n"
 
-# 16. adding replica in r3 db
-echo "[16] adding replica in $r3_ct_name...  "
-echo "master host         : $(docker-ip $r1_ct_name)"
-echo "username            : $r3_db_username"
-echo "password            : $r3_db_password"
-echo "log file            : $r1_log_file"
-echo "log position        : $r1_log_position"
-add_r3_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $r1_ct_name)'", MASTER_USER="'$r3_db_username'", MASTER_PASSWORD="'$r3_db_password'", MASTER_LOG_FILE="'$r1_log_file'", MASTER_LOG_POS='$r1_log_position'; START SLAVE;'
-add_r3_res=`docker exec $r3_ct_name sh -c "export MYSQL_PWD=$r3_db_root_password; mysql -u $r3_db_root_username -e '$add_r3_stmt'"`
-echo "$add_r3_res"
+# 16. adding replica in h4 db
+echo "[16] adding replica in $h4_ct_name...  "
+echo "master host         : $(docker-ip $h2_ct_name)"
+echo "username            : $h4_db_username"
+echo "password            : $h4_db_password"
+echo "log file            : $h2_log_file"
+echo "log position        : $h2_log_position"
+add_h4_stmt='STOP SLAVE; CHANGE MASTER TO MASTER_HOST="'$(docker-ip $h2_ct_name)'", MASTER_USER="'$h4_db_username'", MASTER_PASSWORD="'$h4_db_password'", MASTER_LOG_FILE="'$h2_log_file'", MASTER_LOG_POS='$h2_log_position'; START SLAVE;'
+add_h4_res=`docker exec $h4_ct_name sh -c "mysql -u$h4_db_root_username -p$h4_db_root_password -e '$add_h4_stmt'"`
+echo "$add_h4_res"
 printf "[DONE]\n\n"
 
 # 17. showing replica status
-echo "[17] showing $r3_ct_name status...  "
-r3_status_res=`docker exec $r3_ct_name sh -c "export MYSQL_PWD=$r3_db_root_password; mysql -u $r3_db_root_username -e 'SHOW SLAVE STATUS\G'"`
-echo "$r3_status_res"
+echo "[17] showing $h4_ct_name status...  "
+h4_status_res=`docker exec $h4_ct_name sh -c "mysql -u$h4_db_root_username -p$h4_db_root_password -e 'SHOW SLAVE STATUS\G'"`
+echo "$h4_status_res"
 printf "[DONE]\n\n"
 
 # 18. done

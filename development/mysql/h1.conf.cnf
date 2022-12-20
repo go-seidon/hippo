@@ -10,7 +10,7 @@ skip-name-resolve
 server-id = 1
 
 # Enables bin log and sets the base name and path for the binary log files
-log_bin = /var/log/mysql/mysql-bin.log
+log_bin = /var/lib/mysql/mysql-bin.log
 
 # enum: ROW, STATEMENT, MIXED
 # binlog_format = MIXED 

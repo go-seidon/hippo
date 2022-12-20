@@ -7,13 +7,13 @@ skip-host-cache
 skip-name-resolve 
 
 # It must be different from every other ID in use by any other source or replica.
-server-id = 13
+server-id = 2
 
 # Enables bin log and sets the base name and path for the binary log files
-log_bin = /var/log/mysql/mysql-bin.log
+log_bin = /var/lib/mysql/mysql-bin.log
 
 # Contains database events, read from the source binary log.
-relay-log = /var/log/mysql/mysql-relay-bin.log
+relay-log = /var/lib/mysql/mysql-relay-bin.log
 
 # database to be replicated
 # add more database by entering new entry, e.g:
