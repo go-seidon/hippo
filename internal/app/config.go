@@ -1,9 +1,6 @@
 package app
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/go-seidon/provider/config/viper"
 )
 
@@ -49,15 +46,8 @@ type Config struct {
 }
 
 func NewDefaultConfig() (*Config, error) {
-	appEnv := os.Getenv("APP_ENV")
-	if appEnv == "" {
-		appEnv = ENV_LOCAL
-	}
-	cfg := &Config{AppEnv: appEnv}
-
-	cfgFileName := fmt.Sprintf("config/%s.toml", cfg.AppEnv)
 	tomlConfig, err := viper.NewConfig(
-		viper.WithFileName(cfgFileName),
+		viper.WithFileName("config/default.toml"),
 	)
 	if err != nil {
 		return nil, err
@@ -68,6 +58,7 @@ func NewDefaultConfig() (*Config, error) {
 		return nil, err
 	}
 
+	cfg := &Config{}
 	err = tomlConfig.ParseConfig(cfg)
 	if err != nil {
 		return nil, err
