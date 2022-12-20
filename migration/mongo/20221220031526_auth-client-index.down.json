@@ -1,0 +1,14 @@
+[
+  {
+    "dropIndexes": "auth_client",
+    "index": "idx_type"
+  },
+  {
+    "dropIndexes": "auth_client",
+    "index": "idx_status"
+  },
+  {
+    "dropIndexes": "auth_client",
+    "index": "uk_client_id"
+  }
+]

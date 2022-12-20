@@ -40,8 +40,8 @@ docker-compose stop mongo-db-1 mongo-db-2 mongo-db-3
 docker-compose rm -v -f mongo-db-1 mongo-db-2 mongo-db-3
 printf "[DONE]\n\n"
 
-# 2. remove mongo-db replica data volume (if any)
-echo "[2] removing $h1_ct_name data volume...  "
+# 2. remove mongo-db data volume (if any)
+echo "[2] removing data volume...  "
 docker volume rm hippo_mongo-db-1-data
 docker volume rm hippo_mongo-db-2-data
 docker volume rm hippo_mongo-db-3-data

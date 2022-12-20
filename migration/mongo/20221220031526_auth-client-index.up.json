@@ -1,0 +1,29 @@
+[
+  {
+    "createIndexes": "auth_client",
+    "indexes": [
+      {
+        "key": {
+          "type": 1
+        },
+        "name": "idx_type",
+        "background": true
+      },
+      {
+        "key": {
+          "status": 1
+        },
+        "name": "idx_status",
+        "background": true
+      },
+      {
+        "key": {
+          "client_id": 1
+        },
+        "name": "uk_client_id",
+        "unique": true,
+        "background": true
+      }
+    ]
+  }
+]

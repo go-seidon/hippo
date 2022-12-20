@@ -166,18 +166,14 @@ C:\Windows\System32\drivers\etc\hosts
 ```
 
 ## Todo
-0. App enhancement
-- Rename `config/local.yml` to `config.default.yml`
-- Add db indexes (mongo + mysql)
-- Change mariadb -> mysql
-- Change docker image name (db-r1 -> db-1, etc)
-2. Devs: Observability
+1. Devs: Observability
 - prometheus (metric exporter)
-3. Devs: Monitoring
+2. Devs: Monitoring
 - grafana data visualization
-4. Devs: Tracing
+3. Devs: Tracing
 - open telemetry (https://opentelemetry.io/)
-5. Upload docker image to docker hub
+
+4. Upload docker image to docker hub
 
 ## Nice to have
 1. Upload location strategy

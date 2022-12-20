@@ -150,7 +150,7 @@ dummy: ## used by migrate script as do-nothing targets
 	@:
 
 
-MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3308)/hippo?x-tls-insecure-skip-verify=true
+MYSQL_DB_URI=mysql://admin:123456@tcp(localhost:3311)/hippo?x-tls-insecure-skip-verify=true
 MONGO_DB_URI=mongodb://admin:123456@localhost:27031/hippo
 
 .PHONY: migrate-mysql

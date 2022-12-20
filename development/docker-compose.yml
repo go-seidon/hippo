@@ -1,73 +1,73 @@
 version: '3'
 services:
-  mysql-db:
-    image: "mariadb:10.4"
+  mysql-db-1:
+    image: "mysql:8.0"
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
       - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     volumes:
-      - mysql-db-data:/var/lib/mysql
-      - ./mysql/m1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
-    ports:
-      - 3308:3306
-    networks:
-      mysql-net:
-        ipv4_address: 172.20.0.11
-  mysql-db-r1:
-    image: "mariadb:10.4"
-    environment:
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=123456
-      - MYSQL_DATABASE=hippo
-      - MYSQL_ROOT_PASSWORD=toor
-    depends_on:
-      - mysql-db
-    volumes:
-      - mysql-db-r1-data:/var/lib/mysql
-      - ./mysql/r1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - mysql-db-1-data:/var/lib/mysql
+      - ./mysql/h1.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3311:3306
     networks:
       mysql-net:
-        ipv4_address: 172.20.0.21
-  mysql-db-r2:
-    image: "mariadb:10.4"
+        ipv4_address: 172.20.0.11
+  mysql-db-2:
+    image: "mysql:8.0"
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
       - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     depends_on:
-      - mysql-db-r1
+      - mysql-db-1
     volumes:
-      - mysql-db-r2-data:/var/lib/mysql
-      - ./mysql/r2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - mysql-db-2-data:/var/lib/mysql
+      - ./mysql/h2.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3312:3306
     networks:
       mysql-net:
-        ipv4_address: 172.20.0.22
-  mysql-db-r3:
-    image: "mariadb:10.4"
+        ipv4_address: 172.20.0.12
+  mysql-db-3:
+    image: "mysql:8.0"
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
       - MYSQL_DATABASE=hippo
       - MYSQL_ROOT_PASSWORD=toor
     depends_on:
-      - mysql-db-r1
+      - mysql-db-2
     volumes:
-      - mysql-db-r3-data:/var/lib/mysql
-      - ./mysql/r3.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+      - mysql-db-3-data:/var/lib/mysql
+      - ./mysql/h3.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
     ports:
       - 3313:3306
     networks:
       mysql-net:
-        ipv4_address: 172.20.0.23
+        ipv4_address: 172.20.0.13
+  mysql-db-4:
+    image: "mysql:8.0"
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=hippo
+      - MYSQL_ROOT_PASSWORD=toor
+    depends_on:
+      - mysql-db-2
+    volumes:
+      - mysql-db-4-data:/var/lib/mysql
+      - ./mysql/h4.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf:ro
+    ports:
+      - 3314:3306
+    networks:
+      mysql-net:
+        ipv4_address: 172.20.0.14
   mysql-db-test:
-    image: "mariadb:10.4"
+    image: "mysql:8.0"
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=123456
@@ -82,14 +82,14 @@ services:
     image: "phpmyadmin:5.2"
     restart: always
     ports:
-      - 8010:80
+      - 8031:80
     environment:
-      - PMA_HOSTS=mysql-db,mysql-db-r1,mysql-db-r2,mysql-db-r3,mysql-db-test
+      - PMA_HOSTS=mysql-db-1,mysql-db-2,mysql-db-3,mysql-db-4,mysql-db-test
     depends_on:
-      - mysql-db
-      - mysql-db-r1
-      - mysql-db-r2
-      - mysql-db-r3
+      - mysql-db-1
+      - mysql-db-2
+      - mysql-db-3
+      - mysql-db-4
       - mysql-db-test
     networks:
       mysql-net:
@@ -198,10 +198,10 @@ services:
       mysql-net:
         ipv4_address: 172.20.0.102
 volumes:
-  mysql-db-data:
-  mysql-db-r1-data:
-  mysql-db-r2-data:
-  mysql-db-r3-data:
+  mysql-db-1-data:
+  mysql-db-2-data:
+  mysql-db-3-data:
+  mysql-db-4-data:
   mongo-db-1-data:
   mongo-db-2-data:
   mongo-db-3-data:
