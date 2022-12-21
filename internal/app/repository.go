@@ -26,9 +26,9 @@ func NewDefaultRepository(config *Config) (repository.Repository, error) {
 	var repo repository.Repository
 	if config.RepositoryProvider == repository.PROVIDER_MYSQL {
 		dbPrimary, err := db_mysql.NewClient(
-			db_mysql.WithAuth(config.MySQLMasterUser, config.MySQLMasterPassword),
-			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLMasterDBName}),
-			db_mysql.WithLocation(config.MySQLMasterHost, config.MySQLMasterPort),
+			db_mysql.WithAuth(config.MySQLPrimaryUser, config.MySQLPrimaryPassword),
+			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLPrimaryDBName}),
+			db_mysql.WithLocation(config.MySQLPrimaryHost, config.MySQLPrimaryPort),
 			db_mysql.ParseTime(),
 		)
 		if err != nil {
@@ -36,9 +36,9 @@ func NewDefaultRepository(config *Config) (repository.Repository, error) {
 		}
 
 		dbSecondary, err := db_mysql.NewClient(
-			db_mysql.WithAuth(config.MySQLReplicaUser, config.MySQLReplicaPassword),
-			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLReplicaDBName}),
-			db_mysql.WithLocation(config.MySQLReplicaHost, config.MySQLReplicaPort),
+			db_mysql.WithAuth(config.MySQLSecondaryUser, config.MySQLSecondaryPassword),
+			db_mysql.WithConfig(db_mysql.ClientConfig{DbName: config.MySQLSecondaryDBName}),
+			db_mysql.WithLocation(config.MySQLSecondaryHost, config.MySQLSecondaryPort),
 			db_mysql.ParseTime(),
 		)
 		if err != nil {
