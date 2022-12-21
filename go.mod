@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/go-seidon/provider v0.0.22-alpha
+	github.com/go-seidon/provider v0.0.23-alpha
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/mock v1.6.0
 	github.com/labstack/echo/v4 v4.9.1

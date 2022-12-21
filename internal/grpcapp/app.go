@@ -11,11 +11,11 @@ import (
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/grpcauth"
 	"github.com/go-seidon/hippo/internal/grpchandler"
-	"github.com/go-seidon/hippo/internal/grpclog"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/encoding/base64"
+	"github.com/go-seidon/provider/grpclog"
 	"github.com/go-seidon/provider/hashing/bcrypt"
 	"github.com/go-seidon/provider/health"
 	"github.com/go-seidon/provider/identity/ksuid"
@@ -154,7 +154,6 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 			grpcauth.UnaryServerInterceptor(grpcBasicAuth),
 		),
 		grpc.ChainStreamInterceptor(
-			grpclog.StreamServerInterceptor(grpcLogOpt...),
 			grpcauth.StreamServerInterceptor(grpcBasicAuth),
 		),
 	)
