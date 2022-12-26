@@ -15,6 +15,7 @@ import (
 	"github.com/go-seidon/hippo/internal/restmiddleware"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/datetime"
+	"github.com/go-seidon/provider/echoapp"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/hashing/bcrypt"
 	"github.com/go-seidon/provider/health"
@@ -113,13 +114,13 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 	if p.Server == nil {
 		e := echo.New()
 		e.Debug = p.Config.AppDebug
-		e.HTTPErrorHandler = NewErrorHandler(ErrorHandlerParam{
+		e.HTTPErrorHandler = echoapp.NewErrorHandler(echoapp.ErrorHandlerParam{
 			Debug:  p.Config.AppDebug,
 			Logger: logger,
 		})
 		e.Use(middleware.Recover())
 		e.Use(middleware.RequestID())
-		e.Use(NewRequestLog(RequestLogParam{
+		e.Use(echoapp.NewRequestLog(echoapp.RequestLogParam{
 			Logger: logger,
 		}))
 		server = &echoServer{e}
