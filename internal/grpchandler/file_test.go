@@ -8,9 +8,9 @@ import (
 
 	api "github.com/go-seidon/hippo/api/grpcapp"
 	mock_grpcapp "github.com/go-seidon/hippo/api/grpcapp/mock"
-	"github.com/go-seidon/hippo/internal/file"
-	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	"github.com/go-seidon/hippo/internal/grpchandler"
+	"github.com/go-seidon/hippo/internal/service"
+	mock_service "github.com/go-seidon/hippo/internal/service/mock"
 	mock_context "github.com/go-seidon/provider/context/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/go-seidon/provider/system"
@@ -22,24 +22,23 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Handler Package", func() {
-
+var _ = Describe("File Handler", func() {
 	Context("DeleteFileById function", Label("unit"), func() {
 		var (
 			handler     api.FileServiceServer
-			fileService *mock_file.MockFile
+			fileService *mock_service.MockFile
 			ctx         context.Context
 			currentTs   time.Time
 			p           *api.DeleteFileByIdParam
 			r           *api.DeleteFileByIdResult
-			delParam    file.DeleteFileParam
-			delRes      *file.DeleteFileResult
+			delParam    service.DeleteFileParam
+			delRes      *service.DeleteFileResult
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileService = mock_file.NewMockFile(ctrl)
+			fileService = mock_service.NewMockFile(ctrl)
 			handler = grpchandler.NewFile(grpchandler.FileParam{
 				FileClient: fileService,
 				Config:     &grpchandler.FileConfig{},
@@ -56,10 +55,10 @@ var _ = Describe("Handler Package", func() {
 					DeletedAt: currentTs.UnixMilli(),
 				},
 			}
-			delParam = file.DeleteFileParam{
+			delParam = service.DeleteFileParam{
 				FileId: "file-id",
 			}
-			delRes = &file.DeleteFileResult{
+			delRes = &service.DeleteFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success delete file",
@@ -153,7 +152,7 @@ var _ = Describe("Handler Package", func() {
 	Context("RetrieveFileById function", Label("unit"), func() {
 		var (
 			handler     api.FileServiceServer
-			fileService *mock_file.MockFile
+			fileService *mock_service.MockFile
 			ctx         *mock_context.MockContext
 			p           *api.RetrieveFileByIdParam
 			pendingRes  *api.RetrieveFileByIdResult
@@ -161,15 +160,15 @@ var _ = Describe("Handler Package", func() {
 			failedRes   *api.RetrieveFileByIdResult
 			successRes  *api.RetrieveFileByIdResult
 			stream      *mock_grpcapp.MockFileService_RetrieveFileByIdServer
-			retParam    file.RetrieveFileParam
-			retRes      *file.RetrieveFileResult
+			retParam    service.RetrieveFileParam
+			retRes      *service.RetrieveFileResult
 			rc          *mock_io.MockReadCloser
 		)
 
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileService = mock_file.NewMockFile(ctrl)
+			fileService = mock_service.NewMockFile(ctrl)
 			handler = grpchandler.NewFile(grpchandler.FileParam{
 				FileClient: fileService,
 				Config:     &grpchandler.FileConfig{},
@@ -195,11 +194,11 @@ var _ = Describe("Handler Package", func() {
 				Message: "success retrieve file",
 			}
 			stream = mock_grpcapp.NewMockFileService_RetrieveFileByIdServer(ctrl)
-			retParam = file.RetrieveFileParam{
+			retParam = service.RetrieveFileParam{
 				FileId: "file-id",
 			}
 			rc = mock_io.NewMockReadCloser(ctrl)
-			retRes = &file.RetrieveFileResult{
+			retRes = &service.RetrieveFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success retrieve file",
@@ -888,7 +887,7 @@ var _ = Describe("Handler Package", func() {
 	Context("UploadFile function", Label("unit"), func() {
 		var (
 			handler     api.FileServiceServer
-			fileService *mock_file.MockFile
+			fileService *mock_service.MockFile
 			ctx         *mock_context.MockContext
 			currentTs   time.Time
 			stream      *mock_grpcapp.MockFileService_UploadFileServer
@@ -897,7 +896,7 @@ var _ = Describe("Handler Package", func() {
 		BeforeEach(func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileService = mock_file.NewMockFile(ctrl)
+			fileService = mock_service.NewMockFile(ctrl)
 			handler = grpchandler.NewFile(grpchandler.FileParam{
 				FileClient: fileService,
 				Config: &grpchandler.FileConfig{
@@ -1497,7 +1496,7 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(1)
 
-				uploadRes := &file.UploadFileResult{
+				uploadRes := &service.UploadFileResult{
 					Success: system.Success{
 						Code:    1000,
 						Message: "success upload file",
@@ -1593,7 +1592,7 @@ var _ = Describe("Handler Package", func() {
 					Return(ctx).
 					Times(1)
 
-				uploadRes := &file.UploadFileResult{
+				uploadRes := &service.UploadFileResult{
 					Success: system.Success{
 						Code:    1000,
 						Message: "success upload file",

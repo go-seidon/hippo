@@ -15,10 +15,10 @@ type dailyRotate struct {
 }
 
 func (l *dailyRotate) GetLocation() string {
-	currentTimestamp := l.clock.Now()
-	year := currentTimestamp.Format("2006")
-	month := currentTimestamp.Format("01")
-	day := currentTimestamp.Format("02")
+	currentTs := l.clock.Now()
+	year := currentTs.Format("2006")
+	month := currentTs.Format("01")
+	day := currentTs.Format("02")
 	return fmt.Sprintf("%s/%s/%s", year, month, day)
 }
 

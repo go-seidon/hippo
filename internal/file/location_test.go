@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Daily Rotate Service", func() {
+var _ = Describe("Daily Rotate Location", func() {
 	Context("NewDailyRotate function", Label("unit"), func() {
 		var (
 			p     file.DailyRotateParam

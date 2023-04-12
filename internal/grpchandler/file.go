@@ -8,19 +8,19 @@ import (
 	"io"
 
 	"github.com/go-seidon/hippo/api/grpcapp"
-	"github.com/go-seidon/hippo/internal/file"
+	"github.com/go-seidon/hippo/internal/service"
 	"github.com/go-seidon/provider/status"
 	"google.golang.org/grpc/metadata"
 )
 
 type fileHandler struct {
 	grpcapp.UnimplementedFileServiceServer
-	fileClient file.File
+	fileClient service.File
 	config     *FileConfig
 }
 
 func (h *fileHandler) DeleteFileById(ctx context.Context, p *grpcapp.DeleteFileByIdParam) (*grpcapp.DeleteFileByIdResult, error) {
-	deletion, err := h.fileClient.DeleteFile(ctx, file.DeleteFileParam{
+	deletion, err := h.fileClient.DeleteFile(ctx, service.DeleteFileParam{
 		FileId: p.FileId,
 	})
 	if err != nil {
@@ -42,7 +42,7 @@ func (h *fileHandler) DeleteFileById(ctx context.Context, p *grpcapp.DeleteFileB
 }
 
 func (h *fileHandler) RetrieveFileById(p *grpcapp.RetrieveFileByIdParam, stream grpcapp.FileService_RetrieveFileByIdServer) error {
-	retrieval, rerr := h.fileClient.RetrieveFile(stream.Context(), file.RetrieveFileParam{
+	retrieval, rerr := h.fileClient.RetrieveFile(stream.Context(), service.RetrieveFileParam{
 		FileId: p.FileId,
 	})
 	if rerr != nil {
@@ -191,13 +191,13 @@ func (h *fileHandler) UploadFile(stream grpcapp.FileService_UploadFileServer) er
 
 	upload, uerr := h.fileClient.UploadFile(
 		stream.Context(),
-		file.WithFileInfo(
+		service.WithFileInfo(
 			fileInfo.Name,
 			fileInfo.Mimetype,
 			fileInfo.Extension,
 			fileSize,
 		),
-		file.WithReader(fileReader),
+		service.WithReader(fileReader),
 	)
 	if uerr != nil {
 		res := &grpcapp.UploadFileResult{
@@ -236,7 +236,7 @@ type FileConfig struct {
 }
 
 type FileParam struct {
-	FileClient file.File
+	FileClient service.File
 	Config     *FileConfig
 }
 

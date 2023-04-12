@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/hippo/internal/grpchandler"
 	"github.com/go-seidon/hippo/internal/healthcheck"
 	"github.com/go-seidon/hippo/internal/repository"
+	"github.com/go-seidon/hippo/internal/service"
 	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/encoding/base64"
 	"github.com/go-seidon/provider/grpclog"
@@ -115,7 +116,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 	clock := datetime.NewClock()
 	locator := file.NewDailyRotate(file.DailyRotateParam{})
 
-	fileClient := file.NewFile(file.FileParam{
+	fileClient := service.NewFile(service.FileParam{
 		FileRepo:    repo.GetFile(),
 		FileManager: fileManager,
 		Logger:      logger,
@@ -124,7 +125,7 @@ func NewGrpcApp(opts ...GrpcAppOption) (*grpcApp, error) {
 		DirManager:  dirManager,
 		Locator:     locator,
 		Validator:   govalidator,
-		Config: &file.FileConfig{
+		Config: &service.FileConfig{
 			UploadDir: p.Config.UploadDirectory,
 		},
 	})

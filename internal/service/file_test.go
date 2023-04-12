@@ -1,11 +1,10 @@
-package file_test
+package service_test
 
 import (
 	"context"
 	"fmt"
 	"io"
 	"os"
-	"testing"
 	"time"
 
 	"github.com/go-seidon/hippo/internal/file"
@@ -14,6 +13,7 @@ import (
 	mock_filesystem "github.com/go-seidon/hippo/internal/filesystem/mock"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
+	"github.com/go-seidon/hippo/internal/service"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
 	mock_io "github.com/go-seidon/provider/io/mock"
@@ -26,24 +26,18 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestFile(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "File Package")
-}
-
-var _ = Describe("File", func() {
-
+var _ = Describe("File Service", func() {
 	Context("RetrieveFile function", Label("unit"), func() {
 		var (
 			ctx           context.Context
 			currentTs     time.Time
-			p             file.RetrieveFileParam
-			r             *file.RetrieveFileResult
+			p             service.RetrieveFileParam
+			r             *service.RetrieveFileResult
 			fileRepo      *mock_repository.MockFile
 			fileManager   *mock_filesystem.MockFileManager
 			log           *mock_logging.MockLogger
 			validator     *mock_validation.MockValidator
-			s             file.File
+			s             service.File
 			retrieveParam repository.RetrieveFileParam
 			retrieveRes   *repository.RetrieveFileResult
 			openParam     filesystem.OpenFileParam
@@ -53,7 +47,7 @@ var _ = Describe("File", func() {
 		BeforeEach(func() {
 			ctx = context.Background()
 			currentTs = time.Now().UTC()
-			p = file.RetrieveFileParam{
+			p = service.RetrieveFileParam{
 				FileId: "mock-file-id",
 			}
 			t := GinkgoT()
@@ -65,7 +59,7 @@ var _ = Describe("File", func() {
 			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
-			s = file.NewFile(file.FileParam{
+			s = service.NewFile(service.FileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
 				DirManager:  dirManager,
@@ -73,7 +67,7 @@ var _ = Describe("File", func() {
 				Logger:      log,
 				Locator:     locator,
 				Validator:   validator,
-				Config: &file.FileConfig{
+				Config: &service.FileConfig{
 					UploadDir: "temp",
 				},
 			})
@@ -94,7 +88,7 @@ var _ = Describe("File", func() {
 			openRes = &filesystem.OpenFileResult{
 				File: osFile,
 			}
-			r = &file.RetrieveFileResult{
+			r = &service.RetrieveFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success retrieve file",
@@ -304,12 +298,12 @@ var _ = Describe("File", func() {
 			clock          *mock_datetime.MockClock
 			locator        *mock_file.MockUploadLocation
 			validator      *mock_validation.MockValidator
-			s              file.File
+			s              service.File
 			dirExistsParam filesystem.IsDirectoryExistsParam
 			createDirParam filesystem.CreateDirParam
 			createFileRes  *repository.CreateFileResult
-			opts           []file.UploadFileOption
-			r              *file.UploadFileResult
+			opts           []service.UploadFileOption
+			r              *service.UploadFileResult
 		)
 
 		BeforeEach(func() {
@@ -326,7 +320,7 @@ var _ = Describe("File", func() {
 			locator = mock_file.NewMockUploadLocation(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
 			reader = mock_io.NewMockReader(ctrl)
-			s = file.NewFile(file.FileParam{
+			s = service.NewFile(service.FileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
 				DirManager:  dirManager,
@@ -335,7 +329,7 @@ var _ = Describe("File", func() {
 				Clock:       clock,
 				Locator:     locator,
 				Validator:   validator,
-				Config: &file.FileConfig{
+				Config: &service.FileConfig{
 					UploadDir: "temp",
 				},
 			})
@@ -355,11 +349,11 @@ var _ = Describe("File", func() {
 				Size:      200,
 				CreatedAt: currentTs,
 			}
-			dataOpt := file.WithReader(reader)
-			infoOpt := file.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
+			dataOpt := service.WithReader(reader)
+			infoOpt := service.WithFileInfo("mock-name", "image/jpeg", "jpg", 100)
 			opts = append(opts, dataOpt)
 			opts = append(opts, infoOpt)
-			r = &file.UploadFileResult{
+			r = &service.UploadFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success upload file",
@@ -507,7 +501,7 @@ var _ = Describe("File", func() {
 					Return(0, fmt.Errorf("disk error")).
 					Times(1)
 
-				fwOpt := file.WithReader(reader)
+				fwOpt := service.WithReader(reader)
 				copts := opts
 				copts = append(copts, fwOpt)
 
@@ -553,7 +547,7 @@ var _ = Describe("File", func() {
 					Return("", fmt.Errorf("generate error")).
 					Times(1)
 
-				fwOpt := file.WithReader(reader)
+				fwOpt := service.WithReader(reader)
 				copts := opts
 				copts = append(copts, fwOpt)
 
@@ -696,7 +690,7 @@ var _ = Describe("File", func() {
 			ctrl := gomock.NewController(t)
 			data = []byte{}
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			fn = file.NewCreateFn(data, fileManager)
+			fn = service.NewCreateFn(data, fileManager)
 			createFnParam = repository.CreateFnParam{
 				FilePath: "mock/path/name.jpg",
 			}
@@ -784,21 +778,21 @@ var _ = Describe("File", func() {
 		var (
 			ctx         context.Context
 			currentTs   time.Time
-			p           file.DeleteFileParam
+			p           service.DeleteFileParam
 			fileRepo    *mock_repository.MockFile
 			fileManager *mock_filesystem.MockFileManager
 			clock       *mock_datetime.MockClock
 			log         *mock_logging.MockLogger
 			validator   *mock_validation.MockValidator
-			s           file.File
+			s           service.File
 			deleteRes   *repository.DeleteFileResult
-			r           *file.DeleteFileResult
+			r           *service.DeleteFileResult
 		)
 
 		BeforeEach(func() {
 			currentTs = time.Now().UTC()
 			ctx = context.Background()
-			p = file.DeleteFileParam{
+			p = service.DeleteFileParam{
 				FileId: "mock-file-id",
 			}
 			t := GinkgoT()
@@ -811,7 +805,7 @@ var _ = Describe("File", func() {
 			locator := mock_file.NewMockUploadLocation(ctrl)
 			log = mock_logging.NewMockLogger(ctrl)
 			validator = mock_validation.NewMockValidator(ctrl)
-			s = file.NewFile(file.FileParam{
+			s = service.NewFile(service.FileParam{
 				FileRepo:    fileRepo,
 				FileManager: fileManager,
 				DirManager:  dirManager,
@@ -820,14 +814,14 @@ var _ = Describe("File", func() {
 				Clock:       clock,
 				Locator:     locator,
 				Validator:   validator,
-				Config: &file.FileConfig{
+				Config: &service.FileConfig{
 					UploadDir: "temp",
 				},
 			})
 			deleteRes = &repository.DeleteFileResult{
 				DeletedAt: currentTs,
 			}
-			r = &file.DeleteFileResult{
+			r = &service.DeleteFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success delete file",
@@ -990,7 +984,7 @@ var _ = Describe("File", func() {
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
 			fileManager = mock_filesystem.NewMockFileManager(ctrl)
-			fn = file.NewDeleteFn(fileManager)
+			fn = service.NewDeleteFn(fileManager)
 			deleteFnParam = repository.DeleteFnParam{
 				FilePath: "mock/path",
 			}
