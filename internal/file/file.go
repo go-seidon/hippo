@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/go-seidon/hippo/internal/filesystem"
@@ -34,9 +35,9 @@ func WithReader(w io.Reader) UploadFileOption {
 
 func WithFileInfo(name, mimetype, extension string, size int64) UploadFileOption {
 	return func(p *UploadFileParam) {
-		p.fileName = name
-		p.fileMimetype = mimetype
-		p.fileExtension = extension
+		p.fileName = strings.ToLower(name)
+		p.fileMimetype = strings.ToLower(mimetype)
+		p.fileExtension = strings.ToLower(extension)
 		p.fileSize = size
 	}
 }
