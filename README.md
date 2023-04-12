@@ -172,7 +172,6 @@ C:\Windows\System32\drivers\etc\hosts
 - grafana data visualization
 3. Devs: Tracing
 - open telemetry (https://opentelemetry.io/)
-
 4. Upload docker image to docker hub
 
 ## Nice to have
@@ -180,10 +179,8 @@ C:\Windows\System32\drivers\etc\hosts
 2. Add repo: `postgre`
 3. Update github workflow (cqc.yml) instead of running docker-compose prefer o use mongo docker services
 4. Separate unit test and integration test workflow (cqc.yml)
-
-## Tech Debt
-1. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
-2. Change NewDailyRotate using optional param
+5. Store directory checking result in memory when uploading file to reduce r/w to the disk (dirManager)
+6. Change NewDailyRotate using optional param
 
 ## Issue
 1. Verify script EOL
