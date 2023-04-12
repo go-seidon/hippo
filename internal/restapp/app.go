@@ -169,7 +169,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			HealthClient: healthCheck,
 		})
 
-		authClient := auth.NewAuthClient(auth.AuthClientParam{
+		authClient := service.NewAuthClient(service.AuthClientParam{
 			Validator:  govalidator,
 			Hasher:     bcryptHasher,
 			Identifier: ksuIdentifier,
