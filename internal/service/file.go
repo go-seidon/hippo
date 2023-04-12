@@ -1,4 +1,4 @@
-package file
+package service
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-seidon/hippo/internal/file"
 	"github.com/go-seidon/hippo/internal/filesystem"
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/provider/datetime"
@@ -85,19 +86,21 @@ type DeleteFileResult struct {
 	DeletedAt time.Time
 }
 
-type file struct {
+var _ File = (*fileService)(nil)
+
+type fileService struct {
 	fileRepo    repository.File
 	fileManager filesystem.FileManager
 	dirManager  filesystem.DirectoryManager
 	identifier  identity.Identifier
 	clock       datetime.Clock
 	log         logging.Logger
-	locator     UploadLocation
+	locator     file.UploadLocation
 	validator   validation.Validator
 	config      *FileConfig
 }
 
-func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, *system.Error) {
+func (s *fileService) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*RetrieveFileResult, *system.Error) {
 	s.log.Debug("In function: RetrieveFile")
 	defer s.log.Debug("Returning function: RetrieveFile")
 
@@ -164,7 +167,7 @@ func (s *file) RetrieveFile(ctx context.Context, p RetrieveFileParam) (*Retrieve
 	return res, nil
 }
 
-func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, *system.Error) {
+func (s *fileService) UploadFile(ctx context.Context, opts ...UploadFileOption) (*UploadFileResult, *system.Error) {
 	s.log.Debug("In function: UploadFile")
 	defer s.log.Debug("Returning function: UploadFile")
 
@@ -269,7 +272,7 @@ func (s *file) UploadFile(ctx context.Context, opts ...UploadFileOption) (*Uploa
 	return res, nil
 }
 
-func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, *system.Error) {
+func (s *fileService) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileResult, *system.Error) {
 	s.log.Debug("In function: DeleteFile")
 	defer s.log.Debug("Returning function: DeleteFile")
 
@@ -293,7 +296,7 @@ func (s *file) DeleteFile(ctx context.Context, p DeleteFileParam) (*DeleteFileRe
 				Code:    status.RESOURCE_NOTFOUND,
 				Message: "file is deleted",
 			}
-		} else if errors.Is(err, repository.ErrNotFound) || errors.Is(err, ErrNotFound) {
+		} else if errors.Is(err, repository.ErrNotFound) || errors.Is(err, file.ErrNotFound) {
 			return nil, &system.Error{
 				Code:    status.RESOURCE_NOTFOUND,
 				Message: "file is not found",
@@ -324,7 +327,7 @@ func NewCreateFn(data []byte, fileManager filesystem.FileManager) repository.Cre
 			return err
 		}
 		if exists {
-			return ErrExists
+			return file.ErrExists
 		}
 
 		_, err = fileManager.SaveFile(ctx, filesystem.SaveFileParam{
@@ -350,7 +353,7 @@ func NewDeleteFn(fileManager filesystem.FileManager) repository.DeleteFn {
 		}
 
 		if !exists {
-			return ErrNotFound
+			return file.ErrNotFound
 		}
 
 		_, err = fileManager.RemoveFile(ctx, filesystem.RemoveFileParam{
@@ -375,13 +378,13 @@ type FileParam struct {
 	Logger      logging.Logger
 	Identifier  identity.Identifier
 	Clock       datetime.Clock
-	Locator     UploadLocation
+	Locator     file.UploadLocation
 	Validator   validation.Validator
 	Config      *FileConfig
 }
 
-func NewFile(p FileParam) *file {
-	return &file{
+func NewFile(p FileParam) *fileService {
+	return &fileService{
 		fileRepo:    p.FileRepo,
 		fileManager: p.FileManager,
 		dirManager:  p.DirManager,

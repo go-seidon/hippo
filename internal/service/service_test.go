@@ -1,4 +1,4 @@
-package file_test
+package service_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestFile(t *testing.T) {
+func TestService(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "File Package")
+	RunSpecs(t, "Service Package")
 }

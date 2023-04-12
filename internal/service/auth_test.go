@@ -1,13 +1,13 @@
-package auth_test
+package service_test
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/go-seidon/hippo/internal/auth"
 	"github.com/go-seidon/hippo/internal/repository"
 	mock_repository "github.com/go-seidon/hippo/internal/repository/mock"
+	"github.com/go-seidon/hippo/internal/service"
 	mock_datetime "github.com/go-seidon/provider/datetime/mock"
 	mock_hashing "github.com/go-seidon/provider/hashing/mock"
 	mock_identifier "github.com/go-seidon/provider/identity/mock"
@@ -18,15 +18,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Client Package", func() {
-
+var _ = Describe("Auth Client Package", func() {
 	Context("CreateClient function", Label("unit"), func() {
-
 		var (
 			ctx         context.Context
 			currentTs   time.Time
-			authClient  auth.AuthClient
-			p           auth.CreateClientParam
+			authClient  service.AuthClient
+			p           service.CreateClientParam
 			validator   *mock_validation.MockValidator
 			identifier  *mock_identifier.MockIdentifier
 			hasher      *mock_hashing.MockHasher
@@ -46,14 +44,14 @@ var _ = Describe("Client Package", func() {
 			hasher = mock_hashing.NewMockHasher(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
 			authRepo = mock_repository.NewMockAuth(ctrl)
-			authClient = auth.NewAuthClient(auth.AuthClientParam{
+			authClient = service.NewAuthClient(service.AuthClientParam{
 				Validator:  validator,
 				Hasher:     hasher,
 				Identifier: identifier,
 				Clock:      clock,
 				AuthRepo:   authRepo,
 			})
-			p = auth.CreateClientParam{
+			p = service.CreateClientParam{
 				ClientId:     "client-id",
 				ClientSecret: "client-secret",
 				Name:         "client-name",
@@ -277,9 +275,9 @@ var _ = Describe("Client Package", func() {
 		var (
 			ctx        context.Context
 			currentTs  time.Time
-			authClient auth.AuthClient
-			param      auth.FindClientByIdParam
-			result     *auth.FindClientByIdResult
+			authClient service.AuthClient
+			param      service.FindClientByIdParam
+			result     *service.FindClientByIdResult
 			validator  *mock_validation.MockValidator
 			identifier *mock_identifier.MockIdentifier
 			hasher     *mock_hashing.MockHasher
@@ -299,7 +297,7 @@ var _ = Describe("Client Package", func() {
 			hasher = mock_hashing.NewMockHasher(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
 			authRepo = mock_repository.NewMockAuth(ctrl)
-			authClient = auth.NewAuthClient(auth.AuthClientParam{
+			authClient = service.NewAuthClient(service.AuthClientParam{
 				Validator:  validator,
 				Hasher:     hasher,
 				Identifier: identifier,
@@ -307,7 +305,7 @@ var _ = Describe("Client Package", func() {
 				AuthRepo:   authRepo,
 			})
 
-			param = auth.FindClientByIdParam{
+			param = service.FindClientByIdParam{
 				Id: "client-id",
 			}
 			findParam = repository.FindClientParam{
@@ -322,7 +320,7 @@ var _ = Describe("Client Package", func() {
 				Status:       "active",
 				CreatedAt:    currentTs,
 			}
-			result = &auth.FindClientByIdResult{
+			result = &service.FindClientByIdResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success find auth client",
@@ -420,12 +418,11 @@ var _ = Describe("Client Package", func() {
 	})
 
 	Context("UpdateClientById function", Label("unit"), func() {
-
 		var (
 			ctx         context.Context
 			currentTs   time.Time
-			authClient  auth.AuthClient
-			p           auth.UpdateClientByIdParam
+			authClient  service.AuthClient
+			p           service.UpdateClientByIdParam
 			validator   *mock_validation.MockValidator
 			identifier  *mock_identifier.MockIdentifier
 			hasher      *mock_hashing.MockHasher
@@ -445,14 +442,14 @@ var _ = Describe("Client Package", func() {
 			hasher = mock_hashing.NewMockHasher(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
 			authRepo = mock_repository.NewMockAuth(ctrl)
-			authClient = auth.NewAuthClient(auth.AuthClientParam{
+			authClient = service.NewAuthClient(service.AuthClientParam{
 				Validator:  validator,
 				Hasher:     hasher,
 				Identifier: identifier,
 				Clock:      clock,
 				AuthRepo:   authRepo,
 			})
-			p = auth.UpdateClientByIdParam{
+			p = service.UpdateClientByIdParam{
 				Id:       "id",
 				ClientId: "client-id",
 				Name:     "client-name",
@@ -586,12 +583,11 @@ var _ = Describe("Client Package", func() {
 	})
 
 	Context("SearchClient function", Label("unit"), func() {
-
 		var (
 			ctx         context.Context
 			currentTs   time.Time
-			authClient  auth.AuthClient
-			p           auth.SearchClientParam
+			authClient  service.AuthClient
+			p           service.SearchClientParam
 			validator   *mock_validation.MockValidator
 			identifier  *mock_identifier.MockIdentifier
 			hasher      *mock_hashing.MockHasher
@@ -611,14 +607,14 @@ var _ = Describe("Client Package", func() {
 			hasher = mock_hashing.NewMockHasher(ctrl)
 			clock = mock_datetime.NewMockClock(ctrl)
 			authRepo = mock_repository.NewMockAuth(ctrl)
-			authClient = auth.NewAuthClient(auth.AuthClientParam{
+			authClient = service.NewAuthClient(service.AuthClientParam{
 				Validator:  validator,
 				Hasher:     hasher,
 				Identifier: identifier,
 				Clock:      clock,
 				AuthRepo:   authRepo,
 			})
-			p = auth.SearchClientParam{
+			p = service.SearchClientParam{
 				Keyword:    "goseidon",
 				TotalItems: 24,
 				Page:       2,

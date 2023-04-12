@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/go-seidon/hippo/api/restapp"
-	"github.com/go-seidon/hippo/internal/file"
-	mock_file "github.com/go-seidon/hippo/internal/file/mock"
 	"github.com/go-seidon/hippo/internal/resthandler"
+	"github.com/go-seidon/hippo/internal/service"
+	mock_service "github.com/go-seidon/hippo/internal/service/mock"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	mock_io "github.com/go-seidon/provider/io/mock"
 	"github.com/go-seidon/provider/system"
@@ -29,9 +29,9 @@ var _ = Describe("File Handler", func() {
 			ctx        echo.Context
 			h          func(ctx echo.Context) error
 			rec        *httptest.ResponseRecorder
-			fileClient *mock_file.MockFile
+			fileClient *mock_service.MockFile
 			fileData   *mock_io.MockReadAtSeekCloser
-			uploadRes  *file.UploadFileResult
+			uploadRes  *service.UploadFileResult
 		)
 
 		BeforeEach(func() {
@@ -86,7 +86,7 @@ var _ = Describe("File Handler", func() {
 
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileClient = mock_file.NewMockFile(ctrl)
+			fileClient = mock_service.NewMockFile(ctrl)
 			fileData = mock_io.NewMockReadAtSeekCloser(ctrl)
 			fileHandler := resthandler.NewFile(resthandler.FileParam{
 				FileClient: fileClient,
@@ -101,7 +101,7 @@ var _ = Describe("File Handler", func() {
 				},
 			})
 			h = fileHandler.UploadFile
-			uploadRes = &file.UploadFileResult{
+			uploadRes = &service.UploadFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success upload file",
@@ -253,9 +253,9 @@ var _ = Describe("File Handler", func() {
 			ctx        echo.Context
 			h          func(ctx echo.Context) error
 			rec        *httptest.ResponseRecorder
-			fileClient *mock_file.MockFile
-			findParam  file.RetrieveFileParam
-			findRes    *file.RetrieveFileResult
+			fileClient *mock_service.MockFile
+			findParam  service.RetrieveFileParam
+			findRes    *service.RetrieveFileResult
 			fileData   *mock_io.MockReadCloser
 		)
 
@@ -271,16 +271,16 @@ var _ = Describe("File Handler", func() {
 
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileClient = mock_file.NewMockFile(ctrl)
+			fileClient = mock_service.NewMockFile(ctrl)
 			fileHandler := resthandler.NewFile(resthandler.FileParam{
 				FileClient: fileClient,
 			})
 			h = fileHandler.RetrieveFileById
-			findParam = file.RetrieveFileParam{
+			findParam = service.RetrieveFileParam{
 				FileId: "id",
 			}
 			fileData = mock_io.NewMockReadCloser(ctrl)
-			findRes = &file.RetrieveFileResult{
+			findRes = &service.RetrieveFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success retrieve file",
@@ -397,9 +397,9 @@ var _ = Describe("File Handler", func() {
 			ctx         echo.Context
 			h           func(ctx echo.Context) error
 			rec         *httptest.ResponseRecorder
-			fileClient  *mock_file.MockFile
-			deleteParam file.DeleteFileParam
-			deleteRes   *file.DeleteFileResult
+			fileClient  *mock_service.MockFile
+			deleteParam service.DeleteFileParam
+			deleteRes   *service.DeleteFileResult
 		)
 
 		BeforeEach(func() {
@@ -416,15 +416,15 @@ var _ = Describe("File Handler", func() {
 
 			t := GinkgoT()
 			ctrl := gomock.NewController(t)
-			fileClient = mock_file.NewMockFile(ctrl)
+			fileClient = mock_service.NewMockFile(ctrl)
 			fileHandler := resthandler.NewFile(resthandler.FileParam{
 				FileClient: fileClient,
 			})
 			h = fileHandler.DeleteFileById
-			deleteParam = file.DeleteFileParam{
+			deleteParam = service.DeleteFileParam{
 				FileId: "id",
 			}
-			deleteRes = &file.DeleteFileResult{
+			deleteRes = &service.DeleteFileResult{
 				Success: system.Success{
 					Code:    1000,
 					Message: "success delete file",

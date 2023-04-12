@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/go-seidon/hippo/api/restapp"
-	"github.com/go-seidon/hippo/internal/file"
+	"github.com/go-seidon/hippo/internal/service"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/status"
 	"github.com/labstack/echo/v4"
 )
 
 type fileHandler struct {
-	fileClient file.File
+	fileClient service.File
 	fileParser multipart.Parser
 }
 
@@ -36,8 +36,8 @@ func (h *fileHandler) UploadFile(ctx echo.Context) error {
 
 	uploadFile, err := h.fileClient.UploadFile(
 		ctx.Request().Context(),
-		file.WithReader(fileInfo.Data),
-		file.WithFileInfo(
+		service.WithReader(fileInfo.Data),
+		service.WithFileInfo(
 			fileInfo.Name,
 			fileInfo.Mimetype,
 			fileInfo.Extension,
@@ -71,7 +71,7 @@ func (h *fileHandler) UploadFile(ctx echo.Context) error {
 }
 
 func (h *fileHandler) RetrieveFileById(ctx echo.Context) error {
-	findFile, err := h.fileClient.RetrieveFile(ctx.Request().Context(), file.RetrieveFileParam{
+	findFile, err := h.fileClient.RetrieveFile(ctx.Request().Context(), service.RetrieveFileParam{
 		FileId: ctx.Param("id"),
 	})
 	if err != nil {
@@ -98,7 +98,7 @@ func (h *fileHandler) RetrieveFileById(ctx echo.Context) error {
 }
 
 func (h *fileHandler) DeleteFileById(ctx echo.Context) error {
-	deleteFile, err := h.fileClient.DeleteFile(ctx.Request().Context(), file.DeleteFileParam{
+	deleteFile, err := h.fileClient.DeleteFile(ctx.Request().Context(), service.DeleteFileParam{
 		FileId: ctx.Param("id"),
 	})
 	if err != nil {
@@ -125,7 +125,7 @@ func (h *fileHandler) DeleteFileById(ctx echo.Context) error {
 }
 
 type FileParam struct {
-	FileClient file.File
+	FileClient service.File
 	FileParser multipart.Parser
 }
 

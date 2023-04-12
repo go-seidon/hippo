@@ -13,6 +13,7 @@ import (
 	"github.com/go-seidon/hippo/internal/repository"
 	"github.com/go-seidon/hippo/internal/resthandler"
 	"github.com/go-seidon/hippo/internal/restmiddleware"
+	"github.com/go-seidon/hippo/internal/service"
 	"github.com/go-seidon/hippo/internal/storage/multipart"
 	"github.com/go-seidon/provider/datetime"
 	"github.com/go-seidon/provider/echoapp"
@@ -141,7 +142,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			AuthRepo: repo.GetAuth(),
 		})
 
-		fileClient := file.NewFile(file.FileParam{
+		fileClient := service.NewFile(service.FileParam{
 			FileRepo:    repo.GetFile(),
 			FileManager: fileManager,
 			Logger:      logger,
@@ -150,7 +151,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			DirManager:  dirManager,
 			Locator:     locator,
 			Validator:   govalidator,
-			Config: &file.FileConfig{
+			Config: &service.FileConfig{
 				UploadDir: p.Config.UploadDirectory,
 			},
 		})
@@ -168,7 +169,7 @@ func NewRestApp(opts ...RestAppOption) (*restApp, error) {
 			HealthClient: healthCheck,
 		})
 
-		authClient := auth.NewAuthClient(auth.AuthClientParam{
+		authClient := service.NewAuthClient(service.AuthClientParam{
 			Validator:  govalidator,
 			Hasher:     bcryptHasher,
 			Identifier: ksuIdentifier,
